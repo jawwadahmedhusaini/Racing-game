@@ -1,31 +1,84 @@
-# APEX RUSH — browser racing game
+# APEX RUSH
 
-[Download APEX-RUSH.zip](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
+A complete, independent single-player browser arcade racer: pick a car, choose a circuit, race, earn credits, upgrade your garage, and play again. Inspired by the excitement of premium arcade racing, with original game design and properly licensed assets. This is not an Asphalt product and does not claim Asphalt 9 production quality.
 
-## Play
+## Play online or download
 
-1. Download and unzip the complete archive, then open the `APEX-RUSH` folder.
-2. Install Python 3 if it is not already available.
-3. Windows: double-click `START-WINDOWS.bat`.
-4. macOS/Linux: open a terminal in the extracted folder and run `python3 start-game.py`.
-5. The game opens in your browser. Keep the launcher window open while playing.
+[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.0](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
 
-Use a modern browser with WebGL 2 and hardware acceleration. All assets are bundled; no game account, API key or internet connection is required after download. The `web` folder can also be served by any static HTTP server. Opening `index.html` directly does not load the game correctly.
+The online link requires the repository's GitHub Pages deployment to be enabled; see [HOSTING.md](HOSTING.md). If your browser still shows the previous build, refresh the page. Version 2.0 fixes reversed steering and removes automatic corner-following, rebuilds both environments, and adds a detailed race car, improved materials, contact shading and antialiasing.
 
-## Controls
+## Play and develop
 
-W/Up: accelerate. S/Down: brake. A/D or Left/Right: steer. Space + steering: drift. Shift: nitro. C: camera. R: recover. Escape: pause. Touch controls and optional auto-acceleration are included.
+For the packaged release, unzip `artifacts/apex-rush-web.zip`, then run `START-WINDOWS.bat` on Windows or `python3 start-game.py` on macOS/Linux. Python 3 is the only launcher prerequisite; the launcher opens the game in your browser. Keep its terminal window open while playing. The release includes all game assets and needs no internet connection after download.
+
+To run the editable source:
+
+Requires Node.js 22.12+ (Node 24 tested) and a modern browser with WebGL 2 and hardware acceleration.
+
+```sh
+npm ci
+npm run dev
+```
+
+Open the local address printed by Vite in your browser. The development server uses port 5173. No account, backend, API key or paid service is required. All game assets and fonts are served locally; gameplay makes no external requests.
+
+For a production build:
+
+```sh
+npm run build
+npm run preview
+```
+
+The complete static game is in `dist/`. Serve the contents of that directory with any HTTP server. Do not double-click `index.html`: browser security restrictions require HTTP for the model and modules. If you have Python, `python3 -m http.server 8000 --directory dist` serves the build. For GitHub Pages at `/Racing-game/`, use `npm run build:pages` and the activation steps in [HOSTING.md](HOSTING.md). Models and other assets respect the configured hosting base path.
 
 ## Included
 
-Two circuits, three tuned concept-car variants, AI rivals, quick race, time attack, elimination, a four-event career, upgrades and browser-local saved progress. This is an independent indie game and does not claim Asphalt 9 production quality. Real-device performance remains untested.
+- Reflective 3D garage with three tuned concept-car variants, six paint finishes, unlocks and three upgrade levels.
+- A professionally authored, licensed car chassis with a modeled cockpit, treaded tires, animated wheels, lights and original aero packages.
+- Costa Aurelia: a coastal circuit with elevation, bridges, palms, ridged terrain and textured hills, 3D vegetation, ocean shading and HDR reflections.
+- Neon Harbor: a waterfront city circuit with facade detail, streetlights, headlights and damp asphalt.
+- Detailed player car during races, LED rear lights, clearcoat paint, fitted rear vents, high-quality contact shading and multisample antialiasing.
+- Four rendering presets; High/Ultra enable ambient occlusion and restrained bloom.
+- Six-driver quick races, solo time attack, elimination races and a four-event career.
+- Fixed-step arcade dynamics with manual heading-based steering, braking, drifting, nitro, shockwave, contact, jumps and recovery.
+- Live rivals with speed planning, lane choice, overtaking, boost and collision responses.
+- Countdown, lap progress, minimap, position, speed, timer, results, rewards and replay.
+- Synthesized engine, tire, wind, boost, collision, countdown and background music.
+- Keyboard and touch input, pause/resume, three chase-camera distances, quality presets and audio controls.
+- Validated browser-local progress, settings, best times and purchases.
 
-Asset attribution and licenses are available in the game's Settings and the bundled `web/licenses` folder. See `PLAY-ME.txt` inside the archive for more details.
+## Controls
 
-The ZIP checksum is in [SHA256SUMS.txt](downloads/SHA256SUMS.txt).
+| Action | Keyboard |
+| --- | --- |
+| Accelerate | W / Up |
+| Brake | S / Down |
+| Steer | A, D / Left, Right |
+| Drift | Hold Space while steering |
+| Nitro | Shift |
+| Change chase camera | C |
+| Recover to the road center | R |
+| Pause / resume | Escape |
 
-## Play from a web link
+Brake before bends and steer through them: holding forward alone no longer turns the car. Left/right match the chase-camera view. Drifting and clean landings recharge nitro. Activate boost with a full meter for a shockwave. The outside lane has a marked ramp. Auto-acceleration is optional in Settings. Touch controls appear on touch devices; landscape gives the best view.
 
-The browser site is prepared on the `gh-pages` branch. Enable **Settings → Pages → Deploy from a branch → gh-pages → / (root)** and save. See [HOSTING.md](HOSTING.md) for instructions.
+Progress belongs to the current browser profile and origin. Clearing site data clears progress. No cloud synchronization is implemented.
 
-After deployment completes, the game address is https://jawwadahmedhusaini.github.io/Racing-game/ — players need only their browser, with no ZIP or Python installation.
+## Validation
+
+```sh
+npm test
+npm run test:e2e
+npm run build
+```
+
+Browser tests use system Chromium at `/usr/bin/chromium`. Set `CHROMIUM_PATH` to another Chromium executable if necessary. The test configuration uses SwiftShader for reproducible headless WebGL; it is not a hardware-GPU performance benchmark. Browser tests combine real keyboard/touch events with a development-only fixed-step time-advance hook to complete races without waiting in real time. That hook is removed from production builds.
+
+See [TEST_REPORT.md](TEST_REPORT.md), [PERFORMANCE_REPORT.md](PERFORMANCE_REPORT.md), [ARCHITECTURE.md](ARCHITECTURE.md), [ASSET_LICENSES.md](ASSET_LICENSES.md), [ROADMAP.md](ROADMAP.md) and [BUG_TRACKER.md](BUG_TRACKER.md).
+
+After building, run `python3 scripts/package-release.py` to produce the browser release and editable source archives in `artifacts/`. The package includes an HTTP launcher because browser modules and 3D assets need a server.
+
+## Scope
+
+This release provides the complete single-player play loop. The three cars share a licensed concept chassis, with different aero, proportions, performance, colors and progression costs. They are not three separately licensed manufacturer vehicles. The physics use a track-relative coordinate system with a manually controlled world heading. Forward input does not auto-steer; only rivals use a course-following controller. This is an arcade model with barriers, not a full rigid-body simulator. Multiplayer, branded car collections, photorealistic crash deformation, barrel-roll stunts, a large licensed soundtrack and a major-studio-sized career are not implemented.

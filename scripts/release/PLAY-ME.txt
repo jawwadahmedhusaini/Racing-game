@@ -1,0 +1,32 @@
+APEX RUSH 2.0 — browser racing game
+
+1. Unzip the complete download.
+2. Install Python 3 if it is not already on your computer.
+3. Windows: double-click START-WINDOWS.bat.
+   macOS/Linux: run `python3 start-game.py` from this folder.
+4. Your browser opens the game. Keep the terminal window open while playing.
+
+The launcher only serves files on your own computer. No game account, backend,
+API key, additional package download or internet connection is needed to play.
+The first Python installation, if needed, is a separate prerequisite.
+
+Controls: W/Up accelerate, S/Down brake, A/D or Left/Right steer,
+Space + steering drift, Shift nitro, C camera, R recover, Escape pause.
+Manual driving: brake before corners and steer through them. Forward does not
+automatically turn the car. Left/right match the chase camera.
+Drift to fill nitro. Activate at a full meter for shockwave boost.
+Touch controls and optional auto-acceleration are in the game.
+
+The bundled `web` directory is also ready for any static web host at its domain
+root. It must be served over HTTP/HTTPS; opening index.html directly does not
+load browser modules correctly. Share the hosted edition at:
+https://jawwadahmedhusaini.github.io/Racing-game/
+(The repository owner must enable GitHub Pages if it is not already active.)
+
+Use a modern browser with WebGL 2 and hardware acceleration. Start with
+Medium or Low quality on slower hardware. Browser-local saved progress is tied
+to the server address/port you use. Clearing site data erases progress.
+
+Credits and licenses are available in Settings and in web/licenses.
+The cars are tuned variants of the attributed Car Concept asset, not real
+manufacturer vehicles. This independent game is not an Asphalt product.

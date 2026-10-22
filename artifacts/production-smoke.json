@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-22T22:43:56.148Z",
+  "production": true,
+  "errors": [],
+  "layouts": [
+    {
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "upgradeBottom": 539.328125,
+      "statsTop": 547.65625
+    },
+    {
+      "width": 1600,
+      "height": 900,
+      "overflow": false,
+      "upgradeBottom": 597.71875,
+      "statsTop": 610.65625
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "overflow": false,
+      "upgradeBottom": 232.546875,
+      "statsTop": 233.15625
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "upgradeBottom": 293,
+      "statsTop": 572.25
+    }
+  ],
+  "failedRequests": [],
+  "version": "2.0.0",
+  "testApiAbsent": true,
+  "ultraRendered": true,
+  "keyboardAcceleration": true,
+  "nitro": true,
+  "pause": true,
+  "resume": true,
+  "passed": true
+}
