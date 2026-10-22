@@ -2,6 +2,12 @@
 
 A complete, independent single-player browser arcade racer: pick a car, choose a circuit, race, earn credits, upgrade your garage, and play again. Inspired by the excitement of premium arcade racing, with original game design and properly licensed assets. This is not an Asphalt product and does not claim Asphalt 9 production quality.
 
+## Play online or download
+
+[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.0](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
+
+The online link requires the repository's GitHub Pages deployment to be enabled; see [HOSTING.md](HOSTING.md). If your browser still shows the previous build, refresh the page. Version 2.0 fixes reversed steering and removes automatic corner-following, rebuilds both environments, and adds a detailed race car, improved materials, contact shading and antialiasing.
+
 ## Play and develop
 
 For the packaged release, unzip `artifacts/apex-rush-web.zip`, then run `START-WINDOWS.bat` on Windows or `python3 start-game.py` on macOS/Linux. Python 3 is the only launcher prerequisite; the launcher opens the game in your browser. Keep its terminal window open while playing. The release includes all game assets and needs no internet connection after download.
@@ -30,10 +36,12 @@ The complete static game is in `dist/`. Serve the contents of that directory wit
 
 - Reflective 3D garage with three tuned concept-car variants, six paint finishes, unlocks and three upgrade levels.
 - A professionally authored, licensed car chassis with a modeled cockpit, treaded tires, animated wheels, lights and original aero packages.
-- Costa Aurelia: a coastal circuit with elevation, bridges, palms, ridged terrain and an atmospheric sunset sky and HDR reflections.
-- Neon Harbor: an illuminated waterfront city circuit.
+- Costa Aurelia: a coastal circuit with elevation, bridges, palms, ridged terrain and textured hills, 3D vegetation, ocean shading and HDR reflections.
+- Neon Harbor: a waterfront city circuit with facade detail, streetlights, headlights and damp asphalt.
+- Detailed player car during races, LED rear lights, clearcoat paint, fitted rear vents, high-quality contact shading and multisample antialiasing.
+- Four rendering presets; High/Ultra enable ambient occlusion and restrained bloom.
 - Six-driver quick races, solo time attack, elimination races and a four-event career.
-- Fixed-step arcade dynamics with road-following assistance, manual racing-line control, braking, drifting, nitro, shockwave, contact, jumps and recovery.
+- Fixed-step arcade dynamics with manual heading-based steering, braking, drifting, nitro, shockwave, contact, jumps and recovery.
 - Live rivals with speed planning, lane choice, overtaking, boost and collision responses.
 - Countdown, lap progress, minimap, position, speed, timer, results, rewards and replay.
 - Synthesized engine, tire, wind, boost, collision, countdown and background music.
@@ -53,7 +61,7 @@ The complete static game is in `dist/`. Serve the contents of that directory wit
 | Recover to the road center | R |
 | Pause / resume | Escape |
 
-Drifting and clean landings recharge nitro. Activate boost with a full meter for a shockwave. The outside lane has a marked ramp. Auto-acceleration is optional in Settings. Touch controls appear on touch devices; landscape gives the best view.
+Brake before bends and steer through them: holding forward alone no longer turns the car. Left/right match the chase-camera view. Drifting and clean landings recharge nitro. Activate boost with a full meter for a shockwave. The outside lane has a marked ramp. Auto-acceleration is optional in Settings. Touch controls appear on touch devices; landscape gives the best view.
 
 Progress belongs to the current browser profile and origin. Clearing site data clears progress. No cloud synchronization is implemented.
 
@@ -73,4 +81,4 @@ After building, run `python3 scripts/package-release.py` to produce the browser 
 
 ## Scope
 
-This release provides the complete single-player play loop. The three cars share a licensed concept chassis, with different aero, proportions, performance, colors and progression costs. They are not three separately licensed manufacturer vehicles. The physics intentionally use track-relative arcade assistance rather than a full rigid-body simulator. Multiplayer, branded car collections, photorealistic crash deformation, barrel-roll stunts, a large licensed soundtrack and a major-studio-sized career are not implemented.
+This release provides the complete single-player play loop. The three cars share a licensed concept chassis, with different aero, proportions, performance, colors and progression costs. They are not three separately licensed manufacturer vehicles. The physics use a track-relative coordinate system with a manually controlled world heading. Forward input does not auto-steer; only rivals use a course-following controller. This is an arcade model with barriers, not a full rigid-body simulator. Multiplayer, branded car collections, photorealistic crash deformation, barrel-roll stunts, a large licensed soundtrack and a major-studio-sized career are not implemented.

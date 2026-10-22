@@ -6,13 +6,37 @@ async function boot(page:Page){
   await page.goto('/');await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
 }
 async function start(page:Page){await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await expect(page.locator('#countdown')).toBeVisible();}
+const pose=(page:Page)=>page.evaluate(()=>(window as any).__apex.pose());
+function assertDirection(before:any,after:any,direction:number){
+  const across=after.position.reduce((sum:number,x:number,i:number)=>sum+(x-before.position[i])*before.cameraRight[i],0);
+  const yaw=Math.atan2(Math.sin(after.worldYaw-before.worldYaw),Math.cos(after.worldYaw-before.worldYaw));
+  expect(across*direction).toBeGreaterThan(.2);
+  expect(yaw*direction).toBeLessThan(-.1);
+  expect(after.frontWheelYaw*direction).toBeLessThan(0);
+}
+
+test('WASD and arrow steering turn toward the correct side of the actual chase camera; forward cannot auto-turn',async({page})=>{
+  await boot(page);await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="mode"][data-value="time"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await advance(page,7,{throttle:1},true);
+  for(const [key,direction] of [['a',-1],['d',1],['ArrowLeft',-1],['ArrowRight',1]] as const){
+    await page.keyboard.press('r');await advance(page,0);const before=await pose(page);
+    await page.keyboard.down('w');await page.keyboard.down(key);await page.evaluate(()=>(window as any).__apex.advance(.65,null));const after=await pose(page);await page.keyboard.up(key);await page.keyboard.up('w');
+    assertDirection(before,after,direction);
+  }
+  await page.keyboard.press('r');await advance(page,0);const before=await pose(page);
+  await page.keyboard.down('w');await page.evaluate(()=>(window as any).__apex.advance(1.2,null));await page.keyboard.up('w');const after=await pose(page);
+  expect(Math.abs(Math.atan2(Math.sin(after.worldYaw-before.worldYaw),Math.cos(after.worldYaw-before.worldYaw)))).toBeLessThan(.001);
+  expect(Math.abs(after.roadYaw-before.roadYaw)).toBeGreaterThan(.02);
+});
 
 test('real keyboard controls, pause, boost, complete race, rewards and replay',async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   await boot(page);await page.getByRole('button',{name:'Paint blue'}).click();await start(page);await advance(page,4);
   await page.keyboard.down('w');await expect.poll(async()=>(await state(page)).player.speed).toBeGreaterThan(3);await page.keyboard.up('w');
   await advance(page,4,{throttle:1},true);await page.keyboard.down('d');expect((await state(page)).input.steer).toBe(1);await page.evaluate(()=>(window as any).__apex.advance(.1,null));expect((await state(page)).player.steer).toBe(1);await page.keyboard.up('d');
-  await page.keyboard.press('Escape');await expect(page.getByText('PAUSED.',{exact:true})).toBeVisible();const before=(await state(page)).elapsed;await advance(page,5,{throttle:1});expect((await state(page)).elapsed).toBe(before);await page.getByRole('button',{name:'RESUME RACE'}).click();
+  await page.keyboard.press('Escape');await expect(page.getByText('PAUSED.',{exact:true})).toBeVisible();const before=(await state(page)).elapsed;await advance(page,5,{throttle:1});expect((await state(page)).elapsed).toBe(before);
+  await page.evaluate(async()=>{for(let i=0;i<12;i++)await new Promise(requestAnimationFrame);});
+  const pausedPose=await pose(page);expect(pausedPose.cameraDistance).toBeGreaterThan(6);expect(pausedPose.cameraDistance).toBeLessThan(12);
+  await page.getByRole('button',{name:'RESUME RACE'}).click();
   await advance(page,.2,{throttle:1,nitro:true},true);expect((await state(page)).player.boost).toBeGreaterThan(0);await page.screenshot({path:'artifacts/boost.png'});
   await page.keyboard.press('r');expect(Math.abs((await state(page)).player.lateral)).toBeLessThan(.5);
   await advance(page,120,{throttle:1,nitro:true},true);await expect(page.getByText('FINAL STANDINGS')).toBeVisible();expect((await state(page)).status).toBe('finished');expect((await state(page)).credits).toBeGreaterThan(2500);await page.screenshot({path:'artifacts/results.png'});
@@ -39,5 +63,11 @@ test('mobile layout and touch input work without overflowing the viewport',async
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true,deviceScaleFactor:1});const page=await context.newPage();const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);expect(await page.evaluate(()=>document.body.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'artifacts/mobile-garage.png'});
   await start(page);await advance(page,4);await expect(page.getByRole('button',{name:'Accelerate',exact:true})).toBeVisible();
   const box=(await page.getByRole('button',{name:'Accelerate',exact:true}).boundingBox())!;const cdp=await context.newCDPSession(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2}]});await expect.poll(async()=>(await state(page)).player.speed).toBeGreaterThan(0);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  await advance(page,3,{throttle:1},true);
+  for(const [name,direction] of [['Steer left',-1],['Steer right',1]] as const){
+    await page.keyboard.press('r');await advance(page,0);const before=await pose(page),control=(await page.getByRole('button',{name,exact:true}).boundingBox())!;
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:control.x+control.width/2,y:control.y+control.height/2}]});await page.evaluate(()=>(window as any).__apex.advance(.65,null));const after=await pose(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});assertDirection(before,after,direction);
+    expect((await state(page)).input.steer).toBe(0);
+  }
   await page.screenshot({path:'artifacts/mobile-race.png'});await page.getByRole('button',{name:'Pause race'}).tap();await expect(page.getByRole('button',{name:'RESUME RACE'})).toBeVisible();expect(errors).toEqual([]);await context.close();
 });

@@ -15,6 +15,9 @@ try {
   });
   await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(url);
+  const release = await page.request.get(new URL('version.json',url).href);
+  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.0.0');
+  report.version='2.0.0';
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 60000 });
   expect(await page.evaluate(() => '__apex' in window)).toBe(false);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
@@ -39,6 +42,10 @@ try {
   expect(report.assetPaths.some(path => path.endsWith('/concept-car.glb'))).toBe(true);
   expect(report.assetPaths.some(path => path.endsWith('/concept-car-lod.glb'))).toBe(true);
   expect(report.assetPaths.some(path => path.endsWith('/venice_sunset_1k.hdr'))).toBe(true);
+  expect(report.assetPaths.some(path => path.endsWith('/vegetation.json'))).toBe(true);
+  for (const surface of ['ground-color.png','ground-normal.png','ground-rough.png','grass-color.png','water-normal.png','foliage-color.png','foliage-normal.png','bark-color.jpg','bark-normal.png']) {
+    expect(report.assetPaths.some(path => path.endsWith(`/surfaces/${surface}`))).toBe(true);
+  }
   for (const asset of ['coast-preview.jpg', 'city-preview.jpg']) {
     expect(report.assetPaths.some(path => path.endsWith(`/${asset}`))).toBe(true);
   }

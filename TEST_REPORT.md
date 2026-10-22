@@ -1,61 +1,42 @@
-# Validation report
+# APEX RUSH 2.0 — validation report
 
-Date: 2026-10-22. Project: APEX RUSH 1.0.0.
+Release validation uses Chromium 154 / Playwright 1.64.1 on Linux, Node.js 24.19.0 and npm 11.9.0. Times in machine-readable reports are UTC. Chromium uses SwiftShader software WebGL 2; these checks do not establish hardware-GPU performance.
 
-## Environment
+## Driving and progression
 
-- Linux cloud workspace; Node.js 24.19.0, npm 11.9.0, Python 3.12.
-- Chromium 154.0.8037.57, Playwright 1.64.1; SwiftShader software WebGL 2.
-- Desktop browser checks at 1280 × 800; emulated touch device at 390 × 844.
-- No game backend, account, API key or external runtime asset service.
+- `npm test`: **22 passed**, zero failed or skipped.
+- `npm run test:e2e`: **5 passed**, zero failed, skipped or flaky, no retries; about 4.9 minutes.
+- Dependency audit: zero reported vulnerabilities at this validation.
 
-## Automated checks
+The new regression checks measure actual displacement against the chase camera's right vector, world heading and front-wheel orientation after real WASD, arrow and touch input. Forward-only input preserves world heading as the road bends and cannot automatically follow a lap. A pause regression verifies that camera distance stays between 6 and 12 meters after 12 render frames, preventing the camera from creeping into the stationary car. Both circuits' five rivals finish two laps using explicit steering/braking commands while the idle player remains stationary.
 
-| Check | Result |
-| --- | --- |
-| `npm test` | 16 passed; 0 failed, skipped or disabled. |
-| `npm run test:e2e` | 4 passed; 0 failed, skipped or flaky; no retries. |
-| Dependency audit | 0 reported vulnerabilities at validation time. |
-| Clean `npm ci` with pinned lockfile | Passed; 54 packages installed, followed by successful build. |
-| `npm run build` | Type checking and Vite production compilation passed. |
-| Packaged Python HTTP launcher | Started on Linux; HTML, both GLBs, HDR and CC BY license returned HTTP 200; asset response hashes match source files. |
-| `node scripts/verify-release.mjs` | Passed against the packaged production build: real keyboard acceleration, active nitro effect, pause/resume, no page/console errors or HTTP failures. |
-| Production test-hook removal | `window.__apex` absent; no `__apex` occurrence in built JavaScript. |
-| Release archives | Both archives pass ZIP CRC verification. |
+Other coverage includes countdown, acceleration/braking, drifting, nitro/shockwave, collisions, recovery, ramps/landings, full race completion, elimination, rewards credited once, career unlocks, purchases, upgrades and persistent paint/settings. Tests do not grant progression directly: long races use the same fixed-step simulation, with an explicitly supplied test driver. The production build removes the development observer/stepper.
 
-Unit coverage: stationary countdown; throttle, steering and braking; drift recharge; shockwave consumption; barriers and recovery; car contact; ramp launch, landing and recharge; a full two-lap race with AI; solo city time attack; scheduled elimination; deterministic repeatability; continuity of both circuits; malformed save recovery; purchase accounting; upgrade charges/caps.
+## Graphics and production
 
-Browser workflows:
+The final high-quality visual review checks the garage, coastal opening, seaside bridge section and city. It exercises custom water and terrain shaders, detailed player and rival models, licensed tree LODs, local surface textures, contact shading, shadowing, antialiasing and bloom. The final roadside/barrier detail pass changes rendering only; the separate production smoke tests exercise that final code.
 
-1. Real keyboard throttle/steer, pause, boost, recovery, full race completion, rewards credited once, replay, persisted paint and credits.
-2. Career unlock, earning and spending credits, exact purchased car used in racing, upgrades, persisted difficulty and auto-acceleration.
-3. City elimination, all three chase-camera modes and final standings.
-4. Portrait layout without horizontal overflow, real Chromium touch events on acceleration, and touch pause.
+Production build, packaged launcher, subdirectory hosting, layout, asset-integrity and rendering results are recorded in the machine-readable artifacts listed below. The production tests use actual input without the development stepper, check for its absence, and fail on page/console errors or HTTP failures. Layouts cover 1280×800, 1600×900, 844×390 and 390×844. Ultra is rendered in the packaged-build check; High in the visual review; Low/Medium in the control/performance checks.
 
-The browser suite takes about 3.8 minutes in software graphics. Full-race automation advances the actual fixed-step simulation through a development-only hook. It neither forces a result nor grants credits directly. Separate real input events exercise the input integration. This is not equivalent to a human completing every race in real time.
+- `artifacts/browser-results.json`
+- `artifacts/dependency-audit.json`
+- `artifacts/visual-review.json`
+- `artifacts/performance.json`
+- `artifacts/production-smoke.json`
+- `artifacts/hosting-smoke.json`
 
-Machine-readable results: `artifacts/browser-results.json`, `artifacts/dependency-audit.json`.
-
-The final production check also verifies no horizontal overflow or customization/stats overlap at 1280 × 800, 1600 × 900, 844 × 390 and 390 × 844. It runs without the development stepper. Results are in `artifacts/production-smoke.json`; screenshot in `artifacts/production-race.png`. The final unit suite was rerun after the clean install and passed all 16 tests. The four-workflow browser run preceded the final CSS placement adjustment; the production layout/control check validates that final adjustment.
-
-## Delivery and environment setup
-
-The static build contains 25 files totaling 11,725,119 bytes before archive compression. `artifacts/apex-rush-web.zip` includes the web build and a Python standard-library launcher. `artifacts/apex-rush-source.zip` contains editable source, assets, tests and documentation. `scripts/package-release.py` reproduces both from a current production build.
-
-The tested cloud installation script and startup instructions were saved to the environment configuration draft. Saving does not publish the environment or prove restoration in a new task. The current workspace was verified; no source push or public deployment was performed.
-
-## Visual review
-
-Reviewed rendered screenshots of the detailed garage model, coastal and city circuits, and portrait mobile garage. Updated track preview images are real screenshots from the game. The checks found and corrected the coast sky/background and clipped portrait vehicle, plus a desktop customization/stats overlap.
-
-Screenshots: `artifacts/garage-final.png`, `artifacts/coast-final.png`, `artifacts/city-final.png`, `artifacts/mobile-garage.png`, `artifacts/mobile-race.png`, `artifacts/results.png`.
+Both ZIPs are checked for CRC errors when packaged. All 10 licensed environment assets match the SHA-256 hashes in their provenance manifest. The root-hosted build and `/Racing-game/` build are tested separately.
 
 ## Limits
 
-Hardware-GPU FPS, physical phones, Safari/Firefox, operating-system-specific launchers and subjective audio quality are not validated by the automated runs. See PERFORMANCE_REPORT.md and BUG_TRACKER.md. No public deployment or new-cloud-task restoration has been tested.
+Physical phones, hardware GPU frame rates, Safari/Firefox and subjective audio quality remain unverified. Windows/macOS launcher wrappers have not been executed on those operating systems. The three cars are variations of one licensed chassis. This iteration does not establish Asphalt 9 visual parity.
 
-## GitHub Pages preparation — 2026-10-22
+GitHub branch upload and local subpath verification are distinct from verifying the public Pages deployment. The cloud network blocks the github.io domain, so deployment status must be observed through GitHub Pages or a user's browser. See HOSTING.md.
 
-`npm run build:pages` passed with the `/Racing-game/` hosting base, and all 16 unit tests passed after the asset URL changes. The production site was mounted under that exact subpath on a local HTTP server and exercised by `scripts/verify-hosting.mjs`. Both car models, HDR, fonts, both track previews and the license text loaded successfully. Actual keyboard acceleration and pause worked. No page/console errors or failed HTTP responses were observed; the production development hook remained absent. Evidence is in `artifacts/hosting-smoke.json`.
+## Production results
 
-This verifies the prepared static site. Enabling Pages and observing the actual public deployment are separate from uploading the `gh-pages` branch; see HOSTING.md.
+The packaged launcher served all 38 web files with HTTP response hashes matching the built files. The packaged build passed layout checks at all four viewports, Ultra rendering, real keyboard acceleration, nitro, pause and resume. No page/console errors or failed HTTP requests were recorded. Both production bundles were scanned and contain no development observer/stepper.
+
+The static build contains 38 files and is about 26.5 MB before compression. The playable ZIP is about 23.1 MB. `scripts/package-release.py` reproduces the playable and editable-source archives with CRC verification and SHA-256 checksums.
+
+The `/Racing-game/` production smoke test also passed: both models, all nine surface textures, vegetation data, HDR, fonts, track previews and the license link load under the correct base path. Real keyboard acceleration and pause work; version 2.0.0 is confirmed, with zero browser errors or failed HTTP responses.

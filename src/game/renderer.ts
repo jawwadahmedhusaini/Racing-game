@@ -5,8 +5,23 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { Sky } from 'three/addons/objects/Sky.js';
 import type { Quality } from './content';
 import { publicUrl } from './urls';
+
+// Transparent effects and leaf cards should not become solid silhouettes in the AO buffer.
+class ContactAOPass extends GTAOPass {
+  override render(renderer:THREE.WebGLRenderer,writeBuffer:THREE.WebGLRenderTarget,readBuffer:THREE.WebGLRenderTarget,deltaTime:number,maskActive:boolean){
+    const hidden:THREE.Object3D[]=[];
+    this.scene.traverse(object=>{
+      if(!(object instanceof THREE.Mesh)||!object.visible)return;
+      const materials=Array.isArray(object.material)?object.material:[object.material];
+      if(object instanceof Sky||object.userData.skipAO||materials.some(m=>m.transparent||m.alphaTest>0)){hidden.push(object);object.visible=false;}
+    });
+    try {super.render(renderer,writeBuffer,readBuffer,deltaTime,maskActive);}finally{hidden.forEach(object=>object.visible=true);}
+  }
+}
 
 export class RenderSystem {
   renderer: THREE.WebGLRenderer;
@@ -15,6 +30,7 @@ export class RenderSystem {
   composer: EffectComposer;
   renderPass: RenderPass;
   bloom: UnrealBloomPass;
+  ao: ContactAOPass;
   quality: Quality='high';
   environment?: THREE.Texture;skyBackground?:THREE.Texture;
   ready: Promise<void>;
@@ -22,12 +38,16 @@ export class RenderSystem {
   constructor(container:HTMLElement) {
     this.renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-    this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFShadowMap;
+    this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=.85;
     this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.info.autoReset=false;
     this.renderer.domElement.id='game-canvas';this.renderer.domElement.setAttribute('aria-label','3D racing game');container.append(this.renderer.domElement);
-    this.composer=new EffectComposer(this.renderer);this.renderPass=new RenderPass(this.scene,this.camera);this.composer.addPass(this.renderPass);
-    this.bloom=new UnrealBloomPass(new THREE.Vector2(1,1),.22,.55,1.35);this.composer.addPass(this.bloom);this.composer.addPass(new OutputPass());
+    const target=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:4});
+    this.composer=new EffectComposer(this.renderer,target);this.renderPass=new RenderPass(this.scene,this.camera);this.composer.addPass(this.renderPass);
+    this.ao=new ContactAOPass(this.scene,this.camera,1,1);this.ao.blendIntensity=.7;
+    this.ao.updateGtaoMaterial({radius:1.2,distanceExponent:1.5,thickness:1.5,distanceFallOff:.8,scale:1,samples:12,screenSpaceRadius:false});
+    this.ao.updatePdMaterial({radius:3,rings:2,samples:8});this.composer.addPass(this.ao);
+    this.bloom=new UnrealBloomPass(new THREE.Vector2(1,1),.16,.55,1.6);this.composer.addPass(this.bloom);this.composer.addPass(new OutputPass());
     const pmrem=new THREE.PMREMGenerator(this.renderer);
     const room=new RoomEnvironment();this.environment=pmrem.fromScene(room,.04).texture;room.dispose();this.scene.environment=this.environment;
     this.ready=new HDRLoader().loadAsync(publicUrl('assets/venice_sunset_1k.hdr')).then(hdr=>{
@@ -35,14 +55,14 @@ export class RenderSystem {
     }).catch(()=>{pmrem.dispose();});
     this.resize();window.addEventListener('resize',()=>this.resize());
   }
-  setScene(scene:THREE.Scene) {this.scene=scene;scene.environment=this.environment??null;if(scene.userData.useHDRSky&&this.skyBackground){scene.background=this.skyBackground;scene.backgroundIntensity=.85;scene.backgroundBlurriness=.025;scene.backgroundRotation.y=.5;}this.renderPass.scene=scene;}
+  setScene(scene:THREE.Scene) {this.scene=scene;scene.environment=this.environment??null;if(scene.userData.useHDRSky&&this.skyBackground){scene.background=this.skyBackground;scene.backgroundIntensity=.85;scene.backgroundBlurriness=.025;scene.backgroundRotation.y=.5;}this.renderPass.scene=scene;this.ao.scene=scene;}
   setQuality(quality:Quality) {
     this.quality=quality;
     const ratios={low:.75,medium:1,high:1.5,ultra:2};
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,ratios[quality]));
-    this.renderer.shadowMap.enabled=quality!=='low';this.bloom.enabled=quality==='high'||quality==='ultra';this.resize();
+    this.renderer.shadowMap.enabled=quality!=='low';this.bloom.enabled=this.ao.enabled=quality==='high'||quality==='ultra';this.resize();
   }
-  resize() {this.width=window.innerWidth;this.height=window.innerHeight;this.camera.aspect=this.width/this.height;this.camera.updateProjectionMatrix();this.renderer.setSize(this.width,this.height);this.composer.setSize(this.width,this.height);}
+  resize() {this.width=window.innerWidth;this.height=window.innerHeight;this.camera.aspect=this.width/this.height;this.camera.updateProjectionMatrix();this.renderer.setSize(this.width,this.height);this.composer.setPixelRatio(this.renderer.getPixelRatio());this.composer.setSize(this.width,this.height);const scale=this.renderer.getPixelRatio()*(this.quality==='ultra'?.75:.5);this.ao.setSize(Math.max(1,Math.round(this.width*scale)),Math.max(1,Math.round(this.height*scale)));}
   render() { this.renderer.info.reset();if(this.bloom.enabled)this.composer.render();else this.renderer.render(this.scene,this.camera); }
 }
 

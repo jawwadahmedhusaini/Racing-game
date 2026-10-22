@@ -17,6 +17,8 @@ import {Effects} from './game/effects';
 import {loadSave,saveProgress,buyCar,upgradeCar} from './game/storage';
 import {UI,type Result} from './ui/ui';
 import {logo} from './ui/icons';
+import {loadSurfaceAssets} from './game/materials';
+import {loadVegetation} from './game/vegetation';
 
 const app=document.getElementById('app')!;
 const loading=document.createElement('div');loading.className='loading';loading.innerHTML=`<span class="brand">${logo}<span>APEX<span class="brand-small">RUSH</span></span></span><div class="loading-bar"></div><p>PREPARING YOUR NEXT GREAT DRIVE</p>`;app.append(loading);
@@ -71,10 +73,10 @@ class Game {
     let cached=this.worlds.get(trackId);if(!cached){const track=new Track(trackId);cached={track,world:createWorld(track)};this.worlds.set(trackId,cached);}
     this.world=cached.world;this.render.setScene(this.world.scene);this.render.camera.clearViewOffset();this.render.renderer.toneMappingExposure=trackId==='city'?.95:.9;
     this.simulation=new RaceSimulation({car:CARS.find(c=>c.id===this.save.selected)!,track:cached.track,mode,difficulty:this.save.settings.difficulty,upgrade:this.save.upgrades[this.save.selected]??0});
-    this.raceCars=this.simulation.drivers.map((d,i)=>{const car=createCar(d.spec,i===0?(this.save.paints[d.spec.id]??d.spec.color):['#a6bdc7','#e5dcba','#5f73b3','#82cdb9','#ea564b'][i-1],true);car.group.traverse(o=>{if(o instanceof THREE.Mesh)o.castShadow=i===0;});this.world!.scene.add(car.group);return car;});
+    this.raceCars=this.simulation.drivers.map((d,i)=>{const car=createCar(d.spec,i===0?(this.save.paints[d.spec.id]??d.spec.color):['#a6bdc7','#e5dcba','#5f73b3','#82cdb9','#ea564b'][i-1],i!==0);car.group.traverse(o=>{if(o instanceof THREE.Mesh)o.castShadow=i===0;});this.world!.scene.add(car.group);return car;});
     this.effects=new Effects(this.world.scene);this.ui.hud(this.simulation);this.applyQuality();this.updateRaceView(1/60,0);this.ui.updateHUD(this.simulation);
   }
-  applyQuality(){const size={low:256,medium:512,high:1024,ultra:2048}[this.save.settings.quality];for(const scene of [this.showroom.scene,...[...this.worlds.values()].map(w=>w.world.scene)])scene.traverse(o=>{if(o instanceof THREE.DirectionalLight&&o.castShadow){o.shadow.mapSize.set(size,size);o.shadow.map?.dispose();o.shadow.map=null;}});}
+  applyQuality(){const size={low:256,medium:1024,high:2048,ultra:4096}[this.save.settings.quality];for(const scene of [this.showroom.scene,...[...this.worlds.values()].map(w=>w.world.scene)])scene.traverse(o=>{if(o instanceof THREE.DirectionalLight&&o.castShadow){o.shadow.mapSize.set(size,size);o.shadow.map?.dispose();o.shadow.map=null;}});}
   pause(){if(this.ui.screen!=='racing')return;this.paused=true;this.input.clear();this.ui.pause();this.audio.update(null,false);}
   resume(){this.paused=false;this.input.clear();this.ui.closeModal();this.accumulator=0;}
   disposeRace(){this.raceCars.forEach(c=>{c.group.removeFromParent();c.dispose();});this.raceCars=[];this.effects?.dispose();this.effects=undefined;this.simulation=undefined;}
@@ -90,15 +92,18 @@ class Game {
   }
   updateRaceView(dt:number,time:number){
     const sim=this.simulation!;
-    for(const d of sim.drivers){const car=this.raceCars[d.id],s=sim.track.sample(d.distance);car.group.position.copy(s.position).addScaledVector(s.right,d.lateral);car.group.position.y+=d.airborne+.045;car.group.rotation.set(-Math.asin(s.tangent.y),s.yaw+d.heading+d.drift*.38,0,'YXZ');car.group.visible=!d.eliminated;car.update(d.speed,d.steer,d.drift,d.boost,d.id===0?this.input.read().brake>0:false,time);}
+    const moving=!this.paused&&!this.raceCompleted;
+    for(const d of sim.drivers){const car=this.raceCars[d.id],s=sim.track.sample(d.distance);car.group.position.copy(s.position).addScaledVector(s.right,d.lateral);car.group.position.y+=d.airborne+.025;car.group.rotation.set(-Math.asin(s.tangent.y),s.yaw+d.heading,0,'YXZ');car.group.visible=!d.eliminated;car.update(moving?d.speed:0,d.steer,d.drift,d.boost,d.id===0?this.input.read().brake>0:false,time);}
     const player=sim.player,car=this.raceCars[0],s=sim.track.sample(player.distance),speed=player.speed;
-    const chase=this.cameraMode===1?6.9:this.cameraMode===2?13:9.9,height=this.cameraMode===1?2.9:this.cameraMode===2?6.7:3.9;
-    const desired=car.group.position.clone().addScaledVector(s.tangent,-chase-speed*.018).addScaledVector(s.right,-player.drift*.7);desired.y+=height;
-    const focus=car.group.position.clone().addScaledVector(s.tangent,9+speed*.04);focus.y+=.8;
-    if(!this.cameraInitialized){this.render.camera.position.copy(desired);this.cameraFocus.copy(focus);this.cameraInitialized=true;}else{this.render.camera.position.addScaledVector(s.tangent,speed*dt).lerp(desired,1-Math.exp(-dt*7));this.cameraFocus.addScaledVector(s.tangent,speed*dt).lerp(focus,1-Math.exp(-dt*10));}
+    const forward=new THREE.Vector3(Math.sin(s.yaw+player.heading),s.tangent.y,Math.cos(s.yaw+player.heading)).normalize();
+    const chase=this.cameraMode===1?5.7:this.cameraMode===2?11:7.4,height=this.cameraMode===1?1.65:this.cameraMode===2?5.1:2.45;
+    const desired=car.group.position.clone().addScaledVector(forward,-chase-speed*.008);desired.y+=height;
+    const focus=car.group.position.clone().addScaledVector(forward,14+speed*.035);focus.y+=.55;
+    const travel=moving?speed*dt:0;
+    if(!this.cameraInitialized){this.render.camera.position.copy(desired);this.cameraFocus.copy(focus);this.cameraInitialized=true;}else{this.render.camera.position.addScaledVector(forward,travel).lerp(desired,1-Math.exp(-dt*7));this.cameraFocus.addScaledVector(forward,travel).lerp(focus,1-Math.exp(-dt*6));}
     if(player.collision>.3){this.render.camera.position.x+=Math.sin(time*70)*.07;this.render.camera.position.y+=Math.cos(time*80)*.055;}
-    this.render.camera.lookAt(this.cameraFocus);const fov=58+Math.min(13,speed*.13)+(player.boost===2?12:player.boost?7:0);this.render.camera.fov+=(fov-this.render.camera.fov)*Math.min(1,dt*4);this.render.camera.updateProjectionMatrix();
-    this.world!.update(time,car.group.position);if(!this.paused)this.effects?.update(dt,player,car.group.position,s.yaw+player.heading);
+    this.render.camera.lookAt(this.cameraFocus);const fov=55+Math.min(9,speed*.10)+(player.boost===2?8:player.boost?5:0);this.render.camera.fov+=(fov-this.render.camera.fov)*Math.min(1,dt*4);this.render.camera.updateProjectionMatrix();
+    this.world!.update(time,car.group.position,forward);if(!this.paused)this.effects?.update(dt,player,car.group.position,s.yaw+player.heading);
   }
   frame(now:number){
     const rawDelta=(now-this.lastTime)/1000||1/60,dt=Math.min(.1,rawDelta);this.lastTime=now;this.fpsTimer+=rawDelta;this.frames++;if(this.fpsTimer>=1){this.fps=Math.round(this.frames/this.fpsTimer);this.frames=0;this.fpsTimer=0;}
@@ -118,11 +123,12 @@ class Game {
     this.render.render();requestAnimationFrame(t=>this.frame(t));
   }
 }
-try {await loadVehicleAsset();game=new Game();}catch(error){console.error(error);loading.remove();const fatal=document.createElement('section');fatal.className='fatal';fatal.innerHTML='<h1>LET’S GET YOU BACK ON TRACK.</h1><p>The 3D renderer could not start. Use a current Chrome, Edge, Firefox or Safari browser with WebGL 2 and hardware acceleration enabled, then reload.</p><button class="primary" onclick="location.reload()">RETRY</button>';app.append(fatal);}
+try {await Promise.all([loadVehicleAsset(),loadSurfaceAssets(),loadVegetation()]);game=new Game();}catch(error){console.error(error);loading.remove();const fatal=document.createElement('section');fatal.className='fatal';fatal.innerHTML='<h1>LET’S GET YOU BACK ON TRACK.</h1><p>The 3D renderer could not start. Use a current Chrome, Edge, Firefox or Safari browser with WebGL 2 and hardware acceleration enabled, then reload.</p><button class="primary" onclick="location.reload()">RETRY</button>';app.append(fatal);}
 
 // Development-only observability. Production builds do not expose test controls or progression cheats.
 if(import.meta.env.DEV)Object.defineProperty(window,'__apex',{get:()=>({
+  pose:()=>{const sim=game.simulation!,s=sim.track.sample(sim.player.distance);game.render.camera.updateMatrixWorld();return {position:s.position.addScaledVector(s.right,sim.player.lateral).toArray(),worldYaw:s.yaw+sim.player.heading,roadYaw:s.yaw,cameraRight:new THREE.Vector3(1,0,0).applyQuaternion(game.render.camera.quaternion).toArray(),cameraDistance:game.render.camera.position.distanceTo(game.raceCars[0].group.position),frontWheelYaw:game.raceCars[0].wheels[2].rotation.y};},
   state:()=>({screen:game.ui.screen,status:game.simulation?.status,paused:game.paused,input:game.input.read(),player:game.simulation?{...game.simulation.player,spec:game.simulation.player.spec.id}:null,elapsed:game.simulation?.elapsed,rank:game.simulation?.rank,credits:game.save.credits,selected:game.save.selected,quality:game.save.settings.quality,fps:game.fps,drawCalls:game.render.renderer.info.render.calls,triangles:game.render.renderer.info.render.triangles,geometries:game.render.renderer.info.memory.geometries}),
-  advance:(seconds:number,input:Partial<Controls>|null={},center=false)=>{const sim=game.simulation;if(!sim||game.paused)return;for(let t=0;t<seconds;t+=1/60){const controls=input===null?game.input.read():{...NO_INPUT,...input};if(center)controls.steer=Math.max(-1,Math.min(1,-sim.player.lateral*.18-sim.player.heading*2));sim.step(1/60,controls);if(sim.status==='finished')break;}game.cameraInitialized=false;game.updateRaceView(1/60,performance.now()/1000);game.ui.updateHUD(sim);if(sim.status==='finished')game.completeRace();},
+  advance:(seconds:number,input:Partial<Controls>|null={},center=false)=>{const sim=game.simulation;if(!sim||game.paused)return;for(let t=0;t<seconds;t+=1/60){const controls=input===null?game.input.read():{...NO_INPUT,...input};if(center)controls.steer=sim.steeringFor(sim.player,0);sim.step(1/60,controls);if(sim.status==='finished')break;}game.cameraInitialized=false;game.updateRaceView(1/60,performance.now()/1000);game.ui.updateHUD(sim);if(sim.status==='finished')game.completeRace();},
   snapshot:()=>{game.render.render();return game.render.renderer.domElement.toDataURL();},
 })});

@@ -11,6 +11,7 @@ try {
   for (const quality of ['low', 'medium']) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
     page.on('pageerror', error => results.errors.push(error.message));
+    page.on('console', message => { if(message.type()==='error')results.errors.push(message.text()); });
     await page.addInitScript(quality => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { quality, music: 0, engine: 0, effects: 0 } })), quality);
     await page.goto('http://127.0.0.1:5173');
     await page.waitForSelector('.loading', { state: 'detached', timeout: 60000 });

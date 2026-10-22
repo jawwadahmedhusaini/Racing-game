@@ -3,7 +3,7 @@ import type { TrackId } from './content';
 
 export interface TrackSample { position:THREE.Vector3; tangent:THREE.Vector3; right:THREE.Vector3; yaw:number; curvature:number; }
 export class Track {
-  id:TrackId; length:number; width=21; curve:THREE.CatmullRomCurve3;
+  id:TrackId; length:number; width=18; curve:THREE.CatmullRomCurve3;
   samples:TrackSample[]=[]; count=1800;
   constructor(id:TrackId) {
     this.id=id;
@@ -16,7 +16,8 @@ export class Track {
     this.curve.arcLengthDivisions=3600;this.curve.updateArcLengths();this.length=this.curve.getLength();
     for(let i=0;i<this.count;i++) {
       const t=i/this.count,position=this.curve.getPointAt(t),tangent=this.curve.getTangentAt(t).normalize();
-      const right=new THREE.Vector3(tangent.z,0,-tangent.x).normalize();
+      // Travel direction × world up: camera-right when looking along the road.
+      const right=new THREE.Vector3(-tangent.z,0,tangent.x).normalize();
       const before=this.curve.getTangentAt((t-1/this.count+1)%1),after=this.curve.getTangentAt((t+1/this.count)%1);
       const delta=angleDelta(Math.atan2(before.x,before.z),Math.atan2(after.x,after.z));
       this.samples.push({position,tangent,right,yaw:Math.atan2(tangent.x,tangent.z),curvature:delta/(this.length*2/this.count)});

@@ -25,8 +25,9 @@ export function createCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
     // glTF material primitives are separate meshes in this loader.
     const source=sourceMaterials[0];let mat=materials.get(source) as THREE.MeshPhysicalMaterial|undefined;
     if(!mat){mat=source.clone() as THREE.MeshPhysicalMaterial;materials.set(source,mat);mat.envMapIntensity=.9;
-      if(source.name.startsWith('Paint 1')){mat.color.set(color);mat.metalness=.8;mat.roughness=.26;mat.clearcoat=.85;mat.clearcoatRoughness=.15;mat.normalScale?.setScalar(.12);paint=mat;}
-      if(source.name==='Glass'){mat.color.set('#173d4a');mat.metalness=.65;mat.roughness=.1;mat.transmission=0;mat.transparent=!racing;mat.opacity=racing?1:.85;mat.depthWrite=racing;mat.envMapIntensity=1.3;}
+      if(source.name.startsWith('Paint 1')){mat.color.set(color);mat.metalness=.68;mat.roughness=.3;mat.clearcoat=1;mat.clearcoatRoughness=.13;mat.normalScale?.setScalar(.10);paint=mat;}
+      if(source.name.startsWith('Paint 2')){mat.color.set('#222a30');mat.metalness=.45;mat.roughness=.32;}
+      if(source.name==='Glass'){mat.color.set('#23353d');mat.metalness=.4;mat.roughness=.09;mat.transmission=0;mat.transparent=!racing;mat.opacity=racing?1:.90;mat.depthWrite=racing;mat.envMapIntensity=1.1;}
       if(source.name.startsWith('Interior 3'))mat.color.set(color).multiplyScalar(.55);
       if(source.name==='Brakelight'){mat.emissive.set('#ff1733');mat.emissiveIntensity=2.8;brake=mat;}
       if(source.name==='Headlight'){mat.emissive.set('#cbebff');mat.emissiveIntensity=3.5;headlamps=mat;}
@@ -52,6 +53,30 @@ export function createCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
     for(const side of [-1,1])detail([.035,.14,.35],[side*width/2,height+.025,-1.82],paint);
   }
   if(spec.shape==='track'){detail([2.02,.04,.30],[0,.13,2.18]);for(const side of [-1,1])detail([.13,.06,1.7],[side*1.075,.13,-.1]);}
+  // Fit the rear lighting and vent trim to the actual body surface, including its curved shoulders.
+  body.updateMatrixWorld(true);
+  const rearMeshes=body.children.filter((o):o is THREE.Mesh=>o instanceof THREE.Mesh),ray=new THREE.Raycaster();
+  const rearPoint=(x:number,y:number,offset=.025)=>{
+    ray.set(new THREE.Vector3(x,y,-3),new THREE.Vector3(0,0,1));
+    const hit=ray.intersectObjects(rearMeshes,false)[0];return new THREE.Vector3(x,y,(hit?.point.z??-1.88)-offset);
+  };
+  const trimPoints:number[]=[],trimUvs:number[]=[],trimIndices:number[]=[];
+  for(let i=0;i<=32;i++)for(let j=0;j<=8;j++){
+    trimPoints.push(...rearPoint(-.98+i/32*1.96,.48+j/8*.24,.032).toArray());trimUvs.push(i/32,j/8);
+    if(i<32&&j<8){const a=i*9+j;trimIndices.push(a,a+9,a+1,a+1,a+9,a+10);}
+  }
+  const trimGeo=new THREE.BufferGeometry();trimGeo.setAttribute('position',new THREE.Float32BufferAttribute(trimPoints,3));trimGeo.setAttribute('uv',new THREE.Float32BufferAttribute(trimUvs,2));trimGeo.setIndex(trimIndices);trimGeo.computeVertexNormals();
+  const ventCanvas=document.createElement('canvas');ventCanvas.width=256;ventCanvas.height=64;const vc=ventCanvas.getContext('2d')!;vc.fillStyle='#23292c';vc.fillRect(0,0,256,64);vc.strokeStyle='#090d10';vc.lineWidth=2;
+  for(let y=0;y<70;y+=8)for(let x=-4;x<260;x+=9){const cx=x+(y%16?4.5:0);vc.beginPath();for(let i=0;i<6;i++){const a=i*Math.PI/3;vc.lineTo(cx+Math.cos(a)*4,y+Math.sin(a)*4);}vc.closePath();vc.stroke();}
+  const ventMap=new THREE.CanvasTexture(ventCanvas);ventMap.colorSpace=THREE.SRGBColorSpace;ventMap.anisotropy=8;
+  const trim=new THREE.Mesh(trimGeo,new THREE.MeshStandardMaterial({map:ventMap,metalness:.3,roughness:.55,side:THREE.DoubleSide}));body.add(trim);
+  const ledPieces:THREE.BufferGeometry[]=[];
+  for(const side of [-1,1]){
+    const points=Array.from({length:13},(_,i)=>rearPoint(side*(.16+i/12*.78),.675+Math.pow(i/12,3)*.018,.048));
+    ledPieces.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),24,.013,6,false));
+  }
+  const ledGeometry=mergeGeometries(ledPieces)!;ledPieces.forEach(g=>g.dispose());body.add(new THREE.Mesh(ledGeometry,brake));
+  for(const x of [-.7,-.35,0,.35,.7])detail([.018,.12,.23],[x,.14,-1.85]);
   const canvas=document.createElement('canvas');canvas.width=256;canvas.height=64;const ctx=canvas.getContext('2d')!;ctx.fillStyle='#111c23';ctx.fillRect(0,0,256,64);ctx.fillStyle='#d8e4e7';ctx.font='500 29px Rajdhani, sans-serif';ctx.textAlign='center';ctx.fillText('APEX / RUSH',128,43);const plateMap=new THREE.CanvasTexture(canvas);plateMap.colorSpace=THREE.SRGBColorSpace;
   const plate=new THREE.Mesh(new THREE.PlaneGeometry(.42,.11),new THREE.MeshStandardMaterial({map:plateMap,roughness:.65}));plate.position.set(0,.31,-1.90);plate.rotation.y=Math.PI;body.add(plate);
   const flames:THREE.Mesh[]=[];for(const side of [-1,1])for(let i=0;i<2;i++){
@@ -61,8 +86,8 @@ export function createCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
   group.scale.set(spec.shape==='track'?1.035:spec.shape==='flow'?1:.99,spec.shape==='flow'?1:.95,spec.shape==='flow'?1.06:1);
   let wheelAngle=0,previousTime=0;
   return {group,body,wheels,paint,brake,headlamps,flames,update(speed,steer,drift,boost,braking,time){
-    const delta=previousTime?Math.min(.1,time-previousTime):1/60;previousTime=time;wheelAngle+=speed*delta/.38;wheels.forEach((w,i)=>{w.children[0].rotation.x=wheelAngle;if(i>=2)w.rotation.y=steer*.26;});
+    const delta=previousTime?Math.min(.1,time-previousTime):1/60;previousTime=time;wheelAngle+=speed*delta/.38;wheels.forEach((w,i)=>{w.children[0].rotation.x=wheelAngle;if(i>=2)w.rotation.y=-steer*.26;});
     body.rotation.z=THREE.MathUtils.lerp(body.rotation.z,-steer*Math.min(speed/600,.045)-drift*.02,.12);body.position.y=Math.sin(time*18)*Math.min(speed/6000,.012);brake.emissiveIntensity=braking?6:2.4;
     flames.forEach((f,i)=>{f.visible=boost>0;f.scale.y=(.75+Math.sin(time*70+i)*.15)*(boost===2?1.65:1);(f.material as THREE.MeshBasicMaterial).color.set(i%2?'#ffffff':boost===2?'#b56bff':'#53c5ff');});
-  },dispose(){const geometries=new Set<THREE.BufferGeometry>(),mats=new Set<THREE.Material>();group.traverse(o=>{if(o instanceof THREE.Mesh){geometries.add(o.geometry);(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>mats.add(m));}});geometries.forEach(g=>g.dispose());mats.forEach(m=>m.dispose());plateMap.dispose();shadowTexture.dispose();}};
+  },dispose(){const geometries=new Set<THREE.BufferGeometry>(),mats=new Set<THREE.Material>();group.traverse(o=>{if(o instanceof THREE.Mesh){geometries.add(o.geometry);(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>mats.add(m));}});geometries.forEach(g=>g.dispose());mats.forEach(m=>m.dispose());plateMap.dispose();shadowTexture.dispose();ventMap.dispose();}};
 }

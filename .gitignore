@@ -8,3 +8,7 @@ playwright-report/
 .DS_Store
 artifacts/release/
 artifacts/*.zip
+
+# Generated screenshots and local archive checksums
+artifacts/*.png
+artifacts/SHA256SUMS.txt
