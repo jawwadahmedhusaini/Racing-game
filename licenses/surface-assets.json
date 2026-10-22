@@ -1,0 +1,73 @@
+[
+  {
+    "file": "ground-color.png",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/textures/rockyGround_basecolor.png",
+    "bytes": 1819556,
+    "sha256": "e0f9375b366c3bd3375581a329af36fe70ded07ffee8e1156aa6a210c16f486b",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license"
+  },
+  {
+    "file": "ground-normal.png",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/textures/rockyGround_normal.png",
+    "bytes": 2488211,
+    "sha256": "66fccd4db45e00fcc713907208b42aa9b64f4f26db35e9b5251b36756558b7a1",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license"
+  },
+  {
+    "file": "ground-rough.png",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/textures/rockyGround_metalRough.png",
+    "bytes": 625737,
+    "sha256": "9c92d4710faa18a7e0f547ba0ac7a312732087656b079d9548062f1df09674e8",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license"
+  },
+  {
+    "file": "grass-color.png",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/textures/grass.png",
+    "bytes": 2589839,
+    "sha256": "d4fe021bfb80d380912f77db43571e2b09999cd9f400efdd0a215d8a033b7240",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license"
+  },
+  {
+    "file": "water-normal.png",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/textures/waterbump.png",
+    "bytes": 60352,
+    "sha256": "5e3841ca3f0da0c22462b46f3b9647f7e15d5f49ae463ed558a432a2402ca5e7",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license"
+  },
+  {
+    "file": "foliage-color.png",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/Trees/Broadleaf_Desktop_Atlas.png",
+    "bytes": 1462065,
+    "sha256": "88698d0b2a18452e2eec6cd55be9dcc14c7e3150982807b2ed95de18a80ccd4d",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license"
+  },
+  {
+    "file": "foliage-normal.png",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/Trees/Broadleaf_Desktop_Atlas_Normal.png",
+    "bytes": 1612927,
+    "sha256": "1d995ae2c441eb44aada6bc251277c1d405dee016129fed35cf37efd98010f79",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license"
+  },
+  {
+    "file": "bark-color.jpg",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/Trees/BroadleafBark.jpg",
+    "bytes": 1376995,
+    "sha256": "abd3c66e776fbf37b8d74265fb65bdc936f3a549a2ca0af8548d4129cb5f9c6f",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license"
+  },
+  {
+    "file": "bark-normal.png",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/Trees/BroadleafBark_Normal.png",
+    "bytes": 2127114,
+    "sha256": "b7c482ee77418f0fcc07ff2eb60461512df65eea667fa1ffece52dcc41272b62",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license"
+  },
+  {
+    "file": "../vegetation.json",
+    "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/Trees/rawtrees.babylon",
+    "original_sha256": "ca542e1e4815b8b3e6144a611892f46dbfb6fddb13bbdfc3198873683d0c0e23",
+    "license": "CC BY 4.0; BabylonJS/Assets repository license",
+    "changes": "Selected LOD1 and LOD2, converted handedness, grouped leaf/bark index buffers, reduced float precision.",
+    "sha256": "7614d08ed3b0fff5ce1f6b20d96041c100aa8d2da7ace7b576d2c94c599098d0"
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "date": "2026-10-22",
+  "changes": [
+    "Manual steering and corrected left/right",
+    "Detailed player car and fitted rear lighting",
+    "Rebuilt coastal and city environments",
+    "MSAA, contact shading and lighting improvements"
+  ]
+}
