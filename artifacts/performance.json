@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-22T10:04:37.486Z",
+  "browser": "154.0.8037.57",
+  "viewport": "1280x800",
+  "samples": [
+    {
+      "quality": "low",
+      "scene": "garage",
+      "frames": 24,
+      "wallTimeMs": 23465.699999999997,
+      "fps": 1.02,
+      "medianFrameMs": 733.3,
+      "p95FrameMs": 4083.2,
+      "lastFrame": {
+        "drawCalls": 95,
+        "triangles": 113131,
+        "geometries": 94
+      }
+    },
+    {
+      "quality": "low",
+      "scene": "coast",
+      "frames": 24,
+      "wallTimeMs": 25382.300000000003,
+      "fps": 0.95,
+      "medianFrameMs": 933.3,
+      "p95FrameMs": 2866.6,
+      "lastFrame": {
+        "drawCalls": 76,
+        "triangles": 169204,
+        "geometries": 261
+      }
+    },
+    {
+      "quality": "medium",
+      "scene": "garage",
+      "frames": 24,
+      "wallTimeMs": 35515.3,
+      "fps": 0.68,
+      "medianFrameMs": 1183.3,
+      "p95FrameMs": 2933.2,
+      "lastFrame": {
+        "drawCalls": 140,
+        "triangles": 219582,
+        "geometries": 94
+      }
+    },
+    {
+      "quality": "medium",
+      "scene": "coast",
+      "frames": 24,
+      "wallTimeMs": 35798.600000000006,
+      "fps": 0.67,
+      "medianFrameMs": 1383.2,
+      "p95FrameMs": 2683.2,
+      "lastFrame": {
+        "drawCalls": 127,
+        "triangles": 247790,
+        "geometries": 269
+      }
+    }
+  ],
+  "errors": [],
+  "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+}

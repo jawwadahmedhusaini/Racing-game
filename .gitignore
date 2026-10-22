@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-pages/
+.vite/
+test-results/
+playwright-report/
+*.log
+.DS_Store
+artifacts/release/
+artifacts/*.zip
