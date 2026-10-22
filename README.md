@@ -23,3 +23,9 @@ Two circuits, three tuned concept-car variants, AI rivals, quick race, time atta
 Asset attribution and licenses are available in the game's Settings and the bundled `web/licenses` folder. See `PLAY-ME.txt` inside the archive for more details.
 
 The ZIP checksum is in [SHA256SUMS.txt](downloads/SHA256SUMS.txt).
+
+## Play from a web link
+
+The browser site is prepared on the `gh-pages` branch. Enable **Settings → Pages → Deploy from a branch → gh-pages → / (root)** and save. See [HOSTING.md](HOSTING.md) for instructions.
+
+After deployment completes, the game address is https://jawwadahmedhusaini.github.io/Racing-game/ — players need only their browser, with no ZIP or Python installation.
