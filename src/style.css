@@ -15,3 +15,5 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 
 .modal a{color:#a3d7e8;text-underline-offset:3px}.modal a:hover{color:white}
+
+.touch-steer{position:relative}.touch-controls .touch-recover{position:absolute;left:0;bottom:65px;width:83px;height:29px;font-size:10px;letter-spacing:1px}

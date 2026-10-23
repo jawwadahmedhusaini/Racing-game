@@ -34,3 +34,11 @@ The 106,391-triangle player/garage GLB and 30,534-triangle rival LOD are parsed 
 ## Testing
 
 Vitest exercises the pure simulation and storage boundaries. Playwright uses real keyboard/touch events and the development-only `window.__apex` observer/stepper for deterministic full-race checks. The stepper advances the same simulation used for normal play; it does not mark races complete or assign rewards directly. Production bundles do not contain the test API.
+
+## Version 2.1 rendering and control changes
+
+`batching.ts` partitions static triangles without changing their UVs or vertex normals, and partitions instances while retaining transforms and colors. Equal-material road strips are consolidated before partitioning. Tree clusters use matching near/far geometry with hysteresis. Low quality selects the lighter player model; switching presets replaces its visual model without replacing simulation state.
+
+`RenderSystem.captureEnvironment` captures a 128-pixel half-float cube and prefilters it once per cached scene. The garage excludes the car and includes reflection light cards; track captures occur before adding race cars. Render targets stay cached with their scenes. These probes are static approximations without parallax correction. AO excludes distant geometry, transparent effects and leaf cards.
+
+Input tracks individual touch pointers. Brake suppresses throttle and boost, including auto-acceleration. Pause prevents recovery/camera callbacks, and nested-dialog Escape returns to pause. Barrier constraints use the rotated vehicle footprint and are reapplied after rival contact.

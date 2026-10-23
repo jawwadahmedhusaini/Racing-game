@@ -13,11 +13,13 @@ import { publicUrl } from './urls';
 // Transparent effects and leaf cards should not become solid silhouettes in the AO buffer.
 class ContactAOPass extends GTAOPass {
   override render(renderer:THREE.WebGLRenderer,writeBuffer:THREE.WebGLRenderTarget,readBuffer:THREE.WebGLRenderTarget,deltaTime:number,maskActive:boolean){
-    const hidden:THREE.Object3D[]=[];
+    const hidden:THREE.Object3D[]=[],center=new THREE.Vector3();
     this.scene.traverse(object=>{
       if(!(object instanceof THREE.Mesh)||!object.visible)return;
       const materials=Array.isArray(object.material)?object.material:[object.material];
-      if(object instanceof Sky||object.userData.skipAO||materials.some(m=>m.transparent||m.alphaTest>0)){hidden.push(object);object.visible=false;}
+      const bounds=object instanceof THREE.InstancedMesh?object.boundingSphere:object.geometry.boundingSphere;
+      const distant=bounds&&center.copy(bounds.center).applyMatrix4(object.matrixWorld).distanceTo(this.camera.position)>90+bounds.radius;
+      if(object instanceof Sky||object.userData.skipAO||distant||materials.some(m=>m.transparent||m.alphaTest>0)){hidden.push(object);object.visible=false;}
     });
     try {super.render(renderer,writeBuffer,readBuffer,deltaTime,maskActive);}finally{hidden.forEach(object=>object.visible=true);}
   }
@@ -33,6 +35,7 @@ export class RenderSystem {
   ao: ContactAOPass;
   quality: Quality='high';
   environment?: THREE.Texture;skyBackground?:THREE.Texture;
+  probes=new WeakMap<THREE.Scene,THREE.WebGLRenderTarget>();
   ready: Promise<void>;
   width=1; height=1;
   constructor(container:HTMLElement) {
@@ -44,7 +47,7 @@ export class RenderSystem {
     this.renderer.domElement.id='game-canvas';this.renderer.domElement.setAttribute('aria-label','3D racing game');container.append(this.renderer.domElement);
     const target=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:4});
     this.composer=new EffectComposer(this.renderer,target);this.renderPass=new RenderPass(this.scene,this.camera);this.composer.addPass(this.renderPass);
-    this.ao=new ContactAOPass(this.scene,this.camera,1,1);this.ao.blendIntensity=.7;
+    this.ao=new ContactAOPass(this.scene,this.camera,1,1);this.ao.blendIntensity=.45;
     this.ao.updateGtaoMaterial({radius:1.2,distanceExponent:1.5,thickness:1.5,distanceFallOff:.8,scale:1,samples:12,screenSpaceRadius:false});
     this.ao.updatePdMaterial({radius:3,rings:2,samples:8});this.composer.addPass(this.ao);
     this.bloom=new UnrealBloomPass(new THREE.Vector2(1,1),.16,.55,1.6);this.composer.addPass(this.bloom);this.composer.addPass(new OutputPass());
@@ -55,7 +58,19 @@ export class RenderSystem {
     }).catch(()=>{pmrem.dispose();});
     this.resize();window.addEventListener('resize',()=>this.resize());
   }
-  setScene(scene:THREE.Scene) {this.scene=scene;scene.environment=this.environment??null;if(scene.userData.useHDRSky&&this.skyBackground){scene.background=this.skyBackground;scene.backgroundIntensity=.85;scene.backgroundBlurriness=.025;scene.backgroundRotation.y=.5;}this.renderPass.scene=scene;this.ao.scene=scene;}
+  setScene(scene:THREE.Scene) {this.scene=scene;scene.environment=this.probes.get(scene)?.texture??this.environment??null;this.renderPass.scene=scene;this.ao.scene=scene;}
+  captureEnvironment(scene:THREE.Scene,position:THREE.Vector3,hidden:THREE.Object3D[]=[]){
+    if(this.probes.has(scene))return;
+    const target=new THREE.WebGLCubeRenderTarget(128,{type:THREE.HalfFloatType}),camera=new THREE.CubeCamera(.25,1500,target);
+    camera.position.copy(position);const visibility=hidden.map(o=>o.visible),shadows=this.renderer.shadowMap.enabled,probeOnly:THREE.Object3D[]=[];
+    scene.traverse(o=>{if(o.userData.probeOnly)probeOnly.push(o);});
+    const generator=new THREE.PMREMGenerator(this.renderer);
+    try{
+      hidden.forEach(o=>o.visible=false);probeOnly.forEach(o=>o.visible=true);this.renderer.shadowMap.enabled=false;
+      scene.updateMatrixWorld(true);camera.update(this.renderer,scene);
+      const probe=generator.fromCubemap(target.texture);this.probes.set(scene,probe);scene.environment=probe.texture;
+    }finally{hidden.forEach((o,i)=>o.visible=visibility[i]);probeOnly.forEach(o=>o.visible=false);this.renderer.shadowMap.enabled=shadows;target.dispose();generator.dispose();}
+  }
   setQuality(quality:Quality) {
     this.quality=quality;
     const ratios={low:.75,medium:1,high:1.5,ultra:2};
@@ -67,7 +82,7 @@ export class RenderSystem {
 }
 
 export function createShowroom() {
-  const scene=new THREE.Scene();scene.background=new THREE.Color('#0c151e');scene.fog=new THREE.FogExp2('#0c151e',.023);scene.environmentIntensity=.4;
+  const scene=new THREE.Scene();scene.background=new THREE.Color('#0c151e');scene.fog=new THREE.FogExp2('#0c151e',.015);scene.environmentIntensity=.8;
   const group=new THREE.Group();scene.add(group);
   const floorMaterial=new THREE.MeshStandardMaterial({color:'#18232d',metalness:.12,roughness:.65});
   const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),floorMaterial);floor.rotation.x=-Math.PI/2;floor.position.y=-.08;floor.receiveShadow=true;scene.add(floor);
@@ -87,6 +102,10 @@ export function createShowroom() {
     const rib=new THREE.Mesh(new THREE.BoxGeometry(.12,7,.2),new THREE.MeshStandardMaterial({color:'#293944',metalness:.7,roughness:.4}));rib.position.set(i*2,3,-9);scene.add(rib);
     if(i%2===0){const bar=new THREE.Mesh(new THREE.BoxGeometry(.025,5,.03),lit);bar.position.set(i*2-.12,2.8,-8.85);scene.add(bar);}
   }
-  const ceiling=new THREE.Mesh(new THREE.BoxGeometry(12,.03,.13),lit);ceiling.position.set(0,6,-2);ceiling.rotation.z=-.10;scene.add(ceiling);
+  const wall=new THREE.Mesh(new THREE.BoxGeometry(35,12,.2),new THREE.MeshStandardMaterial({color:'#1c2833',roughness:.75}));wall.position.set(0,5,-9.3);scene.add(wall);
+  // Broad photographic softboxes produce clean, curved highlights across the bodywork.
+  const softbox=new THREE.MeshBasicMaterial({color:new THREE.Color(2.1,2.2,2.3),side:THREE.DoubleSide});
+  for(const x of [-4.8,4.8]){const panel=new THREE.Mesh(new THREE.PlaneGeometry(2.7,8),softbox);panel.position.set(x,5,0);panel.lookAt(0,0,0);panel.userData.probeOnly=true;panel.visible=false;scene.add(panel);}
+  const ceiling=new THREE.Mesh(new THREE.PlaneGeometry(7,2),softbox);ceiling.position.set(0,6,-2);ceiling.lookAt(0,0,0);ceiling.userData.probeOnly=true;ceiling.visible=false;scene.add(ceiling);
   return {scene,group};
 }

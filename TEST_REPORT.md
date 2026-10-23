@@ -1,42 +1,35 @@
-# APEX RUSH 2.0 — validation report
+# APEX RUSH 2.1 — validation report
 
-Release validation uses Chromium 154 / Playwright 1.64.1 on Linux, Node.js 24.19.0 and npm 11.9.0. Times in machine-readable reports are UTC. Chromium uses SwiftShader software WebGL 2; these checks do not establish hardware-GPU performance.
+Chromium 154 / Playwright 1.64.1 on Linux, Node.js 24.19.0 and npm 11.9.0. Machine-readable timestamps are UTC. Chromium uses SwiftShader software WebGL 2; hardware GPU performance is unmeasured.
 
-## Driving and progression
+## Results
 
-- `npm test`: **22 passed**, zero failed or skipped.
-- `npm run test:e2e`: **5 passed**, zero failed, skipped or flaky, no retries; about 4.9 minutes.
-- Dependency audit: zero reported vulnerabilities at this validation.
+- `npm test`: **30 passed** across simulation, geometry and storage; no failed or skipped checks.
+- `npm run test:e2e`: **6 passed**, no failures, skipped or flaky cases, no retries; 5.9 minutes.
+- `npm run build` and `npm run build:pages`: TypeScript and production builds passed.
+- Packaged production launcher and `/Racing-game/` subdirectory build: **both passed**, version 2.1.0, no console/page errors or failed HTTP requests.
+- Dependency audit: zero reported vulnerabilities.
 
-The new regression checks measure actual displacement against the chase camera's right vector, world heading and front-wheel orientation after real WASD, arrow and touch input. Forward-only input preserves world heading as the road bends and cannot automatically follow a lap. A pause regression verifies that camera distance stays between 6 and 12 meters after 12 render frames, preventing the camera from creeping into the stationary car. Both circuits' five rivals finish two laps using explicit steering/braking commands while the idle player remains stationary.
+## Regressions and user flows
 
-Other coverage includes countdown, acceleration/braking, drifting, nitro/shockwave, collisions, recovery, ramps/landings, full race completion, elimination, rewards credited once, career unlocks, purchases, upgrades and persistent paint/settings. Tests do not grant progression directly: long races use the same fixed-step simulation, with an explicitly supplied test driver. The production build removes the development observer/stepper.
+The existing suite verifies actual WASD/arrow/touch displacement against the chase camera, front-wheel yaw, forward-only world heading, paused camera distance, full races on both circuits, every rival finishing while an idle player remains stationary, elimination, career unlocks, purchases, upgrades, persistent settings/paint, replay and rewards credited once.
 
-## Graphics and production
+New checks cover nitro held before launch, empty-meter release/recharge, rotated body clearance at 45°/90°, rivals pushing at a barrier, brake priority over auto-acceleration and boost, independent fingers on a shared touch action, touch recovery, paused recovery/camera lock, Escape from focused settings controls and Low↔Medium quality changes without resetting race state. Geometry ray tests detect an inverted wing shell from above and below.
 
-The final high-quality visual review checks the garage, coastal opening, seaside bridge section and city. It exercises custom water and terrain shaders, detailed player and rival models, licensed tree LODs, local surface textures, contact shading, shadowing, antialiasing and bloom. The final roadside/barrier detail pass changes rendering only; the separate production smoke tests exercise that final code.
+Long race tests advance the same fixed-step simulation using an explicit test-driver input. They do not grant progression directly. Production checks use real input and assert that the development observer/stepper is absent.
 
-Production build, packaged launcher, subdirectory hosting, layout, asset-integrity and rendering results are recorded in the machine-readable artifacts listed below. The production tests use actual input without the development stepper, check for its absence, and fail on page/console errors or HTTP failures. Layouts cover 1280×800, 1600×900, 844×390 and 390×844. Ultra is rendered in the packaged-build check; High in the visual review; Low/Medium in the control/performance checks.
+## Visual and release checks
 
-- `artifacts/browser-results.json`
-- `artifacts/dependency-audit.json`
-- `artifacts/visual-review.json`
-- `artifacts/performance.json`
-- `artifacts/production-smoke.json`
-- `artifacts/hosting-smoke.json`
+Final High-quality captures cover the garage, coast opening, coastal bridge and city. The new wing winding was corrected after the six-flow browser run, then checked by geometry tests, final captures and both final production smoke tests. The review exercises studio/track cubemaps, tinted glass, carbon aero, city facades, terrain/water shaders, tree LODs, shadows, near-field contact shading, bloom and antialiasing. Ultra is rendered in the packaged-build check; Low/Medium in input/performance validation.
 
-Both ZIPs are checked for CRC errors when packaged. All 10 licensed environment assets match the SHA-256 hashes in their provenance manifest. The root-hosted build and `/Racing-game/` build are tested separately.
+Production layout checks cover 1280×800, 1600×900, 844×390 and 390×844. The static build contains 38 files and 26.5 MB before compression. The packaged HTTP files are compared against the build by SHA-256. Both ZIPs receive CRC and SHA-256 checks.
+
+The Pages-base smoke verifies both car models, all nine surfaces, vegetation, HDR, fonts, preview images and the license link under `/Racing-game/`. Actual acceleration and pause work. Both bundles are scanned for the absent development API.
+
+Evidence: `artifacts/browser-results.json`, `dependency-audit.json`, `visual-review.json`, `performance.json`, `production-smoke.json` and `hosting-smoke.json`. Final images are in `artifacts/` and the editable-source package.
 
 ## Limits
 
-Physical phones, hardware GPU frame rates, Safari/Firefox and subjective audio quality remain unverified. Windows/macOS launcher wrappers have not been executed on those operating systems. The three cars are variations of one licensed chassis. This iteration does not establish Asphalt 9 visual parity.
+Physical phones, hardware GPU frame rates, Safari/Firefox, gamepads and subjective speaker/headphone audio remain unverified. Windows/macOS launcher wrappers are included but have not been executed on those operating systems. The cars are three tuned variants of one licensed chassis. Reflections use static scene probes, not real-time moving-object reflection or ray tracing. This release does not establish Asphalt 9 visual parity or universal bug-free behavior.
 
-GitHub branch upload and local subpath verification are distinct from verifying the public Pages deployment. The cloud network blocks the github.io domain, so deployment status must be observed through GitHub Pages or a user's browser. See HOSTING.md.
-
-## Production results
-
-The packaged launcher served all 38 web files with HTTP response hashes matching the built files. The packaged build passed layout checks at all four viewports, Ultra rendering, real keyboard acceleration, nitro, pause and resume. No page/console errors or failed HTTP requests were recorded. Both production bundles were scanned and contain no development observer/stepper.
-
-The static build contains 38 files and is about 26.5 MB before compression. The playable ZIP is about 23.1 MB. `scripts/package-release.py` reproduces the playable and editable-source archives with CRC verification and SHA-256 checksums.
-
-The `/Racing-game/` production smoke test also passed: both models, all nine surface textures, vegetation data, HDR, fonts, track previews and the license link load under the correct base path. Real keyboard acceleration and pause work; version 2.0.0 is confirmed, with zero browser errors or failed HTTP responses.
+Uploading the gh-pages branch and testing a local subpath do not verify public Pages availability. The cloud network blocks github.io; see HOSTING.md for activation and the public URL.

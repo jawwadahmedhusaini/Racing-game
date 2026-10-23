@@ -3,6 +3,8 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import type {CarSpec} from './content';
 import {publicUrl} from './urls';
+import {random} from './materials';
+import {wingGeometry} from './aero';
 export interface CarModel {group:THREE.Group;body:THREE.Group;wheels:THREE.Group[];paint:THREE.MeshPhysicalMaterial;brake:THREE.MeshStandardMaterial;headlamps:THREE.MeshStandardMaterial;flames:THREE.Mesh[];update:(speed:number,steer:number,drift:number,boost:number,braking:boolean,time:number)=>void;dispose:()=>void;}
 let garageTemplate:THREE.Group|undefined,raceTemplate:THREE.Group|undefined;
 export async function loadVehicleAsset(){const loader=new GLTFLoader();const [garage,race]=await Promise.all([loader.loadAsync(publicUrl('assets/concept-car.glb')),loader.loadAsync(publicUrl('assets/concept-car-lod.glb'))]);garageTemplate=garage.scene;raceTemplate=race.scene;garageTemplate.updateMatrixWorld(true);raceTemplate.updateMatrixWorld(true);}
@@ -24,10 +26,10 @@ export function createCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
     const sourceMaterials=Array.isArray(o.material)?o.material:[o.material];
     // glTF material primitives are separate meshes in this loader.
     const source=sourceMaterials[0];let mat=materials.get(source) as THREE.MeshPhysicalMaterial|undefined;
-    if(!mat){mat=source.clone() as THREE.MeshPhysicalMaterial;materials.set(source,mat);mat.envMapIntensity=.9;
-      if(source.name.startsWith('Paint 1')){mat.color.set(color);mat.metalness=.68;mat.roughness=.3;mat.clearcoat=1;mat.clearcoatRoughness=.13;mat.normalScale?.setScalar(.10);paint=mat;}
+    if(!mat){mat=source.clone() as THREE.MeshPhysicalMaterial;materials.set(source,mat);mat.envMapIntensity=1;mat.aoMapIntensity=.7;
+      if(source.name.startsWith('Paint 1')){mat.color.set(color);mat.metalness=.72;mat.roughness=.27;mat.clearcoat=1;mat.clearcoatRoughness=.09;mat.normalScale?.setScalar(.065);paint=mat;}
       if(source.name.startsWith('Paint 2')){mat.color.set('#222a30');mat.metalness=.45;mat.roughness=.32;}
-      if(source.name==='Glass'){mat.color.set('#23353d');mat.metalness=.4;mat.roughness=.09;mat.transmission=0;mat.transparent=!racing;mat.opacity=racing?1:.90;mat.depthWrite=racing;mat.envMapIntensity=1.1;}
+      if(source.name==='Glass'){mat.color.set(racing?'#1c2c35':'#455c66');mat.metalness=.22;mat.roughness=.075;mat.transmission=0;mat.transparent=!racing;mat.opacity=racing?1:.73;mat.depthWrite=racing;mat.envMapIntensity=1.25;mat.aoMap=null;mat.normalMap=null;}
       if(source.name.startsWith('Interior 3'))mat.color.set(color).multiplyScalar(.55);
       if(source.name==='Brakelight'){mat.emissive.set('#ff1733');mat.emissiveIntensity=2.8;brake=mat;}
       if(source.name==='Headlight'){mat.emissive.set('#cbebff');mat.emissiveIntensity=3.5;headlamps=mat;}
@@ -43,14 +45,18 @@ export function createCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
   });
   for(const {mat,geos,parent} of buckets.values()){const geo=mergeGeometries(geos);if(geo){const mesh=new THREE.Mesh(geo,mat);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);}geos.forEach(g=>g.dispose());}
   paint??=new THREE.MeshPhysicalMaterial({color,metalness:.75,roughness:.26});brake??=new THREE.MeshStandardMaterial({emissive:'#ff1733'});headlamps??=new THREE.MeshStandardMaterial({emissive:'#ffffff'});
-  const carbon=new THREE.MeshStandardMaterial({color:'#111923',metalness:.4,roughness:.37});
+  const carbonMap=carbonTexture(),carbon=new THREE.MeshPhysicalMaterial({map:carbonMap,color:'#515b62',metalness:.3,roughness:.35,clearcoat:.7,clearcoatRoughness:.22});
   const detail=(size:number[],pos:number[],material:THREE.Material=carbon)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(...size as [number,number,number]),material);m.position.set(...pos as [number,number,number]);m.castShadow=true;body.add(m);return m;};
   // Distinct touring, long-tail and track aero packages on the licensed concept chassis.
   if(spec.shape!=='flow'){
     const width=spec.shape==='track'?2.32:2.08,height=spec.shape==='track'?1.19:.99;
-    for(const side of [-1,1])detail([.045,.32,.15],[side*.68,height-.16,-1.72]);
-    detail([width,.055,.31],[0,height,-1.82],spec.shape==='track'?carbon:paint).rotation.x=-.06;
-    for(const side of [-1,1])detail([.035,.14,.35],[side*width/2,height+.025,-1.82],paint);
+    for(const side of [-1,1]){const support=detail([.032,.28,.11],[side*.63,height-.14,-1.68]);support.rotation.x=-.27;}
+    const wing=new THREE.Mesh(wingGeometry(width,.38),carbon);wing.position.set(0,height,-1.79);wing.castShadow=true;body.add(wing);
+    for(const side of [-1,1]){
+      const shape=new THREE.Shape();shape.moveTo(-.18,-.06);shape.lineTo(.17,-.025);shape.quadraticCurveTo(.22,.10,.12,.12);shape.lineTo(-.15,.10);shape.lineTo(-.21,.01);shape.closePath();
+      const geometry=new THREE.ExtrudeGeometry(shape,{depth:.018,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.006,bevelThickness:.004,curveSegments:8});
+      const endplate=new THREE.Mesh(geometry,carbon);endplate.rotation.y=Math.PI/2;endplate.position.set(side*width/2,height+.07,-1.79);endplate.castShadow=true;body.add(endplate);
+    }
   }
   if(spec.shape==='track'){detail([2.02,.04,.30],[0,.13,2.18]);for(const side of [-1,1])detail([.13,.06,1.7],[side*1.075,.13,-.1]);}
   // Fit the rear lighting and vent trim to the actual body surface, including its curved shoulders.
@@ -89,5 +95,11 @@ export function createCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
     const delta=previousTime?Math.min(.1,time-previousTime):1/60;previousTime=time;wheelAngle+=speed*delta/.38;wheels.forEach((w,i)=>{w.children[0].rotation.x=wheelAngle;if(i>=2)w.rotation.y=-steer*.26;});
     body.rotation.z=THREE.MathUtils.lerp(body.rotation.z,-steer*Math.min(speed/600,.045)-drift*.02,.12);body.position.y=Math.sin(time*18)*Math.min(speed/6000,.012);brake.emissiveIntensity=braking?6:2.4;
     flames.forEach((f,i)=>{f.visible=boost>0;f.scale.y=(.75+Math.sin(time*70+i)*.15)*(boost===2?1.65:1);(f.material as THREE.MeshBasicMaterial).color.set(i%2?'#ffffff':boost===2?'#b56bff':'#53c5ff');});
-  },dispose(){const geometries=new Set<THREE.BufferGeometry>(),mats=new Set<THREE.Material>();group.traverse(o=>{if(o instanceof THREE.Mesh){geometries.add(o.geometry);(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>mats.add(m));}});geometries.forEach(g=>g.dispose());mats.forEach(m=>m.dispose());plateMap.dispose();shadowTexture.dispose();ventMap.dispose();}};
+  },dispose(){const geometries=new Set<THREE.BufferGeometry>(),mats=new Set<THREE.Material>();group.traverse(o=>{if(o instanceof THREE.Mesh){geometries.add(o.geometry);(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>mats.add(m));}});geometries.forEach(g=>g.dispose());mats.forEach(m=>m.dispose());plateMap.dispose();shadowTexture.dispose();ventMap.dispose();carbonMap.dispose();}};
+}
+
+function carbonTexture(){
+  const canvas=document.createElement('canvas');canvas.width=canvas.height=256;const c=canvas.getContext('2d')!,pixels=c.createImageData(256,256),rng=random(919);
+  for(let y=0;y<256;y++)for(let x=0;x<256;x++){const vertical=(Math.floor(x/8)+Math.floor(y/8))%2===0,strand=(vertical?x:y)%8,value=55+Math.sin(strand/8*Math.PI)*27+rng()*5;pixels.data.set([value*.91,value*.96,value,255],(y*256+x)*4);}
+  c.putImageData(pixels,0,0);const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.set(4,1);texture.anisotropy=8;return texture;
 }

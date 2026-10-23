@@ -66,6 +66,8 @@ export class RaceSimulation {
         a.collision=b.collision=.4;
       }
     }
+    // Rival contact can push a car across the wall after its own integration.
+    for(const d of this.drivers)if(!d.eliminated&&d.finishTime===null)this.constrainToRoad(d,0);
     if(this.mode==='elimination'&&this.elapsed>=this.nextElimination) {
       const active=this.ordered.filter(d=>!d.eliminated&&d.finishTime===null);
       if(active.length>1){const last=active[active.length-1];last.eliminated=true;last.speed=0;this.event(last.id===0?'ELIMINATED':`${last.name} ELIMINATED`);}
@@ -82,9 +84,11 @@ export class RaceSimulation {
     const max=d.spec.topSpeed/3.6*(1+up*.024);
     const accel=(15+d.spec.acceleration*.09)*(1+up*.06);
     d.boostCooldown=Math.max(0,d.boostCooldown-dt);
-    if(c.nitro&&d.nitro>0&&d.speed>5) {
-      if(!d.boostPrevious){d.boost=d.nitro>=95?2:1;if(d.id===0)this.event(d.boost===2?'SHOCKWAVE':'NITRO');}
-      d.nitro=Math.max(0,d.nitro-dt*(d.boost===2?23:17));
+    if(c.nitro&&d.speed>5) {
+      if(d.nitro>0){
+        if(!d.boostPrevious||d.boost===0){d.boost=d.nitro>=95?2:1;if(d.id===0)this.event(d.boost===2?'SHOCKWAVE':'NITRO');}
+        d.nitro=Math.max(0,d.nitro-dt*(d.boost===2?23:17));
+      }
     } else {d.boost=0;d.nitro=Math.min(100,d.nitro+dt*(c.throttle>0?2.3:1.2));}
     d.boostPrevious=c.nitro;
     if(d.nitro<=0)d.boost=0;
@@ -106,18 +110,26 @@ export class RaceSimulation {
     d.distance+=advance;
     const roadTurn=angleDelta(sample.yaw,this.track.sample(d.distance).yaw);
     d.heading=angleDelta(0,d.heading-roadTurn);
-    const bound=this.track.width/2-1.15;
     d.collision=Math.max(0,d.collision-dt);
-    if(Math.abs(d.lateral)>bound) {
-      d.lateral=clamp(d.lateral,-bound,bound);
-      if(d.collision<=0){d.speed*=.48;d.collision=.7;if(d.id===0)this.event('BARRIER CONTACT · STEER AWAY OR PRESS R');}
-      d.speed=Math.max(0,d.speed-dt*38);
-    }
+    this.constrainToRoad(d,dt);
     if(d.airborne>0||d.verticalSpeed>0){d.verticalSpeed-=dt*15;d.airborne+=d.verticalSpeed*dt;if(d.airborne<=0){d.airborne=0;d.verticalSpeed=0;d.nitro=Math.min(100,d.nitro+12);if(d.id===0)this.event('CLEAN LANDING · +12 NITRO');}}
     const lap=Math.floor(Math.max(0,d.distance)/this.track.length);
     if(d.speed>25&&d.airborne===0&&this.track.rampAt(d.distance,d.lateral)&&d.lastRamp!==lap){d.verticalSpeed=8+d.speed*.04;d.airborne=.1;d.lastRamp=lap;d.jumpTotal++;if(d.id===0)this.event('AIR TIME');}
     if(lap+1>d.lap&&lap<this.laps&&d.id===0)this.event(lap+1===this.laps?'FINAL LAP':`LAP ${lap+1}`);
     d.lap=lap+1;
+  }
+  roadClearance(d:Driver){
+    // Project the full rotated car footprint, including the wider track aero package.
+    const halfWidth=d.spec.shape==='track'?1.22:1.13,halfLength=d.spec.shape==='flow'?2.4:2.3;
+    return this.track.width/2-(Math.abs(Math.cos(d.heading))*halfWidth+Math.abs(Math.sin(d.heading))*halfLength)-.06;
+  }
+  constrainToRoad(d:Driver,dt:number){
+    const bound=this.roadClearance(d);
+    if(Math.abs(d.lateral)>bound){
+      d.lateral=clamp(d.lateral,-bound,bound);
+      if(d.collision<=0){d.speed*=.48;d.collision=.7;if(d.id===0)this.event('BARRIER CONTACT · STEER AWAY OR RECOVER');}
+      d.speed=Math.max(0,d.speed-dt*38);
+    }
   }
   recover(){if(this.status==='finished')return;this.player.lateral=0;this.player.heading=0;this.player.yawVelocity=0;this.player.speed=Math.min(this.player.speed,25);this.player.airborne=0;this.player.verticalSpeed=0;this.event('BACK ON TRACK');}
 }

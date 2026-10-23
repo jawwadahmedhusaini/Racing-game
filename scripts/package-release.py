@@ -27,7 +27,7 @@ with ZipFile(root/'artifacts'/'apex-rush-source.zip','w',ZIP_DEFLATED,compressle
         if file.is_file() and (file.suffix in ['.md','.json','.ts','.html'] or file.name=='.gitignore'):
             archive.write(file,Path('Racing-game')/file.name)
     evidence = ['browser-results.json','dependency-audit.json','performance.json','production-smoke.json','hosting-smoke.json','visual-review.json',
-                'garage-final.png','ultra-garage.png','coast-start.png','coast-final.png','city-final.png','mobile-garage.png','mobile-race.png','results.png','production-race.png']
+                'garage-final.png','garage-final.jpg','ultra-garage.png','coast-start.png','coast-final.png','city-final.png','mobile-garage.png','mobile-race.png','results.png','production-race.png']
     for name in evidence:
         file=root/'artifacts'/name
         if file.exists():

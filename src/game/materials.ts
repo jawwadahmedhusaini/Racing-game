@@ -26,7 +26,7 @@ export function asphaltMaterial(length: number, width: number, wet: boolean) {
     const value=43+grain*24+patch*4+(grain>.99?15:0);
     heights[i]=grain;
     pixels.data.set([value*.94,value*.97,value,255],i*4);
-    const r=wet?135+Math.max(0,patch+.3)*60:195+grain*45;
+    const r=wet?140+Math.min(1,Math.max(0,patch+.3))*90:195+grain*45;
     roughPixels.data.set([r,r,r,255],i*4);
   }
   c.putImageData(pixels,0,0);rough.putImageData(roughPixels,0,0);
@@ -37,7 +37,7 @@ export function asphaltMaterial(length: number, width: number, wet: boolean) {
   const map=new THREE.CanvasTexture(canvas),normalMap=new THREE.CanvasTexture(normalCanvas),roughnessMap=new THREE.CanvasTexture(roughCanvas);
   map.colorSpace=THREE.SRGBColorSpace;
   for(const texture of [map,normalMap,roughnessMap]){texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.set(width/5,length/5);texture.anisotropy=16;}
-  return new THREE.MeshPhysicalMaterial({map,normalMap,normalScale:new THREE.Vector2(.16,.16),roughnessMap,roughness:1,metalness:0,clearcoat:wet?.12:0,clearcoatRoughness:.24,envMapIntensity:wet?.55:.45});
+  return new THREE.MeshPhysicalMaterial({map,normalMap,normalScale:new THREE.Vector2(wet?.09:.16,wet?.09:.16),roughnessMap,roughness:1,metalness:0,clearcoat:wet?.18:0,clearcoatRoughness:.32,envMapIntensity:wet?.65:.45});
 }
 
 export function terrainMaterial() {
@@ -53,8 +53,8 @@ export function terrainMaterial() {
       vec3 rock=texture2D(rockSurface,vTerrainWorld.zy*.095).rgb*weights.x+texture2D(rockSurface,vTerrainWorld.xz*.095).rgb*weights.y+texture2D(rockSurface,vTerrainWorld.xy*.095).rgb*weights.z;
       vec3 grass=texture2D(grassSurface,vTerrainWorld.xz*.065).rgb*vec3(.78,.71,.48);
       float cover=smoothstep(.65,.93,vTerrainNormal.y)*smoothstep(-4.,18.,vTerrainWorld.y);
-      float variation=.88+.12*sin(vTerrainWorld.x*.073+sin(vTerrainWorld.z*.053));
-      diffuseColor.rgb*=mix(rock*1.15,grass,cover*.72)*variation;
+      float variation=.84+.12*sin(vTerrainWorld.x*.021+sin(vTerrainWorld.z*.017)*2.)+.07*sin(vTerrainWorld.x*.13+vTerrainWorld.z*.11);
+      diffuseColor.rgb*=mix(rock*1.2,grass,cover*(.58+.18*sin(vTerrainWorld.z*.037)*sin(vTerrainWorld.x*.031)))*variation;
     `);
   };
   material.customProgramCacheKey=()=> 'apex-triplanar-terrain-v2';

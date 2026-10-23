@@ -1,4 +1,4 @@
-APEX RUSH 2.0 — browser racing game
+APEX RUSH 2.1 — browser racing game
 
 1. Unzip the complete download.
 2. Install Python 3 if it is not already on your computer.
@@ -15,7 +15,8 @@ Space + steering drift, Shift nitro, C camera, R recover, Escape pause.
 Manual driving: brake before corners and steer through them. Forward does not
 automatically turn the car. Left/right match the chase camera.
 Drift to fill nitro. Activate at a full meter for shockwave boost.
-Touch controls and optional auto-acceleration are in the game.
+Touch controls include RECOVER. Brake overrides auto-acceleration and nitro.
+Release an empty boost to recharge.
 
 The bundled `web` directory is also ready for any static web host at its domain
 root. It must be served over HTTP/HTTPS; opening index.html directly does not
