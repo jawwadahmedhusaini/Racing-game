@@ -9,6 +9,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 import type { Quality } from './content';
 import { publicUrl } from './urls';
+import {ResolutionGovernor} from './performance';
 
 // Transparent effects and leaf cards should not become solid silhouettes in the AO buffer.
 class ContactAOPass extends GTAOPass {
@@ -37,7 +38,7 @@ export class RenderSystem {
   environment?: THREE.Texture;skyBackground?:THREE.Texture;
   probes=new WeakMap<THREE.Scene,THREE.WebGLRenderTarget>();
   ready: Promise<void>;
-  width=1; height=1;
+  width=1; height=1;governor=new ResolutionGovernor();
   constructor(container:HTMLElement) {
     this.renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
@@ -73,11 +74,19 @@ export class RenderSystem {
   }
   setQuality(quality:Quality) {
     this.quality=quality;
-    const ratios={low:.75,medium:1,high:1.5,ultra:2};
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio,ratios[quality]));
+    this.governor.reset();
+    this.updateResolution();
     this.renderer.shadowMap.enabled=quality!=='low';this.bloom.enabled=this.ao.enabled=quality==='high'||quality==='ultra';this.resize();
   }
-  resize() {this.width=window.innerWidth;this.height=window.innerHeight;this.camera.aspect=this.width/this.height;this.camera.updateProjectionMatrix();this.renderer.setSize(this.width,this.height);this.composer.setPixelRatio(this.renderer.getPixelRatio());this.composer.setSize(this.width,this.height);const scale=this.renderer.getPixelRatio()*(this.quality==='ultra'?.75:.5);this.ao.setSize(Math.max(1,Math.round(this.width*scale)),Math.max(1,Math.round(this.height*scale)));}
+  setAdaptive(enabled:boolean){this.governor.enabled=enabled;this.governor.reset();this.updateResolution();this.resize();}
+  sampleFrame(seconds:number,active:boolean){if(this.governor.sample(seconds,active)){this.updateResolution();this.resize();}}
+  updateResolution(){
+    const ratios={low:.75,medium:1,high:1.5,ultra:2};
+    const pixels=this.quality==='ultra'?3840*2160:2560*1440;
+    const cap=Math.sqrt(pixels/Math.max(1,innerWidth*innerHeight));
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio,ratios[this.quality],cap)*this.governor.scale);
+  }
+  resize() {this.updateResolution();this.width=window.innerWidth;this.height=window.innerHeight;this.camera.aspect=this.width/this.height;this.camera.updateProjectionMatrix();this.renderer.setSize(this.width,this.height);this.composer.setPixelRatio(this.renderer.getPixelRatio());this.composer.setSize(this.width,this.height);const scale=this.renderer.getPixelRatio()*(this.quality==='ultra'?.75:.5);this.ao.setSize(Math.max(1,Math.round(this.width*scale)),Math.max(1,Math.round(this.height*scale)));}
   render() { this.renderer.info.reset();if(this.bloom.enabled)this.composer.render();else this.renderer.render(this.scene,this.camera); }
 }
 

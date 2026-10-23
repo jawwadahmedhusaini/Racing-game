@@ -1,4 +1,4 @@
-APEX RUSH 2.1 — browser racing game
+APEX RUSH 2.2 — browser racing game
 
 1. Unzip the complete download.
 2. Install Python 3 if it is not already on your computer.
@@ -31,3 +31,8 @@ to the server address/port you use. Clearing site data erases progress.
 Credits and licenses are available in Settings and in web/licenses.
 The cars are tuned variants of the attributed Car Concept asset, not real
 manufacturer vehicles. This independent game is not an Asphalt product.
+
+Settings now include Adaptive Resolution and a live Performance Display.
+Adaptive Resolution keeps your effects preset and adjusts render sharpness
+under sustained load. Lower the graphics preset if the frame rate stays low.
+Close other APEX RUSH tabs before opening another session; this protects saves.

@@ -19,7 +19,7 @@ Warm Mediterranean coastal sunset and cool architectural showroom; black, ivory 
 Single-player first. No backend, purchases or public deployment required. Free-driving feel uses track-relative arcade dynamics rather than full rigid-body crash simulation. Major-studio asset fidelity, multiplayer, extensive cinematic content and device-wide performance guarantees are outside the first independently verified release.
 
 ## Current status
-All eight implementation stages are delivered for the scoped single-player release, including both circuits, progression, keyboard/touch controls and local packaging. See TEST_REPORT.md, PERFORMANCE_REPORT.md and BUG_TRACKER.md for the exact verified outcomes and limits. The built site is published to the gh-pages branch; GitHub Pages must be enabled by the owner. Real-device performance validation remains open. The 2.1 graphics/usability upgrade is specified in UPGRADE_PLAN.md.
+All eight implementation stages are delivered for the scoped single-player release, including both circuits, progression, keyboard/touch controls and local packaging. See TEST_REPORT.md, PERFORMANCE_REPORT.md and BUG_TRACKER.md for the exact verified outcomes and limits. The built site is published to the gh-pages branch; GitHub Pages must be enabled by the owner. Real-device performance validation remains open. The 2.2 graphics/usability upgrade is specified in UPGRADE_PLAN.md.
 
 ## Potential next releases
 

@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-23T08:26:50.491Z",
+  "date": "2026-10-23T18:13:23.645Z",
   "production": true,
   "errors": [],
   "layouts": [
@@ -33,7 +33,7 @@
     }
   ],
   "failedRequests": [],
-  "version": "2.1.0",
+  "version": "2.2.0",
   "testApiAbsent": true,
   "ultraRendered": true,
   "keyboardAcceleration": true,

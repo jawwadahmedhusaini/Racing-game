@@ -1,10 +1,11 @@
 {
-  "version": "2.1.0",
+  "version": "2.2.0",
   "date": "2026-10-23",
   "changes": [
-    "Scene-specific garage, coast and city reflections",
-    "Refined paint, tinted glass and sculpted carbon aero",
-    "Varied city architecture and distance-based scenery detail",
-    "Nitro, barrier, braking, touch and pause fixes"
+    "Remodeled long-nose and wide-body vehicle silhouettes",
+    "Coastal lighthouse and city transit landmarks",
+    "Adaptive resolution, pixel budgets and live performance display",
+    "Rotated/lapped-car contacts, skid marks and shadow fixes",
+    "Safer audio/storage failures, reload recovery and competing-tab protection"
   ]
 }

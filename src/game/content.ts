@@ -6,8 +6,8 @@ export interface CarSpec {
 
 export const CARS: CarSpec[] = [
   { id: 'vanta', name: 'VANTA GT', maker: 'AUREL', class: 'A', tagline: 'Precision, without compromise.', color: '#ff552b', topSpeed: 322, acceleration: 88, handling: 91, nitro: 82, price: 0, shape: 'wedge' },
-  { id: 'spectre', name: 'SPECTRE S', maker: 'NOVARA', class: 'S', tagline: 'Quiet design. Unreasonable speed.', color: '#b8dce0', topSpeed: 356, acceleration: 93, handling: 83, nitro: 94, price: 6000, shape: 'flow' },
-  { id: 'stratos', name: 'STRATOS R', maker: 'KAIROS', class: 'S', tagline: 'Engineered for the edge.', color: '#e7f069', topSpeed: 338, acceleration: 96, handling: 98, nitro: 88, price: 10000, shape: 'track' },
+  { id: 'spectre', name: 'SPECTRE S', maker: 'NOVARA', class: 'S', tagline: 'A long nose. A low horizon.', color: '#b8dce0', topSpeed: 356, acceleration: 93, handling: 83, nitro: 94, price: 6000, shape: 'flow' },
+  { id: 'stratos', name: 'STRATOS R', maker: 'KAIROS', class: 'S', tagline: 'Wide stance. Built for the apex.', color: '#e7f069', topSpeed: 338, acceleration: 96, handling: 98, nitro: 88, price: 10000, shape: 'track' },
 ];
 
 export const PAINTS = ['#ff552b', '#b8dce0', '#e7f069', '#f2f1eb', '#7672e8', '#263645'];

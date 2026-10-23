@@ -2,7 +2,7 @@ import {test,expect,type Page} from '@playwright/test';
 const state=(page:Page)=>page.evaluate(()=>(window as any).__apex.state());
 const advance=(page:Page,seconds:number,input:Record<string,number|boolean>={},center=false)=>page.evaluate(({seconds,input,center})=>(window as any).__apex.advance(seconds,input,center),{seconds,input,center});
 async function boot(page:Page){
-  await page.addInitScript(()=>{if(!localStorage.getItem('apex-rush-save-v1'))localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{quality:'low',difficulty:'rookie',music:0,engine:0,effects:0}}));});
+  await page.addInitScript(()=>{if(!localStorage.getItem('apex-rush-save-v1'))localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{adaptiveResolution:false,quality:'low',difficulty:'rookie',music:0,engine:0,effects:0}}));});
   await page.goto('/');await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
 }
 async function start(page:Page){await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await expect(page.locator('#countdown')).toBeVisible();}
@@ -86,10 +86,55 @@ test('brake overrides auto acceleration, pause locks recovery, and quality chang
   expect((await state(page)).input).toMatchObject({throttle:0,brake:1,nitro:false});const speed=(await state(page)).player.speed;
   await page.evaluate(()=>(window as any).__apex.advance(.5,null));expect((await state(page)).player.speed).toBeLessThan(speed-12);await page.keyboard.up('s');await page.keyboard.up('Shift');
   await advance(page,.2,{throttle:1,steer:1});await page.keyboard.press('Escape');const paused=await state(page);
-  await page.keyboard.press('r');await page.keyboard.press('c');expect((await state(page)).player).toEqual(paused.player);
+  await page.keyboard.press('r');await page.keyboard.press('c');expect((await state(page)).player).toEqual(paused.player);expect((await state(page)).cameraMode).toBe(paused.cameraMode);
   await page.getByRole('button',{name:'SETTINGS',exact:true}).click();await page.locator('#quality').selectOption('medium');
   expect((await state(page)).player).toEqual(paused.player);expect((await state(page)).quality).toBe('medium');
   await page.keyboard.press('Escape');await expect(page.getByText('PAUSED.',{exact:true})).toBeVisible();expect((await state(page)).paused).toBe(true);
   await page.keyboard.press('Escape');expect((await state(page)).paused).toBe(false);await page.keyboard.press('r');expect((await state(page)).player.heading).toBeCloseTo(0,1);
   await page.keyboard.press('Escape');await page.getByRole('button',{name:'SETTINGS',exact:true}).click();await page.locator('#quality').selectOption('low');expect((await state(page)).quality).toBe('low');expect(errors).toEqual([]);
+});
+
+test('rapid car browsing and repeated restarts release resources; graphics settings and blur remain safe',async({page})=>{
+  test.setTimeout(300_000); // Four complete restarts and thirteen mesh rebuilds under software WebGL.
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
+  const bounds:number[][]=[];
+  for(const name of ['VANTA GT','SPECTRE S','STRATOS R']){await page.getByRole('button',{name:`View ${name}`}).click();bounds.push((await state(page)).carBounds);}
+  expect(bounds[0][0]).toBeLessThan(2.38);expect(bounds[2][0]).toBeLessThan(2.48);expect(bounds[1][2]).toBeGreaterThan(bounds[0][2]*1.06);expect(bounds[2][1]).toBeLessThan(bounds[0][1]);
+  await page.getByRole('button',{name:'View VANTA GT'}).click();
+  await page.evaluate(()=>{for(let i=0;i<12;i++)(document.querySelector(`[data-action="car"][data-value="${i%3}"]`) as HTMLElement).click();(document.querySelector('[data-action="car"][data-value="0"]') as HTMLElement).click();});
+  await start(page);await advance(page,5);const samples:any[]=[];
+  for(let i=0;i<4;i++){
+    await page.keyboard.press('Escape');await page.getByRole('button',{name:'RESTART RACE',exact:true}).click();
+    await page.evaluate(async()=>{for(let f=0;f<2;f++)await new Promise(requestAnimationFrame);});samples.push(await state(page));
+  }
+  expect(samples.at(-1).geometries).toBeLessThanOrEqual(samples[1].geometries+2);expect(samples.at(-1).textures).toBeLessThanOrEqual(samples[1].textures+2);
+  await page.keyboard.down('w');await page.evaluate(()=>window.dispatchEvent(new Event('blur')));expect((await state(page)).paused).toBe(true);expect((await state(page)).input.throttle).toBe(0);await page.keyboard.up('w');
+  await page.getByRole('button',{name:'SETTINGS',exact:true}).click();await page.locator('#quality').selectOption('medium');expect((await state(page)).invalidCarShadows).toBe(0);
+  await page.locator('#adaptiveResolution').check();await page.locator('#showPerformance').check();await expect(page.getByLabel('Rendering performance')).toBeVisible();await expect(page.getByLabel('Rendering performance')).toContainText('AUTO');
+  await page.locator('#adaptiveResolution').uncheck();expect((await state(page)).adaptiveScale).toBe(1);
+  await page.getByRole('button',{name:'Close settings'}).click();await page.getByRole('button',{name:'QUIT TO GARAGE'}).click();await page.reload();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});await expect(page.getByLabel('Rendering performance')).toBeVisible();expect(errors).toEqual([]);
+});
+
+test('a second tab cannot overwrite progress and can take over after the first tab closes',async({context,page})=>{
+  await boot(page);await page.getByRole('button',{name:'Paint blue'}).click();const second=await context.newPage();await second.goto('/');
+  await expect(second.getByRole('heading',{name:'The game is open in another tab'})).toBeVisible();expect(await second.locator('#game-canvas').count()).toBe(0);
+  await page.close();await second.getByRole('button',{name:'RELOAD GAME'}).click();await expect(second.locator('.loading')).toHaveCount(0,{timeout:60000});await expect(second.getByRole('button',{name:'Paint blue'})).toHaveAttribute('aria-pressed','true');
+});
+
+test('blocked storage and a failed audio graph do not stop driving',async({page})=>{
+  await page.addInitScript(()=>{
+    const Original=window.AudioContext;
+    window.AudioContext=class extends Original{createGain():GainNode{throw new Error('Injected audio device failure');}};
+    Storage.prototype.setItem=function(){throw new DOMException('Storage blocked','SecurityError');};
+  });
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
+  await page.getByRole('button',{name:'Settings',exact:true}).click();await page.locator('#quality').selectOption('low');await page.getByRole('button',{name:'Close settings'}).click();
+  await page.getByRole('button',{name:'Paint blue'}).click();await expect(page.getByText('Progress is not saving — browser storage is unavailable.')).toBeVisible();await start(page);await advance(page,7,{throttle:1},true);expect((await state(page)).player.speed).toBeGreaterThan(20);expect(errors).toEqual([]);
+});
+
+test('asset download failure offers retry and context loss gives a usable reload action',async({page})=>{
+  await page.route('**/assets/concept-car.glb',route=>route.abort());await page.goto('/');await expect(page.getByRole('heading',{name:'Game files could not load'})).toBeVisible();
+  await page.unroute('**/assets/concept-car.glb');await page.getByRole('button',{name:'RELOAD GAME'}).click();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
+  await page.evaluate(()=>{const canvas=document.querySelector<HTMLCanvasElement>('#game-canvas')!;canvas.getContext('webgl2')!.getExtension('WEBGL_lose_context')!.loseContext();});
+  await expect(page.getByRole('heading',{name:'Graphics interrupted'})).toBeVisible();await page.getByRole('button',{name:'RELOAD GAME'}).click();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible();
 });

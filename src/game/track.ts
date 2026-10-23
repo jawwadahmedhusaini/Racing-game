@@ -5,6 +5,7 @@ export interface TrackSample { position:THREE.Vector3; tangent:THREE.Vector3; ri
 export class Track {
   id:TrackId; length:number; width=18; curve:THREE.CatmullRomCurve3;
   samples:TrackSample[]=[]; count=1800;
+  private maps=new Map<string,{path:string;point:(distance:number)=>{x:number;y:number}}>();
   constructor(id:TrackId) {
     this.id=id;
     const points=id==='coast'?[
@@ -33,10 +34,11 @@ export class Track {
     return d>this.length*.18&&d<this.length*.18+13&&lateral>3&&lateral<8;
   }
   mapPath(size=180,pad=12) {
+    const key=`${size}:${pad}`,cached=this.maps.get(key);if(cached)return cached;
     const xs=this.samples.map(s=>s.position.x),zs=this.samples.map(s=>s.position.z);
     const minX=Math.min(...xs),maxX=Math.max(...xs),minZ=Math.min(...zs),maxZ=Math.max(...zs),scale=(size-pad*2)/Math.max(maxX-minX,maxZ-minZ);
     const point=(distance:number)=>{const p=this.sample(distance).position;return {x:pad+(p.x-minX)*scale+(size-pad*2-(maxX-minX)*scale)/2,y:pad+(p.z-minZ)*scale+(size-pad*2-(maxZ-minZ)*scale)/2};};
-    let path='';for(let i=0;i<=100;i++){const p=point(i/100*this.length);path+=`${i?'L':'M'}${p.x.toFixed(1)},${p.y.toFixed(1)} `;}return {path:path+'Z',point};
+    let path='';for(let i=0;i<=100;i++){const p=point(i/100*this.length);path+=`${i?'L':'M'}${p.x.toFixed(1)},${p.y.toFixed(1)} `;}const result={path:path+'Z',point};this.maps.set(key,result);return result;
   }
 }
 export function angleDelta(a:number,b:number) {return Math.atan2(Math.sin(b-a),Math.cos(b-a));}

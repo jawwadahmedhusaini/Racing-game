@@ -12,7 +12,7 @@
 - Adapted GLB: `public/assets/concept-car.glb`.
 - Adapted GLB SHA-256: `bcf160d534b872d576b252b8406406095f9cc579b43af42ddd00da83ea21d22a`.
 
-Changes: reduced dense mesh geometry and texture resolution in Blender; neutralized the source showcase steering; removed the third-party license plate and steering emblem; changed glass rendering for performance; added game-specific paint, license plate, aero, fitted rear vents and LED light strips, wheel animation, lighting and boost effects. The variants have fictional names, tuned stats and different aero/proportions. No author or organization endorsement is implied.
+Changes: reduced dense mesh geometry and texture resolution in Blender; neutralized the source showcase steering; removed the third-party license plate and steering emblem; changed glass rendering for performance; added game-specific paint, license plate, aero, fitted rear vents and LED light strips, wheel animation, lighting and boost effects. The variants have fictional names, tuned stats and different aero/proportions. Version 2.2 adds original, coherent body/glass deformation for longer-nose and wider/lower silhouettes, with inverse-transpose normal correction and rigid wheel assemblies. These remain derivatives of the credited model, not separately sourced vehicle assets. The lighthouse and transit-platform geometry is original. No author or organization endorsement is implied.
 
 The original sample contains Khronos and 3D Commerce marks. The plate and emblem objects were removed rather than using those marks as game branding. Upstream metadata remains unmodified for provenance. In-game attribution is available through Settings → Asset Credits & Licenses.
 

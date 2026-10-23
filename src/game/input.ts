@@ -11,7 +11,7 @@ export class InputSystem {
     document.addEventListener('pointerup',release);document.addEventListener('pointercancel',release);document.addEventListener('lostpointercapture',release);
   }
   syncTouch(){this.touch.clear();for(const {action,element} of this.pointers.values()){this.touch.add(action);element.classList.add('pressed');}}
-  clear(){this.keys.clear();this.touch.clear();this.pointers.clear();document.querySelectorAll('.pressed').forEach(el=>el.classList.remove('pressed'));}
+  clear(){this.keys.clear();this.touch.clear();const pointers=[...this.pointers];this.pointers.clear();for(const [id,{element}] of pointers)if(element.hasPointerCapture(id))element.releasePointerCapture(id);document.querySelectorAll('.pressed').forEach(el=>el.classList.remove('pressed'));}
   read():Controls {
     const yes=(action:string,...codes:string[])=>this.touch.has(action)||codes.some(k=>this.keys.has(k));
     const brake=yes('brake','KeyS','ArrowDown')?1:0;

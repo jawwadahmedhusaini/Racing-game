@@ -1,6 +1,6 @@
 {
-  "version": "2.1.0",
-  "date": "2026-10-23T08:19:29.429Z",
+  "version": "2.2.0",
+  "date": "2026-10-23T13:30:44.937Z",
   "quality": "high",
   "errors": [],
   "scenes": [
@@ -20,11 +20,11 @@
         "id": 0,
         "name": "YOU",
         "spec": "vanta",
-        "distance": 1774.777409945367,
-        "lateral": -0.02192856652179384,
-        "speed": 39.06372009472427,
-        "heading": 0.008251918328605851,
-        "yawVelocity": -0.012001608903900101,
+        "distance": 1783.7231449334745,
+        "lateral": -0.03377537828766013,
+        "speed": 38.9770534280576,
+        "heading": 0.01036092918394541,
+        "yawVelocity": -0.011418841664474986,
         "nitro": 100,
         "boost": 0,
         "drift": 0,
@@ -42,15 +42,26 @@
         "boostPrevious": false,
         "jumpTotal": 0
       },
-      "elapsed": 28.533333333332994,
+      "elapsed": 28.683333333332985,
       "rank": 1,
       "credits": 2500,
       "selected": "vanta",
       "quality": "high",
+      "cameraMode": 0,
+      "adaptiveScale": 1,
+      "pixelRatio": 1,
+      "textures": 85,
+      "skidMarks": 0,
+      "carBounds": [
+        2.337911009788513,
+        1.0340470969676971,
+        4.357380628585815
+      ],
+      "invalidCarShadows": 0,
       "fps": 0,
-      "drawCalls": 510,
-      "triangles": 570155,
-      "geometries": 651
+      "drawCalls": 522,
+      "triangles": 573069,
+      "geometries": 657
     },
     {
       "track": "city",
@@ -68,12 +79,12 @@
         "id": 0,
         "name": "YOU",
         "spec": "vanta",
-        "distance": 146.19021534111226,
-        "lateral": -0.046109162741360565,
-        "speed": 62.05336684066764,
-        "heading": 0.008630283699104582,
-        "yawVelocity": -0.007414532445295217,
-        "nitro": 73.78833333333185,
+        "distance": 65.96693261878819,
+        "lateral": 0.03960324426138265,
+        "speed": 41.7977858110591,
+        "heading": -0.002679221481135153,
+        "yawVelocity": 0.005844243742593817,
+        "nitro": 70.4783333333324,
         "boost": 0,
         "drift": 0,
         "driftTotal": 0,
@@ -90,16 +101,46 @@
         "boostPrevious": false,
         "jumpTotal": 0
       },
-      "elapsed": 3.9166666666666576,
-      "rank": 2,
+      "elapsed": 2.533333333333329,
+      "rank": 1,
       "credits": 2500,
       "selected": "vanta",
       "quality": "high",
+      "cameraMode": 0,
+      "adaptiveScale": 1,
+      "pixelRatio": 1,
+      "textures": 98,
+      "skidMarks": 0,
+      "carBounds": [
+        2.337911009788513,
+        1.0340470969676971,
+        4.357380628585815
+      ],
+      "invalidCarShadows": 0,
       "fps": 0,
-      "drawCalls": 680,
-      "triangles": 561881,
-      "geometries": 1020
+      "drawCalls": 795,
+      "triangles": 576398,
+      "geometries": 649
     }
   ],
-  "passed": true
+  "vehicles": [
+    {
+      "name": "SPECTRE S",
+      "bounds": [
+        2.1471277475357056,
+        1.0977663695812225,
+        4.811995029449463
+      ]
+    },
+    {
+      "name": "STRATOS R",
+      "bounds": [
+        2.4253944158554077,
+        0.9066085517406464,
+        4.2702330350875854
+      ]
+    }
+  ],
+  "passed": true,
+  "cityRecheck": "2026-10-23T13:47:56.369Z"
 }
