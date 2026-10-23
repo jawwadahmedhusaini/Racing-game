@@ -33,8 +33,25 @@ describe('racing dynamics',()=>{
   it('throttle alone cannot auto-follow a lap through barriers',()=>{const sim=make('time');run(sim,90,{throttle:1});expect(sim.status).toBe('racing');expect(sim.player.distance).toBeLessThan(coast.length*.5);});
   it('rewards real drifting with nitro and records slip time',()=>{const sim=make('time');run(sim,7,{throttle:1},true);sim.player.nitro=30;run(sim,.4,{throttle:1,drift:true,steer:1});expect(sim.player.driftTotal).toBeGreaterThan(.35);expect(sim.player.nitro).toBeGreaterThan(35);expect(sim.player.drift).toBeGreaterThan(.5);});
   it('uses a full meter for shockwave and consumes it',()=>{const sim=make('time');run(sim,8,{throttle:1},true);sim.player.nitro=100;run(sim,.5,{throttle:1,nitro:true},true);expect(sim.player.boost).toBe(2);expect(sim.player.nitro).toBeLessThan(90);run(sim,.2,{throttle:1},true);expect(sim.player.boost).toBe(0);});
+  it('activates held nitro after launching, without wasting fuel before speed is sufficient',()=>{
+    const sim=make('time');run(sim,3.6);const fuel=sim.player.nitro;run(sim,.15,{throttle:1,nitro:true},true);expect(sim.player.speed).toBeLessThan(5);expect(sim.player.nitro).toBeGreaterThanOrEqual(fuel);
+    run(sim,.5,{throttle:1,nitro:true},true);expect(sim.player.boost).toBe(1);expect(sim.player.nitro).toBeLessThan(fuel);
+  });
+  it('keeps an exhausted boost empty until released, then recharges normally',()=>{
+    const sim=make('time');run(sim,7,{throttle:1},true);sim.player.nitro=.1;run(sim,.2,{throttle:1,nitro:true},true);expect(sim.player.nitro).toBe(0);expect(sim.player.boost).toBe(0);
+    run(sim,1,{throttle:1,nitro:true},true);expect(sim.player.nitro).toBe(0);expect(sim.player.boost).toBe(0);run(sim,.5,{throttle:1},true);expect(sim.player.nitro).toBeGreaterThan(1);
+  });
   it('barrier contact costs speed and recovery restores a usable line',()=>{const sim=make('time');run(sim,8,{throttle:1},true);const speed=sim.player.speed;sim.player.lateral=20;sim.step(1/60,NO_INPUT);expect(sim.player.speed).toBeLessThan(speed*.8);expect(sim.player.lateral).toBeLessThan(coast.width/2);expect(sim.player.collision).toBeGreaterThan(0);sim.recover();expect(sim.player.lateral).toBe(0);expect(sim.player.heading).toBe(0);});
   it('separates cars on contact without NaN or leaving the road',()=>{const sim=make();run(sim,4);sim.drivers[0].distance=100;sim.drivers[1].distance=102;sim.drivers[0].lateral=sim.drivers[1].lateral=0;sim.step(1/60,NO_INPUT);expect(Math.abs(sim.drivers[0].lateral-sim.drivers[1].lateral)).toBeGreaterThan(1.8);expect(sim.drivers.every(d=>Number.isFinite(d.speed))).toBe(true);});
+  for(const heading of [Math.PI/4,Math.PI/2,-Math.PI/2])it(`keeps the rotated body inside barriers at heading ${heading}`,()=>{
+    const sim=make('time');run(sim,4);sim.player.lateral=8;sim.player.heading=heading;sim.step(1/60,NO_INPUT);
+    const extent=Math.abs(Math.cos(sim.player.heading))*1.13+Math.abs(Math.sin(sim.player.heading))*2.3;
+    expect(Math.abs(sim.player.lateral)+extent).toBeLessThanOrEqual(coast.width/2-.05);
+  });
+  it('keeps a car inside the barrier when another car pushes it outward',()=>{
+    const sim=make();run(sim,4);sim.player.distance=100;sim.drivers[1].distance=100;sim.player.lateral=7.7;sim.drivers[1].lateral=7.6;
+    sim.step(1/60,NO_INPUT);for(const d of sim.drivers)expect(Math.abs(d.lateral)).toBeLessThanOrEqual(sim.roadClearance(d)+1e-6);
+  });
   it('launches from the marked ramp, lands, and awards nitro',()=>{const sim=make('time');run(sim,4);sim.player.distance=coast.length*.18+2;sim.player.lateral=5.5;sim.player.speed=40;sim.player.nitro=10;sim.step(1/60,{...NO_INPUT,throttle:1});expect(sim.player.airborne).toBeGreaterThan(0);expect(sim.player.jumpTotal).toBe(1);run(sim,3,{throttle:1},true);expect(sim.player.airborne).toBe(0);expect(sim.player.nitro).toBeGreaterThan(25);});
   it('runs a full two-lap race with physical AI opponents and valid results',()=>{const sim=make();run(sim,120,{throttle:1,nitro:true},true);expect(sim.status).toBe('finished');expect(sim.resultPosition).toBeGreaterThanOrEqual(1);expect(sim.resultPosition).toBeLessThanOrEqual(6);expect(sim.player.distance).toBeGreaterThanOrEqual(coast.length*2);expect(sim.player.finishTime).toBeGreaterThan(20);expect(sim.drivers.slice(1).every(d=>d.distance>coast.length*.5)).toBe(true);const time=sim.elapsed;run(sim,1,{throttle:1});expect(sim.elapsed).toBe(time);});
   for(const id of ['coast','city'] as const)it(`all rivals steer and finish both laps of ${id} while an idle player remains stationary`,()=>{

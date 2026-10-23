@@ -130,12 +130,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 25977,
+                  "duration": 28707,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-22T22:30:25.537Z",
+                  "startTime": "2026-10-23T08:09:05.067Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -164,12 +164,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 102660,
+                  "duration": 90706,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-22T22:30:51.737Z",
+                  "startTime": "2026-10-23T08:09:33.991Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -198,12 +198,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 88253,
+                  "duration": 93608,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-22T22:32:34.408Z",
+                  "startTime": "2026-10-23T08:11:04.708Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -232,12 +232,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 32091,
+                  "duration": 35831,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-22T22:34:02.680Z",
+                  "startTime": "2026-10-23T08:12:38.350Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -266,12 +266,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 44773,
+                  "duration": 44966,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-22T22:34:34.805Z",
+                  "startTime": "2026-10-23T08:13:14.200Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -283,15 +283,49 @@
           "file": "game.spec.ts",
           "line": 62,
           "column": 1
+        },
+        {
+          "title": "brake overrides auto acceleration, pause locks recovery, and quality changes preserve the race",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 55812,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T08:13:59.209Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8b1bb1493a64c9fc3ab6-d1f4d1b83da7e010338b",
+          "file": "game.spec.ts",
+          "line": 82,
+          "column": 1
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-22T22:30:25.023Z",
-    "duration": 295417.43799999997,
-    "expected": 5,
+    "startTime": "2026-10-23T08:09:04.587Z",
+    "duration": 353328.301,
+    "expected": 6,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

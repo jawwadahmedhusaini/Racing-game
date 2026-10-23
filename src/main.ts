@@ -32,14 +32,14 @@ class Game {
   constructor(){
     this.render=new RenderSystem(app);const uiRoot=document.createElement('div');uiRoot.id='ui';app.append(uiRoot);this.ui=new UI(uiRoot,this.save);
     this.garageCar=createCar(CARS.find(c=>c.id===this.save.selected)!,this.save.paints[this.save.selected]);this.showroom.group.add(this.garageCar.group);this.render.setScene(this.showroom.scene);this.render.setQuality(this.save.settings.quality);
-    this.ui.onAction=(action,value)=>this.action(action,value);this.input.onPause=()=>{if(this.simulation&&this.ui.screen==='racing')this.paused?this.resume():this.pause();else this.ui.closeModal();};this.input.onCamera=()=>this.cameraMode=(this.cameraMode+1)%3;this.input.onRecover=()=>this.simulation?.recover();this.input.autoAccelerate=this.save.settings.autoAccelerate;
+    this.ui.onAction=(action,value)=>this.action(action,value);this.input.onPause=()=>{if(this.simulation&&this.ui.screen==='racing')this.paused?(document.getElementById('modal')?.classList.contains('pause-modal')?this.resume():this.ui.pause()):this.pause();else this.ui.closeModal();};this.input.onCamera=()=>{if(this.ui.screen==='racing'&&!this.paused)this.cameraMode=(this.cameraMode+1)%3;};this.input.onRecover=()=>this.recover();this.input.autoAccelerate=this.save.settings.autoAccelerate;
     this.ui.viewed=Math.max(0,CARS.findIndex(c=>c.id===this.save.selected));this.ui.garage();this.applyQuality();
     this.render.renderer.domElement.addEventListener('pointerdown',e=>{if(this.ui.screen!=='garage')return;this.dragging=true;this.dragX=e.clientX;this.render.renderer.domElement.setPointerCapture(e.pointerId);});
     this.render.renderer.domElement.addEventListener('pointermove',e=>{if(this.dragging){this.rotation+=(e.clientX-this.dragX)*.008;this.dragX=e.clientX;}});this.render.renderer.domElement.addEventListener('pointerup',()=>this.dragging=false);this.render.renderer.domElement.addEventListener('pointercancel',()=>this.dragging=false);
     this.render.renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();if(this.simulation)this.pause();this.ui.toast('Graphics context interrupted. Reload the page to restore rendering. Your progress is saved.');});
     document.addEventListener('visibilitychange',()=>{if(document.hidden&&this.ui.screen==='racing'&&!this.paused)this.pause();});window.addEventListener('blur',()=>{if(this.ui.screen==='racing'&&!this.paused)this.pause();});
     document.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const modal=document.getElementById('modal');if(!modal)return;const elements=[...modal.querySelectorAll<HTMLElement>('button:not([disabled]),input,select')];if(!elements.length)return;const first=elements[0],last=elements.at(-1)!;if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
-    Promise.all([this.render.ready,document.fonts.ready]).then(()=>{loading.style.opacity='0';setTimeout(()=>loading.remove(),600);});
+    Promise.all([this.render.ready,document.fonts.ready]).then(()=>{this.render.captureEnvironment(this.showroom.scene,new THREE.Vector3(0,1.2,0),[this.showroom.group]);loading.style.opacity='0';setTimeout(()=>loading.remove(),600);});
     requestAnimationFrame(t=>this.frame(t));
   }
   persist(){if(!saveProgress(this.save))this.ui.toast('Browser storage is unavailable. This session still works, but progress cannot be saved.');}
@@ -61,6 +61,7 @@ class Game {
       case 'replay':case 'restart':this.startRace(this.lastRace.track,this.lastRace.mode,this.lastRace.event);break;
       case 'pause':this.pause();break;
       case 'resume':this.resume();break;
+      case 'recover':this.recover();break;
       case 'settings':this.settingsFromPause=this.ui.screen==='racing';if(this.settingsFromPause&&!this.paused)this.pause();this.ui.settings(this.settingsFromPause);break;
       case 'controls':this.ui.controls();break;
       case 'credits':this.ui.credits();break;
@@ -71,12 +72,27 @@ class Game {
   startRace(trackId:TrackId,mode:RaceMode,event=0){
     this.disposeRace();this.paused=false;this.raceCompleted=false;this.cameraInitialized=false;this.lastRace={track:trackId,mode,event};this.accumulator=0;this.lastCountdown=4;this.input.clear();this.ui.closeModal();
     let cached=this.worlds.get(trackId);if(!cached){const track=new Track(trackId);cached={track,world:createWorld(track)};this.worlds.set(trackId,cached);}
-    this.world=cached.world;this.render.setScene(this.world.scene);this.render.camera.clearViewOffset();this.render.renderer.toneMappingExposure=trackId==='city'?.95:.9;
+    this.world=cached.world;this.render.setScene(this.world.scene);const grid=cached.track.sample(0);this.world.update(0,grid.position,grid.tangent);this.render.captureEnvironment(this.world.scene,grid.position.clone().add(new THREE.Vector3(0,2,0)));this.render.camera.clearViewOffset();this.render.renderer.toneMappingExposure=trackId==='city'?.95:.9;
     this.simulation=new RaceSimulation({car:CARS.find(c=>c.id===this.save.selected)!,track:cached.track,mode,difficulty:this.save.settings.difficulty,upgrade:this.save.upgrades[this.save.selected]??0});
-    this.raceCars=this.simulation.drivers.map((d,i)=>{const car=createCar(d.spec,i===0?(this.save.paints[d.spec.id]??d.spec.color):['#a6bdc7','#e5dcba','#5f73b3','#82cdb9','#ea564b'][i-1],i!==0);car.group.traverse(o=>{if(o instanceof THREE.Mesh)o.castShadow=i===0;});this.world!.scene.add(car.group);return car;});
+    this.raceCars=this.simulation.drivers.map((d,i)=>{const car=createCar(d.spec,i===0?(this.save.paints[d.spec.id]??d.spec.color):['#a6bdc7','#e5dcba','#5f73b3','#82cdb9','#ea564b'][i-1],i!==0||this.save.settings.quality==='low');car.group.userData.detailLevel=i===0&&this.save.settings.quality!=='low';car.group.traverse(o=>{if(o instanceof THREE.Mesh)o.castShadow=i===0;});this.world!.scene.add(car.group);return car;});
     this.effects=new Effects(this.world.scene);this.ui.hud(this.simulation);this.applyQuality();this.updateRaceView(1/60,0);this.ui.updateHUD(this.simulation);
   }
-  applyQuality(){const size={low:256,medium:1024,high:2048,ultra:4096}[this.save.settings.quality];for(const scene of [this.showroom.scene,...[...this.worlds.values()].map(w=>w.world.scene)])scene.traverse(o=>{if(o instanceof THREE.DirectionalLight&&o.castShadow){o.shadow.mapSize.set(size,size);o.shadow.map?.dispose();o.shadow.map=null;}});}
+  applyQuality(){
+    const quality=this.save.settings.quality,size={low:256,medium:1024,high:2048,ultra:4096}[quality];
+    for(const scene of [this.showroom.scene,...[...this.worlds.values()].map(w=>w.world.scene)]){
+      scene.userData.quality=quality;
+      scene.traverse(o=>{
+        if(o instanceof THREE.DirectionalLight&&o.castShadow){o.shadow.mapSize.set(size,size);o.shadow.map?.dispose();o.shadow.map=null;}
+        if(o instanceof THREE.LOD&&o.userData.treeLOD)o.levels[1].distance={low:0,medium:75,high:115,ultra:170}[quality];
+      });
+    }
+    const player=this.raceCars[0],detailed=quality!=='low';
+    if(player&&player.group.userData.detailLevel!==detailed){
+      const spec=this.simulation!.player.spec,car=createCar(spec,this.save.paints[spec.id],!detailed);
+      car.group.userData.detailLevel=detailed;player.group.removeFromParent();player.dispose();this.raceCars[0]=car;this.world!.scene.add(car.group);
+    }
+  }
+  recover(){if(this.ui.screen==='racing'&&!this.paused&&!this.raceCompleted){this.simulation?.recover();this.cameraInitialized=false;}}
   pause(){if(this.ui.screen!=='racing')return;this.paused=true;this.input.clear();this.ui.pause();this.audio.update(null,false);}
   resume(){this.paused=false;this.input.clear();this.ui.closeModal();this.accumulator=0;}
   disposeRace(){this.raceCars.forEach(c=>{c.group.removeFromParent();c.dispose();});this.raceCars=[];this.effects?.dispose();this.effects=undefined;this.simulation=undefined;}

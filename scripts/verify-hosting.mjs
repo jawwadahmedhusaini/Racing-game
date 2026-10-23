@@ -16,8 +16,8 @@ try {
   await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(url);
   const release = await page.request.get(new URL('version.json',url).href);
-  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.0.0');
-  report.version='2.0.0';
+  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.1.0');
+  report.version='2.1.0';
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 60000 });
   expect(await page.evaluate(() => '__apex' in window)).toBe(false);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();

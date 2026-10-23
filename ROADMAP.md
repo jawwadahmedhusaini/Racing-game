@@ -13,13 +13,13 @@ Build an original browser arcade racer inspired by the pace and presentation of 
 8. Verification: build, meaningful deterministic simulation tests, browser interactions and full race completion, screenshots, console checks and measured performance. Document remaining limitations honestly.
 
 ## Art direction
-Warm Mediterranean coastal sunset and cool architectural showroom; black, ivory and vermilion editorial racing UI. The same fully modeled car is used in garage and gameplay. The vehicles use an attributed CC BY concept-car chassis with original aero, proportions and tuning. Road and architecture geometry is original, with attributed BabylonJS tree/surface assets, a CC0 HDR reflection map, atmospheric sky and locally bundled open-license typefaces. No copied Asphalt assets or licensed manufacturer identities.
+Warm Mediterranean coastal sunset and cool architectural showroom; black, ivory and vermilion editorial racing UI. The detailed chassis is used in the garage and Medium/High/Ultra gameplay; Low uses the lighter race mesh. The vehicles use an attributed CC BY concept-car chassis with original aero, proportions and tuning. Road and architecture geometry is original, with attributed BabylonJS tree/surface assets, a CC0 HDR reflection map, atmospheric sky and locally bundled open-license typefaces. No copied Asphalt assets or licensed manufacturer identities.
 
 ## Constraints
 Single-player first. No backend, purchases or public deployment required. Free-driving feel uses track-relative arcade dynamics rather than full rigid-body crash simulation. Major-studio asset fidelity, multiplayer, extensive cinematic content and device-wide performance guarantees are outside the first independently verified release.
 
 ## Current status
-All eight implementation stages are delivered for the scoped single-player release, including both circuits, progression, keyboard/touch controls and local packaging. See TEST_REPORT.md, PERFORMANCE_REPORT.md and BUG_TRACKER.md for the exact verified outcomes and limits. The built site is published to the gh-pages branch; GitHub Pages must be enabled by the owner. Real-device performance validation remains open. The 2.0 driving/visual upgrade is specified in UPGRADE_PLAN.md.
+All eight implementation stages are delivered for the scoped single-player release, including both circuits, progression, keyboard/touch controls and local packaging. See TEST_REPORT.md, PERFORMANCE_REPORT.md and BUG_TRACKER.md for the exact verified outcomes and limits. The built site is published to the gh-pages branch; GitHub Pages must be enabled by the owner. Real-device performance validation remains open. The 2.1 graphics/usability upgrade is specified in UPGRADE_PLAN.md.
 
 ## Potential next releases
 

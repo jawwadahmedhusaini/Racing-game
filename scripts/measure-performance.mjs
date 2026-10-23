@@ -1,12 +1,13 @@
 import { chromium } from '@playwright/test';
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium',
   headless: true,
   args: ['--no-sandbox', '--disable-dev-shm-usage', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
-const results = { date: new Date().toISOString(), browser: browser.version(), viewport: '1280x800', samples: [], errors: [] };
+const version=JSON.parse(await readFile('package.json','utf8')).version;
+const results = { version,date: new Date().toISOString(), browser: browser.version(), viewport: '1280x800', samples: [], errors: [] };
 try {
   for (const quality of ['low', 'medium']) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
@@ -48,6 +49,7 @@ try {
   }
 } finally {
   await browser.close();
+  results.passed=results.samples.length===4&&results.errors.length===0;
   await writeFile('artifacts/performance.json', JSON.stringify(results, null, 2));
 }
-if (results.errors.length) throw new Error(results.errors.join('\n'));
+if (!results.passed) throw new Error(results.errors.join('\n')||'Incomplete performance run');

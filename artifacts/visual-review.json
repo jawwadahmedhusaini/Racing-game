@@ -1,5 +1,6 @@
 {
-  "date": "2026-10-22T22:35:21.030Z",
+  "version": "2.1.0",
+  "date": "2026-10-23T08:19:29.429Z",
   "quality": "high",
   "errors": [],
   "scenes": [
@@ -19,11 +20,11 @@
         "id": 0,
         "name": "YOU",
         "spec": "vanta",
-        "distance": 1772.0635567235884,
-        "lateral": -0.020412818548219074,
+        "distance": 1774.777409945367,
+        "lateral": -0.02192856652179384,
         "speed": 39.06372009472427,
-        "heading": 0.007990728484247003,
-        "yawVelocity": -0.011752260117369538,
+        "heading": 0.008251918328605851,
+        "yawVelocity": -0.012001608903900101,
         "nitro": 100,
         "boost": 0,
         "drift": 0,
@@ -41,15 +42,15 @@
         "boostPrevious": false,
         "jumpTotal": 0
       },
-      "elapsed": 28.58333333333299,
+      "elapsed": 28.533333333332994,
       "rank": 1,
       "credits": 2500,
       "selected": "vanta",
       "quality": "high",
       "fps": 0,
-      "drawCalls": 352,
-      "triangles": 1789264,
-      "geometries": 297
+      "drawCalls": 510,
+      "triangles": 570155,
+      "geometries": 651
     },
     {
       "track": "city",
@@ -67,12 +68,12 @@
         "id": 0,
         "name": "YOU",
         "spec": "vanta",
-        "distance": 139.9335863105896,
-        "lateral": -0.0160896783095534,
-        "speed": 62.31708750816825,
-        "heading": 0.003762518250325824,
-        "yawVelocity": -0.013832745782203663,
-        "nitro": 73.64999999999854,
+        "distance": 146.19021534111226,
+        "lateral": -0.046109162741360565,
+        "speed": 62.05336684066764,
+        "heading": 0.008630283699104582,
+        "yawVelocity": -0.007414532445295217,
+        "nitro": 73.78833333333185,
         "boost": 0,
         "drift": 0,
         "driftTotal": 0,
@@ -89,15 +90,15 @@
         "boostPrevious": false,
         "jumpTotal": 0
       },
-      "elapsed": 3.816666666666658,
+      "elapsed": 3.9166666666666576,
       "rank": 2,
       "credits": 2500,
       "selected": "vanta",
       "quality": "high",
       "fps": 0,
-      "drawCalls": 418,
-      "triangles": 855384,
-      "geometries": 343
+      "drawCalls": 680,
+      "triangles": 561881,
+      "geometries": 1020
     }
   ],
   "passed": true

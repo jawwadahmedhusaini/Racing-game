@@ -4,13 +4,26 @@
 
 | Issue | Resolution / evidence |
 | --- | --- |
+| New wing rendered its inner surface | Corrected triangle winding; ray tests verify the outer shell from above and below. |
+| Nitro held before launch drained fuel without activating | Activation now waits for sufficient speed; regression covers launch and empty-meter release/recharge. |
+| Rotated car nose could cross the barrier | Wall clearance projects both vehicle length and width; 45°/90° regression checks. |
+| Rival contact pushed a car outside the road after integration | Reapply road constraints after car-to-car separation; regression covers contact at the boundary. |
+| Braking fought auto-acceleration / held throttle and boost | Brake has priority over throttle and nitro in the input layer. |
+| Two fingers on one touch action released together | Track each pointer independently and keep an action held until its final pointer releases. |
+| Recovery / camera shortcuts changed a paused race | Accept these actions only during active racing. |
+| Escape from settings resumed the race immediately | Escape returns nested race dialogs to pause before resuming; also works while a select has focus. |
+| Touch players had no recovery action | Added a dedicated RECOVER button. |
+| Driving backward had no clear warning | HUD now displays a wrong-way notice. |
+| Night cars reflected a sunny environment | Capture a filtered cubemap from each scene and reuse it on return. |
+| All city buildings shared one facade | Three facade families, stepped crowns and varied interior lighting. |
+| Entire scenery batches rendered when a small portion was visible | Spatial geometry/instance cells, tree LODs, local grass visibility and near-field AO. |
 | Paused camera crept into the car | Disable camera motion feed-forward and wheel spin while paused/finished; browser regression checks chase distance after 12 paused render frames. |
 | Reversed steering | Corrected the road right-vector and wheel yaw. Tests measure camera-relative displacement from real WASD, arrow and touch input. |
 | Forward automatically followed corners | Integrate world yaw explicitly and compensate for road-frame rotation; player steering has no automatic controller. Forward-only heading and full-lap regression checks pass. |
 | Floating road and sparse scenery | Grounded textured terrain, supported bridges, detailed road furniture, spatially instanced 3D trees, villas and rebuilt city facades. |
 | Excessive horizon bloom during the new art pass | Bounded sky radiance before bloom. Final visual captures verify the result. |
 | Water shader compilation error during development | Corrected the fragment shader; high-quality and production console checks cover compilation. |
-| Test runner collected browser specs as unit tests | Separate Vitest include pattern; 22 simulation/storage tests pass. |
+| Test runner collected browser specs as unit tests | Separate Vitest include pattern; 30 simulation/geometry/storage tests pass. |
 | Camera lost the car after large diagnostic time advances | Reset the diagnostic camera and add motion feed-forward to normal chasing; browser race and camera checks pass. |
 | Excessive racing model geometry and interior/shadow work | 30,534-triangle rival LOD, detailed player car, material batching, spatial tree culling and player-only dynamic car shadows. |
 | Coast HDR photograph put nearby buildings in the sky | Use an atmospheric sky shader; retain HDR only for reflections. Final coast screenshot reviewed. |

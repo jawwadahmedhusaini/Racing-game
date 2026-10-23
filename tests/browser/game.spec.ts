@@ -63,11 +63,33 @@ test('mobile layout and touch input work without overflowing the viewport',async
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true,deviceScaleFactor:1});const page=await context.newPage();const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);expect(await page.evaluate(()=>document.body.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'artifacts/mobile-garage.png'});
   await start(page);await advance(page,4);await expect(page.getByRole('button',{name:'Accelerate',exact:true})).toBeVisible();
   const box=(await page.getByRole('button',{name:'Accelerate',exact:true}).boundingBox())!;const cdp=await context.newCDPSession(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2}]});await expect.poll(async()=>(await state(page)).player.speed).toBeGreaterThan(0);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  // Independent fingers may share one action; releasing one must not release the other.
+  const ax=box.x+box.width/2,ay=box.y+box.height/2;
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:ax-6,y:ay,id:1},{x:ax+6,y:ay,id:2}]});
+  expect((await state(page)).input.throttle).toBe(1);
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:ax+6,y:ay,id:2}]});expect((await state(page)).input.throttle).toBe(1);
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});expect((await state(page)).input.throttle).toBe(0);
   await advance(page,3,{throttle:1},true);
   for(const [name,direction] of [['Steer left',-1],['Steer right',1]] as const){
     await page.keyboard.press('r');await advance(page,0);const before=await pose(page),control=(await page.getByRole('button',{name,exact:true}).boundingBox())!;
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:control.x+control.width/2,y:control.y+control.height/2}]});await page.evaluate(()=>(window as any).__apex.advance(.65,null));const after=await pose(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});assertDirection(before,after,direction);
     expect((await state(page)).input.steer).toBe(0);
   }
+  await page.getByRole('button',{name:'Recover car',exact:true}).tap();expect(Math.abs((await state(page)).player.lateral)).toBeLessThan(.1);
   await page.screenshot({path:'artifacts/mobile-race.png'});await page.getByRole('button',{name:'Pause race'}).tap();await expect(page.getByRole('button',{name:'RESUME RACE'})).toBeVisible();expect(errors).toEqual([]);await context.close();
+});
+
+test('brake overrides auto acceleration, pause locks recovery, and quality changes preserve the race',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  await boot(page);await page.getByRole('button',{name:'Settings',exact:true}).click();await page.locator('#autoAccelerate').check();await page.getByRole('button',{name:'Close settings'}).click();
+  await start(page);await advance(page,7,{throttle:1},true);await page.keyboard.down('s');await page.keyboard.down('Shift');
+  expect((await state(page)).input).toMatchObject({throttle:0,brake:1,nitro:false});const speed=(await state(page)).player.speed;
+  await page.evaluate(()=>(window as any).__apex.advance(.5,null));expect((await state(page)).player.speed).toBeLessThan(speed-12);await page.keyboard.up('s');await page.keyboard.up('Shift');
+  await advance(page,.2,{throttle:1,steer:1});await page.keyboard.press('Escape');const paused=await state(page);
+  await page.keyboard.press('r');await page.keyboard.press('c');expect((await state(page)).player).toEqual(paused.player);
+  await page.getByRole('button',{name:'SETTINGS',exact:true}).click();await page.locator('#quality').selectOption('medium');
+  expect((await state(page)).player).toEqual(paused.player);expect((await state(page)).quality).toBe('medium');
+  await page.keyboard.press('Escape');await expect(page.getByText('PAUSED.',{exact:true})).toBeVisible();expect((await state(page)).paused).toBe(true);
+  await page.keyboard.press('Escape');expect((await state(page)).paused).toBe(false);await page.keyboard.press('r');expect((await state(page)).player.heading).toBeCloseTo(0,1);
+  await page.keyboard.press('Escape');await page.getByRole('button',{name:'SETTINGS',exact:true}).click();await page.locator('#quality').selectOption('low');expect((await state(page)).quality).toBe('low');expect(errors).toEqual([]);
 });
