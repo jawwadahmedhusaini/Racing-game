@@ -42,3 +42,13 @@ Vitest exercises the pure simulation and storage boundaries. Playwright uses rea
 `RenderSystem.captureEnvironment` captures a 128-pixel half-float cube and prefilters it once per cached scene. The garage excludes the car and includes reflection light cards; track captures occur before adding race cars. Render targets stay cached with their scenes. These probes are static approximations without parallax correction. AO excludes distant geometry, transparent effects and leaf cards.
 
 Input tracks individual touch pointers. Brake suppresses throttle and boost, including auto-acceleration. Pause prevents recovery/camera callbacks, and nested-dialog Escape returns to pause. Barrier constraints use the rotated vehicle footprint and are reapplied after rival contact.
+
+## Version 2.2 resilience and device controls
+
+`vehicle-shape.ts` coherently remaps the licensed body/glass mesh and its authored normals, while repositioning complete wheel assemblies. `contact.ts` uses oriented footprints and wrapped track distance, so lapped and sideways cars collide. The physics remain an arcade approximation in road coordinates.
+
+`performance.ts` samples uncapped wall time in two-second windows after a three-second settling period. Sustained averages over 24 ms reduce scale by 0.1 to a floor of 0.55. Four windows below 17 ms permit a 0.05 increase. Menu pauses/hidden tabs are excluded and manual preset changes reset it. Pixel budgets additionally cap High and lower at 2560×1440, Ultra at 3840×2160. This controls GPU fill cost, not CPU scene complexity.
+
+`session.ts` holds a Web Lock until page exit. A second tab receives a reload screen before assets are downloaded. The persistence layer also compares the last read serialized save before writing, and stops a stale session if another source changes it. Without Web Locks the comparison catches sequential stale writes but is not an atomic cross-process transaction. A restored back/forward-cache page reloads before resuming.
+
+Audio becomes available to the frame loop only after the whole graph succeeds; partial setup is closed. Temporary sound nodes disconnect when finished and a zero effects volume never creates tones. Fatal asset-download and graphics-context failures expose a keyboard-accessible reload action. Runtime resources are bounded and race restarts dispose car/effect geometry, materials and per-car textures. Minimap paths are cached by viewport size.

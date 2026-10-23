@@ -1,6 +1,6 @@
 {
-  "version": "2.1.0",
-  "date": "2026-10-23T08:22:34.194Z",
+  "version": "2.2.0",
+  "date": "2026-10-23T13:49:41.779Z",
   "browser": "154.0.8037.57",
   "viewport": "1280x800",
   "samples": [
@@ -8,10 +8,10 @@
       "quality": "low",
       "scene": "garage",
       "frames": 24,
-      "wallTimeMs": 13099.5,
-      "fps": 1.83,
-      "medianFrameMs": 466.6,
-      "p95FrameMs": 1466.6,
+      "wallTimeMs": 12049.5,
+      "fps": 1.99,
+      "medianFrameMs": 483.4,
+      "p95FrameMs": 949.9,
       "lastFrame": {
         "drawCalls": 102,
         "triangles": 116059,
@@ -22,24 +22,24 @@
       "quality": "low",
       "scene": "coast",
       "frames": 24,
-      "wallTimeMs": 27582.199999999997,
+      "wallTimeMs": 27582.1,
       "fps": 0.87,
-      "medianFrameMs": 1133.3,
-      "p95FrameMs": 1266.6,
+      "medianFrameMs": 1133.2,
+      "p95FrameMs": 1299.9,
       "lastFrame": {
-        "drawCalls": 272,
-        "triangles": 205514,
-        "geometries": 678
+        "drawCalls": 250,
+        "triangles": 182342,
+        "geometries": 668
       }
     },
     {
       "quality": "medium",
       "scene": "garage",
       "frames": 24,
-      "wallTimeMs": 18082.6,
-      "fps": 1.33,
-      "medianFrameMs": 749.9,
-      "p95FrameMs": 1583.3,
+      "wallTimeMs": 19732.5,
+      "fps": 1.22,
+      "medianFrameMs": 783.3,
+      "p95FrameMs": 1583.2,
       "lastFrame": {
         "drawCalls": 152,
         "triangles": 224350,
@@ -50,14 +50,14 @@
       "quality": "medium",
       "scene": "coast",
       "frames": 24,
-      "wallTimeMs": 52764.5,
+      "wallTimeMs": 53914.5,
       "fps": 0.45,
-      "medianFrameMs": 2166.6,
-      "p95FrameMs": 2399.9,
+      "medianFrameMs": 2233.1,
+      "p95FrameMs": 2599.9,
       "lastFrame": {
-        "drawCalls": 376,
-        "triangles": 484974,
-        "geometries": 688
+        "drawCalls": 348,
+        "triangles": 458034,
+        "geometries": 675
       }
     }
   ],

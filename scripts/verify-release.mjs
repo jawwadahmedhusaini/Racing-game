@@ -8,11 +8,11 @@ try {
   page.on('pageerror', e => report.errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error') report.errors.push(m.text()); });
   page.on('response', response => { if (response.status() >= 400) report.failedRequests.push({ url: response.url(), status: response.status() }); });
-  await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { quality: 'low', engine: 0, music: 0, effects: 0 } })));
+  await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(process.env.GAME_URL || 'http://127.0.0.1:8000');
   const release = await page.request.get(new URL('version.json',page.url()).href);
-  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.1.0');
-  report.version='2.1.0';
+  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.2.0');
+  report.version='2.2.0';
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 60000 });
   expect(await page.evaluate(() => '__apex' in window)).toBe(false);
   report.testApiAbsent = true;

@@ -26,7 +26,7 @@ export function asphaltMaterial(length: number, width: number, wet: boolean) {
     const value=43+grain*24+patch*4+(grain>.99?15:0);
     heights[i]=grain;
     pixels.data.set([value*.94,value*.97,value,255],i*4);
-    const r=wet?140+Math.min(1,Math.max(0,patch+.3))*90:195+grain*45;
+    const r=wet?225+grain*25:195+grain*45;
     roughPixels.data.set([r,r,r,255],i*4);
   }
   c.putImageData(pixels,0,0);rough.putImageData(roughPixels,0,0);
@@ -37,7 +37,21 @@ export function asphaltMaterial(length: number, width: number, wet: boolean) {
   const map=new THREE.CanvasTexture(canvas),normalMap=new THREE.CanvasTexture(normalCanvas),roughnessMap=new THREE.CanvasTexture(roughCanvas);
   map.colorSpace=THREE.SRGBColorSpace;
   for(const texture of [map,normalMap,roughnessMap]){texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.set(width/5,length/5);texture.anisotropy=16;}
-  return new THREE.MeshPhysicalMaterial({map,normalMap,normalScale:new THREE.Vector2(wet?.09:.16,wet?.09:.16),roughnessMap,roughness:1,metalness:0,clearcoat:wet?.18:0,clearcoatRoughness:.32,envMapIntensity:wet?.65:.45});
+  const material=new THREE.MeshPhysicalMaterial({map,normalMap,normalScale:new THREE.Vector2(wet?.09:.16,wet?.09:.16),roughnessMap,roughness:1,metalness:0,clearcoat:wet?.18:0,clearcoatRoughness:.32,envMapIntensity:wet?.65:.45});
+  if(wet){
+    // Meter-scale grain and broad wetness need independent spatial scales.
+    // World-space variation avoids the repeated 5 m checkerboard of glossy tiles.
+    material.onBeforeCompile=shader=>{
+      shader.vertexShader='varying vec3 vRoadWorld;\n'+shader.vertexShader;
+      shader.vertexShader=shader.vertexShader.replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvRoadWorld=(modelMatrix*vec4(position,1.)).xyz;');
+      shader.fragmentShader='varying vec3 vRoadWorld;\n'+shader.fragmentShader;
+      shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
+        float wetness=.5+.23*sin(vRoadWorld.x*.065+sin(vRoadWorld.z*.047)*1.8)+.2*sin(vRoadWorld.z*.083+vRoadWorld.x*.029);
+        roughnessFactor*=mix(.60,.96,smoothstep(.25,.75,wetness));`);
+    };
+    material.customProgramCacheKey=()=> 'apex-wet-road-v3';
+  }
+  return material;
 }
 
 export function terrainMaterial() {

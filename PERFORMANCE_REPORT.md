@@ -1,47 +1,36 @@
-# APEX RUSH 2.1 — rendering and performance
+# APEX RUSH 2.2.0 — rendering and performance
 
-Measured at 2026-10-23T08:22:34.194Z (UTC). Raw data: `artifacts/performance.json`.
+Measured at 2026-10-23T13:49:41.779Z (UTC). Raw evidence: `artifacts/performance.json`.
 
-## Conditions and results
+## Conditions
 
-Chromium 154 on Linux, ANGLE/SwiftShader software WebGL 2 on the shared cloud CPU, no hardware GPU. One browser at a time, 1280×800 CSS pixels and device scale factor 1. After five warm-up frames, the script samples 24 actual requestAnimationFrame intervals per scene/preset. The coast sample is a moving six-car race near the opening. These short runs include shared-host scheduling variability; they are diagnostics, not a stable device benchmark.
+Chromium 154.0.8037.57, Linux, ANGLE/SwiftShader software WebGL 2 on a shared cloud CPU. No hardware GPU. One browser at a time, 1280×800 CSS pixels, DPR 1, adaptive resolution explicitly disabled. After five warm-up frames, 24 real requestAnimationFrame intervals are collected per scene/preset. The coast sample is a moving six-car race near the opening; this is a short diagnostic with host scheduling variability.
 
-| Preset / scene | Wall-clock FPS | Median frame | P95 frame | Last-frame draw calls | Last-frame triangles |
+| Preset / scene | Wall-clock FPS | Median ms | P95 ms | Last-frame calls | Last-frame triangles |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Low / garage | 1.83 | 466.6 ms | 1466.6 ms | 102 | 116,059 |
-| Low / coast | 0.87 | 1133.3 ms | 1266.6 ms | 272 | 205,514 |
-| Medium / garage | 1.33 | 749.9 ms | 1583.3 ms | 152 | 224,350 |
-| Medium / coast | 0.45 | 2166.6 ms | 2399.9 ms | 376 | 484,974 |
+| low / garage | 1.99 | 483.4 | 949.9 | 102 | 116,059 |
+| low / coast | 0.87 | 1133.2 | 1299.9 | 250 | 182,342 |
+| medium / garage | 1.22 | 783.3 | 1583.2 | 152 | 224,350 |
+| medium / coast | 0.45 | 2233.1 | 2599.9 | 348 | 458,034 |
 
-The software renderer does not provide a usable gaming frame rate. These results do not demonstrate 30/60 FPS on a hardware-accelerated desktop or phone. The simulation slows on insufficient hardware rather than integrating unstable large time steps.
+These software results do not establish a playable hardware frame rate. There is no claim of a 30/60 FPS target being met on phones or desktop GPUs. Very slow rendering deliberately slows simulation instead of integrating unstable large timesteps.
 
-## Comparison with 2.0
+## Implemented controls
 
-The same script, viewport, presets and opening-track procedure were used. Because the race moves during sampling, final camera positions are similar but not identical; resource counts are indicative, not a controlled single-frame benchmark. CPU scheduling also varies between runs.
+- Adaptive resolution samples uncapped frame time. After settling, sustained averages above 24 ms reduce render scale by 0.1, down to 0.55; four windows below 17 ms allow a gradual 0.05 increase. Pause/hidden frames are excluded. Changing the preset or disabling adaptive resolution restores full preset resolution.
+- Pixel budgets cap High and lower at 2560×1440 and Ultra at 3840×2160, in addition to the preset/DPR caps. This limits pixel allocation on dense and very large displays.
+- Low uses the 30,534-triangle player mesh and no dynamic shadows/AO/bloom. Medium and above use the 106,391-triangle detailed player; all rivals retain the lighter mesh. Modeled silhouette changes add no triangles.
+- Static geometry is spatially divided; equal-material road strips and landmark meshes are merged. Near/far trees and grass distances control scenery detail. Transparent effects and distant geometry are excluded from contact AO.
+- Reflection probes are 128-pixel cube faces, captured once per scene and cached. No per-frame cube capture or moving-object reflections.
+- The minimap path and bounds are cached. Car/effect resources are disposed between races; the browser stress flow checks geometry/texture counts after four restarts. Particle and skid buffers are bounded.
 
-- Low coast: 712,290 → 205,514 rendered triangles (71.1% fewer); draw calls 194 → 272; software FPS 0.64 → 0.87.
-- Medium coast: 1,127,887 → 484,974 rendered triangles (57.0% fewer); draw calls 267 → 376; software FPS 0.42 → 0.45.
-
-Spatial subdivision trades additional draw calls for less off-screen geometry. Hardware performance still needs measurement before selecting final cell sizes for specific mobile/desktop GPUs.
-
-## Cost controls
-
-- Detailed garage/player chassis: 106,391 triangles before runtime aero/lights; rivals and the Low-quality player use the 30,534-triangle mesh.
-- Only the player casts dynamic car shadows. Rival contact shadows, material batching and separate wheel groups remain.
-- Terrain, buildings, road strips and instances use spatial cells. Matching near/far trees switch with hysteresis. Distant grass is hidden. AO excludes distant geometry, leaf cards and transparent effects.
-- Scene reflection probes are captured once at 128 pixels per face and prefiltered, then cached. Captures happen on scene entry, not every frame. They are static, lack parallax correction and do not reflect moving opponents.
-- Track worlds are cached; per-race car/effect resources are disposed. Geometry and material presets can change without resetting progress in the current race.
-- Local assets and bounded particle/skid buffers; no third-party runtime requests.
-
-## Presets
-
-| Preset | Pixel-ratio cap | Shadow map | Contact AO | Bloom / antialiasing | Detailed trees within |
+| Preset | DPR cap | Shadow map | Contact AO | Bloom | Near trees |
 | --- | ---: | ---: | --- | --- | ---: |
-| Low | 0.75 | Disabled | Off | Off; native canvas AA | Always lower LOD |
-| Medium | 1.0 | 1024 | Off | Off; native canvas AA | 75 m |
-| High | 1.5 | 2048 | Half resolution | Restrained bloom; 4× MSAA target | 115 m |
-| Ultra | 2.0 | 4096 | Three-quarter resolution | Restrained bloom; 4× MSAA target | 170 m |
+| Low | 0.75 | Off | Off | Off | Lower LOD only |
+| Medium | 1.0 | 1024 | Off | Off | 75 m |
+| High | 1.5 | 2048 | Half resolution | On | 115 m |
+| Ultra | 2.0 | 4096 | Three-quarter resolution | On | 170 m |
 
-Tree distances refer to cluster centers and include hysteresis. Pixel ratio is also capped by devicePixelRatio; MSAA support follows WebGL capabilities. There is no automatic device benchmark or dynamic resolution. FPS measures wall time, not the 60 Hz physics step.
+Adaptive resolution affects GPU pixel cost. It does not fix CPU/driver bottlenecks or guarantee a frame rate. The optional display reports rolling wall-clock FPS, approximate frame time, actual render dimensions and the chosen preset. It is not a GPU profiler.
 
-Reproduce with `npm run dev`, then `node scripts/measure-performance.mjs`. High-quality visual counters are in `artifacts/visual-review.json`; those camera positions differ from this benchmark.
+Reproduce with `npm run dev` and `node scripts/measure-performance.mjs`. Physical-device procedure and pending device matrix: [DEVICE_TESTING.md](DEVICE_TESTING.md).

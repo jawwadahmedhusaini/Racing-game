@@ -1,5 +1,6 @@
 import {CARS,type CarSpec,type RaceMode,type Difficulty} from './content';
 import {Track,angleDelta} from './track';
+import {contactOffset,footprint} from './contact';
 
 export interface Controls {throttle:number; brake:number; steer:number; drift:boolean; nitro:boolean;}
 export const NO_INPUT:Controls={throttle:0,brake:0,steer:0,drift:false,nitro:false};
@@ -42,7 +43,7 @@ export class RaceSimulation {
     d.targetLane=Math.sin(this.elapsed*.18+d.id*2)*4.8;
     for(const other of this.drivers) {
       if(other.id===d.id||other.eliminated)continue;
-      const gap=other.distance-d.distance;
+      const gap=((other.distance-d.distance)%this.track.length+this.track.length)%this.track.length;
       if(gap>0&&gap<24&&Math.abs(other.lateral-d.lateral)<2.5)d.targetLane=other.lateral>0?-4.5:4.5;
     }
     return {throttle:d.speed<targetSpeed?1:.25,brake:d.speed>targetSpeed+3?.75:0,steer:this.steeringFor(d,d.targetLane),drift:false,nitro:d.nitro>35&&bend<.002&&d.speed>40&&(Math.sin(this.elapsed*.2+d.id)>0)};
@@ -59,10 +60,10 @@ export class RaceSimulation {
     // Broadphase for six cars: physical separation and speed exchange on close contact.
     for(let i=0;i<this.drivers.length;i++)for(let j=i+1;j<this.drivers.length;j++) {
       const a=this.drivers[i],b=this.drivers[j];if(a.eliminated||b.eliminated||a.finishTime!==null||b.finishTime!==null||a.airborne>1||b.airborne>1)continue;
-      const dz=a.distance-b.distance,dx=a.lateral-b.lateral;
-      if(Math.abs(dz)<4.1&&Math.abs(dx)<1.95) {
-        const side=dx>=0?1:-1,push=(1.95-Math.abs(dx))*.51;a.lateral+=side*push;b.lateral-=side*push;
-        if(Math.abs(dz)>2.5){const rear=dz>0?b:a,front=dz>0?a:b;const impulse=Math.max(0,rear.speed-front.speed)*.55;rear.speed-=impulse;front.speed+=impulse*.3;}
+      const contact=contactOffset(a,b,this.track.length,angleDelta(this.track.sample(a.distance).yaw,this.track.sample(b.distance).yaw));
+      if(contact){
+        a.lateral+=contact.x;b.lateral-=contact.x;a.distance+=contact.z;b.distance-=contact.z;
+        if(Math.abs(contact.dz)>2.5){const rear=contact.dz>0?b:a,front=contact.dz>0?a:b;const impulse=Math.max(0,rear.speed-front.speed)*.55;rear.speed-=impulse;front.speed+=impulse*.3;}
         a.collision=b.collision=.4;
       }
     }
@@ -120,7 +121,7 @@ export class RaceSimulation {
   }
   roadClearance(d:Driver){
     // Project the full rotated car footprint, including the wider track aero package.
-    const halfWidth=d.spec.shape==='track'?1.22:1.13,halfLength=d.spec.shape==='flow'?2.4:2.3;
+    const {width:halfWidth,length:halfLength}=footprint(d);
     return this.track.width/2-(Math.abs(Math.cos(d.heading))*halfWidth+Math.abs(Math.sin(d.heading))*halfLength)-.06;
   }
   constrainToRoad(d:Driver,dt:number){

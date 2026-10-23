@@ -5,6 +5,7 @@ import {Track} from './track';
 import {asphaltMaterial,terrainMaterial,tiled,surface,random,signTexture} from './materials';
 import {addTrees} from './vegetation';
 import {spatialInstances,spatialMesh} from './batching';
+import {addLandmarks} from './landmarks';
 
 export interface World {scene:THREE.Scene;sun:THREE.DirectionalLight;update:(time:number,position:THREE.Vector3,forward?:THREE.Vector3)=>void;}
 const UP=new THREE.Vector3(0,1,0);
@@ -94,6 +95,7 @@ export function createWorld(track:Track):World {
     addTrees(scene,near,far);
     addMarina(scene);
   }
+  addLandmarks(scene,track,groundHeight);
   addGantry(scene,track,night);
   const rs=track.sample(track.length*.18+7),ramp=new THREE.Mesh(new THREE.BoxGeometry(4.8,.32,14),new THREE.MeshStandardMaterial({color:night?'#37596a':'#7b6751',roughness:.65,metalness:.3}));ramp.position.copy(rs.position).addScaledVector(rs.right,5.5);ramp.position.y+=.7;ramp.rotation.set(-.1,rs.yaw,0,'YXZ');ramp.receiveShadow=true;scene.add(ramp);
   for(let i=-4;i<6;i+=3){const bar=new THREE.Mesh(new THREE.BoxGeometry(4.7,.02,.25),new THREE.MeshStandardMaterial({color:'#e1ac55',roughness:.75}));bar.position.set(0,.17,i);ramp.add(bar);}

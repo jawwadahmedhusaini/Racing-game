@@ -4,6 +4,18 @@
 
 | Issue | Resolution / evidence |
 | --- | --- |
+| Wet road formed repeating glossy tiles | Use broad world-space wetness independently of fine aggregate texture scale. Final night capture reviewed. |
+| Skid marks vanished below about 39 m/s at 60 FPS | Accumulate distance from the last emitted stamp; paired marks now follow road pitch. Regression at 20 m/s. |
+| Transparent flames/contact planes cast solid shadows | Preserve authored player shadow flags; disable rival shadows without enabling effects. |
+| Rotated or lapped cars passed through one another | Oriented-body separation and wrapped circuit distance, with rival avoidance across the lap boundary. |
+| Optional audio setup failure could stop every render frame | Publish the AudioContext only after complete setup; close partial graphs and skip unavailable audio. |
+| Zero sound-effects volume still scheduled a tone | Return before allocating sound nodes; disconnect completed temporary voices. |
+| Competing tabs overwrote newer progression | One active HTTPS/localhost play session via Web Locks; serialized-save comparison and external-storage interruption. |
+| Save-failure toast disappeared when garage controls redrew | Persistent status lives outside the replaceable UI root. Denied-storage browser flow remains drivable. |
+| Lost graphics context left no visible recovery action | Persistent reload screen, input clearing and muted audio. Asset downloads have a separate failure message. |
+| Minimap bounds/path rebuilt throughout every race | Cache immutable map data; calculate only current marker positions. |
+| Full-resolution effects exceeded smaller devices' fill budget | Adaptive render resolution with hysteresis, viewport pixel caps, explicit override and live FPS/resolution readout. |
+| Paused collisions continued shaking the camera | Gate collision shake and skid/particle updates on active racing. |
 | New wing rendered its inner surface | Corrected triangle winding; ray tests verify the outer shell from above and below. |
 | Nitro held before launch drained fuel without activating | Activation now waits for sufficient speed; regression covers launch and empty-meter release/recharge. |
 | Rotated car nose could cross the barrier | Wall clearance projects both vehicle length and width; 45°/90° regression checks. |
@@ -23,7 +35,7 @@
 | Floating road and sparse scenery | Grounded textured terrain, supported bridges, detailed road furniture, spatially instanced 3D trees, villas and rebuilt city facades. |
 | Excessive horizon bloom during the new art pass | Bounded sky radiance before bloom. Final visual captures verify the result. |
 | Water shader compilation error during development | Corrected the fragment shader; high-quality and production console checks cover compilation. |
-| Test runner collected browser specs as unit tests | Separate Vitest include pattern; 30 simulation/geometry/storage tests pass. |
+| Test runner collected browser specs as unit tests | Separate Vitest include pattern; 44 simulation/geometry/storage/effects/audio/performance tests pass. |
 | Camera lost the car after large diagnostic time advances | Reset the diagnostic camera and add motion feed-forward to normal chasing; browser race and camera checks pass. |
 | Excessive racing model geometry and interior/shadow work | 30,534-triangle rival LOD, detailed player car, material batching, spatial tree culling and player-only dynamic car shadows. |
 | Coast HDR photograph put nearby buildings in the sky | Use an atmospheric sky shader; retain HDR only for reflections. Final coast screenshot reviewed. |
@@ -36,7 +48,7 @@
 - Hardware performance is unmeasured. SwiftShader in this cloud machine runs much slower than a usable gaming frame rate. Use hardware acceleration and start at Low/Medium on slower devices; validate actual target devices before any FPS guarantee.
 - Extremely slow rendering deliberately slows simulation rather than integrating large unstable physics steps.
 - Chrome/Chromium desktop and emulated touch have been exercised. Real Android/iOS, Safari, Firefox, gamepads and assistive-technology gameplay need separate testing.
-- The three garage choices are tuned/aero variants of one licensed concept chassis. There are two tracks and four career events.
+- The three garage choices are remodeled variants of one licensed concept chassis. There are two tracks and four career events.
 - Steering controls world heading manually. Road boundaries still constrain the arcade simulation. There is no off-road free roaming, rigid-body vehicle damage, barrel-roll stunt system or multiplayer.
 - Audio is synthesized. Automated tests verify the application path without exceptions, not subjective audio quality on speakers/headphones.
 - Saves are local to the browser and origin. Clearing data removes progress; private browsing or blocked storage may prevent persistence. The game reports failed save writes.
