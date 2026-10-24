@@ -1,0 +1,374 @@
+{
+  "version": "2.3.0",
+  "date": "2026-10-24T00:51:11.459Z",
+  "browser": "154.0.8037.57",
+  "renderer": "ANGLE/SwiftShader software WebGL 2",
+  "viewport": "1100x720",
+  "quality": "low",
+  "runs": [
+    {
+      "track": "coast",
+      "cached": false,
+      "clickMs": 12.099999994039536,
+      "screen": "preparing",
+      "preparation": {
+        "totalMs": 6959.100000008941,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 11.600000008940697
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.100000008940697
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 35.79999999701977
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 14.299999997019768
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 15.600000008940697
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.900000005960464
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 18.30000001192093
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 13.799999997019768
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 11.099999994039536
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 31.80000001192093
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.299999997019768
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 7.5
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 8.5
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 7
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 7.200000002980232
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 22
+          },
+          {
+            "label": "Laying the road and barriers…",
+            "elapsedSinceYieldMs": 91
+          },
+          {
+            "label": "Installing circuit lighting…",
+            "elapsedSinceYieldMs": 109.40000000596046
+          },
+          {
+            "label": "Building the surroundings…",
+            "elapsedSinceYieldMs": 0.5
+          },
+          {
+            "label": "Planting roadside scenery…",
+            "elapsedSinceYieldMs": 3.199999988079071
+          },
+          {
+            "label": "Growing the coastal forest…",
+            "elapsedSinceYieldMs": 39.29999999701977
+          },
+          {
+            "label": "Finishing the starting grid…",
+            "elapsedSinceYieldMs": 7.5
+          },
+          {
+            "label": "Optimizing the circuit…",
+            "elapsedSinceYieldMs": 9.200000002980232
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 23.799999997019768
+          },
+          {
+            "label": "Lighting the circuit · 1 / 6",
+            "elapsedSinceYieldMs": 1.8999999910593033
+          },
+          {
+            "label": "Lighting the circuit · 2 / 6",
+            "elapsedSinceYieldMs": 1010.1999999880791
+          },
+          {
+            "label": "Lighting the circuit · 3 / 6",
+            "elapsedSinceYieldMs": 799.5999999940395
+          },
+          {
+            "label": "Lighting the circuit · 4 / 6",
+            "elapsedSinceYieldMs": 6.700000002980232
+          },
+          {
+            "label": "Lighting the circuit · 5 / 6",
+            "elapsedSinceYieldMs": 9.5
+          },
+          {
+            "label": "Lighting the circuit · 6 / 6",
+            "elapsedSinceYieldMs": 3.5999999940395355
+          },
+          {
+            "label": "Finishing the reflections…",
+            "elapsedSinceYieldMs": 9.900000005960464
+          },
+          {
+            "label": "Preparing car 1 of 6…",
+            "elapsedSinceYieldMs": 603.4000000059605
+          },
+          {
+            "label": "Preparing car 2 of 6…",
+            "elapsedSinceYieldMs": 506.29999999701977
+          },
+          {
+            "label": "Preparing car 3 of 6…",
+            "elapsedSinceYieldMs": 0.8999999910593033
+          },
+          {
+            "label": "Preparing car 4 of 6…",
+            "elapsedSinceYieldMs": 44.900000005960464
+          },
+          {
+            "label": "Preparing car 5 of 6…",
+            "elapsedSinceYieldMs": 32.400000005960464
+          },
+          {
+            "label": "Preparing car 6 of 6…",
+            "elapsedSinceYieldMs": 0.7999999970197678
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 6.100000008940697
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 71.29999999701977
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 1009.5
+          }
+        ]
+      },
+      "audit": {
+        "track": "coast",
+        "samples": 3460,
+        "placements": 551,
+        "minTerrainClearance": 0.633625655712347,
+        "minSceneryClearance": 2.482380155119756,
+        "violations": []
+      }
+    },
+    {
+      "track": "coast",
+      "cached": true,
+      "clickMs": 1,
+      "screen": "preparing",
+      "preparation": {
+        "totalMs": 2327.5999999940395,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 1
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 0
+          },
+          {
+            "label": "Preparing car 1 of 6…",
+            "elapsedSinceYieldMs": 1.1000000089406967
+          },
+          {
+            "label": "Preparing car 2 of 6…",
+            "elapsedSinceYieldMs": 0.8999999910593033
+          },
+          {
+            "label": "Preparing car 3 of 6…",
+            "elapsedSinceYieldMs": 0.6000000089406967
+          },
+          {
+            "label": "Preparing car 4 of 6…",
+            "elapsedSinceYieldMs": 0.5
+          },
+          {
+            "label": "Preparing car 5 of 6…",
+            "elapsedSinceYieldMs": 0.5999999940395355
+          },
+          {
+            "label": "Preparing car 6 of 6…",
+            "elapsedSinceYieldMs": 0.7999999970197678
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 1
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 41.79999999701977
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 810.2000000029802
+          }
+        ]
+      },
+      "audit": {
+        "track": "coast",
+        "samples": 3460,
+        "placements": 551,
+        "minTerrainClearance": 0.633625655712347,
+        "minSceneryClearance": 2.482380155119756,
+        "violations": []
+      }
+    },
+    {
+      "track": "city",
+      "cached": false,
+      "clickMs": 0.9000000059604645,
+      "screen": "preparing",
+      "preparation": {
+        "totalMs": 5887,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 0.9000000059604645
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.5
+          },
+          {
+            "label": "Laying the road and barriers…",
+            "elapsedSinceYieldMs": 1
+          },
+          {
+            "label": "Installing circuit lighting…",
+            "elapsedSinceYieldMs": 148.6000000089407
+          },
+          {
+            "label": "Building the surroundings…",
+            "elapsedSinceYieldMs": 2.3999999910593033
+          },
+          {
+            "label": "Finishing the starting grid…",
+            "elapsedSinceYieldMs": 34.8999999910593
+          },
+          {
+            "label": "Optimizing the circuit…",
+            "elapsedSinceYieldMs": 7.5999999940395355
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 23.200000002980232
+          },
+          {
+            "label": "Lighting the circuit · 1 / 6",
+            "elapsedSinceYieldMs": 2.2000000029802322
+          },
+          {
+            "label": "Lighting the circuit · 2 / 6",
+            "elapsedSinceYieldMs": 1126.300000011921
+          },
+          {
+            "label": "Lighting the circuit · 3 / 6",
+            "elapsedSinceYieldMs": 6.800000011920929
+          },
+          {
+            "label": "Lighting the circuit · 4 / 6",
+            "elapsedSinceYieldMs": 1.7999999970197678
+          },
+          {
+            "label": "Lighting the circuit · 5 / 6",
+            "elapsedSinceYieldMs": 0.7999999970197678
+          },
+          {
+            "label": "Lighting the circuit · 6 / 6",
+            "elapsedSinceYieldMs": 8.299999997019768
+          },
+          {
+            "label": "Finishing the reflections…",
+            "elapsedSinceYieldMs": 7.0999999940395355
+          },
+          {
+            "label": "Preparing car 1 of 6…",
+            "elapsedSinceYieldMs": 595.0999999940395
+          },
+          {
+            "label": "Preparing car 2 of 6…",
+            "elapsedSinceYieldMs": 1
+          },
+          {
+            "label": "Preparing car 3 of 6…",
+            "elapsedSinceYieldMs": 0.9000000059604645
+          },
+          {
+            "label": "Preparing car 4 of 6…",
+            "elapsedSinceYieldMs": 0.5999999940395355
+          },
+          {
+            "label": "Preparing car 5 of 6…",
+            "elapsedSinceYieldMs": 0.7999999970197678
+          },
+          {
+            "label": "Preparing car 6 of 6…",
+            "elapsedSinceYieldMs": 1.300000011920929
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 1.2000000029802322
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 72.5
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 1467.0999999940395
+          }
+        ]
+      },
+      "audit": {
+        "track": "city",
+        "samples": 0,
+        "placements": 272,
+        "minTerrainClearance": null,
+        "minSceneryClearance": 3.587610902445025,
+        "violations": []
+      }
+    }
+  ],
+  "errors": [],
+  "failedRequests": [],
+  "heldThrottleDuringLoading": true,
+  "passed": true
+}

@@ -1,11 +1,179 @@
 {
-  "version": "2.2.0",
-  "date": "2026-10-23T13:30:44.937Z",
+  "version": "2.3.0",
+  "date": "2026-10-24T00:47:47.659Z",
   "quality": "high",
   "errors": [],
   "scenes": [
     {
       "track": "coast",
+      "preparing": false,
+      "loadMetrics": {
+        "totalMs": 14934.70000000298,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 3.5999999940395355
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 6.5
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 23.599999994039536
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 14.700000002980232
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 6.5999999940395355
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 6.100000008940697
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 6.200000002980232
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.600000008940697
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 8.200000002980232
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 5.899999991059303
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 6.699999988079071
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 6.600000008940697
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 5.699999988079071
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 5.200000002980232
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 5.100000008940697
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 5.0999999940395355
+          },
+          {
+            "label": "Laying the road and barriers…",
+            "elapsedSinceYieldMs": 70.30000001192093
+          },
+          {
+            "label": "Installing circuit lighting…",
+            "elapsedSinceYieldMs": 94.6000000089407
+          },
+          {
+            "label": "Building the surroundings…",
+            "elapsedSinceYieldMs": 1
+          },
+          {
+            "label": "Planting roadside scenery…",
+            "elapsedSinceYieldMs": 3
+          },
+          {
+            "label": "Growing the coastal forest…",
+            "elapsedSinceYieldMs": 35.70000000298023
+          },
+          {
+            "label": "Finishing the starting grid…",
+            "elapsedSinceYieldMs": 7.9000000059604645
+          },
+          {
+            "label": "Optimizing the circuit…",
+            "elapsedSinceYieldMs": 11.200000002980232
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 23.799999997019768
+          },
+          {
+            "label": "Lighting the circuit · 1 / 6",
+            "elapsedSinceYieldMs": 2.2999999970197678
+          },
+          {
+            "label": "Lighting the circuit · 2 / 6",
+            "elapsedSinceYieldMs": 957.3000000119209
+          },
+          {
+            "label": "Lighting the circuit · 3 / 6",
+            "elapsedSinceYieldMs": 1077.800000011921
+          },
+          {
+            "label": "Lighting the circuit · 4 / 6",
+            "elapsedSinceYieldMs": 4.600000008940697
+          },
+          {
+            "label": "Lighting the circuit · 5 / 6",
+            "elapsedSinceYieldMs": 2.5999999940395355
+          },
+          {
+            "label": "Lighting the circuit · 6 / 6",
+            "elapsedSinceYieldMs": 11.099999994039536
+          },
+          {
+            "label": "Finishing the reflections…",
+            "elapsedSinceYieldMs": 14.5
+          },
+          {
+            "label": "Preparing car 1 of 6…",
+            "elapsedSinceYieldMs": 638.6000000089407
+          },
+          {
+            "label": "Preparing car 2 of 6…",
+            "elapsedSinceYieldMs": 1.7000000029802322
+          },
+          {
+            "label": "Preparing car 3 of 6…",
+            "elapsedSinceYieldMs": 541.4000000059605
+          },
+          {
+            "label": "Preparing car 4 of 6…",
+            "elapsedSinceYieldMs": 35.6000000089407
+          },
+          {
+            "label": "Preparing car 5 of 6…",
+            "elapsedSinceYieldMs": 23.200000002980232
+          },
+          {
+            "label": "Preparing car 6 of 6…",
+            "elapsedSinceYieldMs": 1.5999999940395355
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 2.5
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 77.20000000298023
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 3741.5999999940395
+          }
+        ]
+      },
+      "sceneryCount": 551,
       "screen": "racing",
       "status": "racing",
       "paused": true,
@@ -20,29 +188,32 @@
         "id": 0,
         "name": "YOU",
         "spec": "vanta",
-        "distance": 1783.7231449334745,
-        "lateral": -0.03377537828766013,
-        "speed": 38.9770534280576,
-        "heading": 0.01036092918394541,
-        "yawVelocity": -0.011418841664474986,
+        "distance": 1753.4911425451564,
+        "lateral": -6.989914921425659,
+        "speed": 9.934852312134325,
+        "heading": 0.37520784665159373,
+        "yawVelocity": -0.1821778379570912,
         "nitro": 100,
         "boost": 0,
         "drift": 0,
         "driftTotal": 0,
         "airborne": 0,
         "verticalSpeed": 0,
+        "rampLift": 0,
+        "jumpRewardPending": false,
         "finishTime": null,
         "eliminated": false,
-        "collision": 0,
+        "collision": 0.4999999999999994,
         "steer": 0,
         "lap": 1,
         "targetLane": -3,
         "lastRamp": -1,
         "boostCooldown": 0,
         "boostPrevious": false,
-        "jumpTotal": 0
+        "jumpTotal": 0,
+        "reverseHold": 0
       },
-      "elapsed": 28.683333333332985,
+      "elapsed": 26.36666666666645,
       "rank": 1,
       "credits": 2500,
       "selected": "vanta",
@@ -50,7 +221,7 @@
       "cameraMode": 0,
       "adaptiveScale": 1,
       "pixelRatio": 1,
-      "textures": 85,
+      "textures": 95,
       "skidMarks": 0,
       "carBounds": [
         2.337911009788513,
@@ -59,12 +230,116 @@
       ],
       "invalidCarShadows": 0,
       "fps": 0,
-      "drawCalls": 522,
-      "triangles": 573069,
-      "geometries": 657
+      "drawCalls": 1005,
+      "triangles": 921089,
+      "geometries": 703
     },
     {
       "track": "city",
+      "preparing": false,
+      "loadMetrics": {
+        "totalMs": 11174.5,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 1.3999999910593033
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 8.399999991059303
+          },
+          {
+            "label": "Laying the road and barriers…",
+            "elapsedSinceYieldMs": 0.6000000089406967
+          },
+          {
+            "label": "Installing circuit lighting…",
+            "elapsedSinceYieldMs": 106.79999999701977
+          },
+          {
+            "label": "Building the surroundings…",
+            "elapsedSinceYieldMs": 1
+          },
+          {
+            "label": "Finishing the starting grid…",
+            "elapsedSinceYieldMs": 26.299999997019768
+          },
+          {
+            "label": "Optimizing the circuit…",
+            "elapsedSinceYieldMs": 15.700000002980232
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 29.400000005960464
+          },
+          {
+            "label": "Lighting the circuit · 1 / 6",
+            "elapsedSinceYieldMs": 1.5999999940395355
+          },
+          {
+            "label": "Lighting the circuit · 2 / 6",
+            "elapsedSinceYieldMs": 1116.5
+          },
+          {
+            "label": "Lighting the circuit · 3 / 6",
+            "elapsedSinceYieldMs": 8.099999994039536
+          },
+          {
+            "label": "Lighting the circuit · 4 / 6",
+            "elapsedSinceYieldMs": 2.5
+          },
+          {
+            "label": "Lighting the circuit · 5 / 6",
+            "elapsedSinceYieldMs": 1.7000000029802322
+          },
+          {
+            "label": "Lighting the circuit · 6 / 6",
+            "elapsedSinceYieldMs": 4.799999997019768
+          },
+          {
+            "label": "Finishing the reflections…",
+            "elapsedSinceYieldMs": 6.800000011920929
+          },
+          {
+            "label": "Preparing car 1 of 6…",
+            "elapsedSinceYieldMs": 567.1999999880791
+          },
+          {
+            "label": "Preparing car 2 of 6…",
+            "elapsedSinceYieldMs": 0.9000000059604645
+          },
+          {
+            "label": "Preparing car 3 of 6…",
+            "elapsedSinceYieldMs": 0.5999999940395355
+          },
+          {
+            "label": "Preparing car 4 of 6…",
+            "elapsedSinceYieldMs": 0.7000000029802322
+          },
+          {
+            "label": "Preparing car 5 of 6…",
+            "elapsedSinceYieldMs": 0.5999999940395355
+          },
+          {
+            "label": "Preparing car 6 of 6…",
+            "elapsedSinceYieldMs": 0.6000000089406967
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 1.3999999910593033
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 67.5
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 4170.100000008941
+          }
+        ]
+      },
+      "sceneryCount": 272,
       "screen": "racing",
       "status": "racing",
       "paused": true,
@@ -79,37 +354,40 @@
         "id": 0,
         "name": "YOU",
         "spec": "vanta",
-        "distance": 65.96693261878819,
-        "lateral": 0.03960324426138265,
-        "speed": 41.7977858110591,
-        "heading": -0.002679221481135153,
-        "yawVelocity": 0.005844243742593817,
-        "nitro": 70.4783333333324,
+        "distance": 49.56688990839797,
+        "lateral": 0.03758264232627497,
+        "speed": 39.342418215118954,
+        "heading": 0.031222042680416884,
+        "yawVelocity": -0.008555200711365852,
+        "nitro": 69.83999999999918,
         "boost": 0,
         "drift": 0,
         "driftTotal": 0,
         "airborne": 0,
         "verticalSpeed": 0,
+        "rampLift": 0,
+        "jumpRewardPending": false,
         "finishTime": null,
         "eliminated": false,
-        "collision": 0,
+        "collision": 0.4,
         "steer": 0,
         "lap": 1,
         "targetLane": -3,
         "lastRamp": -1,
         "boostCooldown": 0,
         "boostPrevious": false,
-        "jumpTotal": 0
+        "jumpTotal": 0,
+        "reverseHold": 0
       },
-      "elapsed": 2.533333333333329,
-      "rank": 1,
+      "elapsed": 2.199999999999997,
+      "rank": 2,
       "credits": 2500,
       "selected": "vanta",
       "quality": "high",
       "cameraMode": 0,
       "adaptiveScale": 1,
       "pixelRatio": 1,
-      "textures": 98,
+      "textures": 137,
       "skidMarks": 0,
       "carBounds": [
         2.337911009788513,
@@ -118,9 +396,9 @@
       ],
       "invalidCarShadows": 0,
       "fps": 0,
-      "drawCalls": 795,
-      "triangles": 576398,
-      "geometries": 649
+      "drawCalls": 775,
+      "triangles": 601884,
+      "geometries": 1118
     }
   ],
   "vehicles": [
@@ -141,6 +419,5 @@
       ]
     }
   ],
-  "passed": true,
-  "cityRecheck": "2026-10-23T13:47:56.369Z"
+  "passed": true
 }

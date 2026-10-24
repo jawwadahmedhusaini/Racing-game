@@ -3,10 +3,11 @@ import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {Track} from './track';
 import {signTexture,tiled} from './materials';
 import {spatialMesh} from './batching';
+import {RoadSpace} from './road-space';
 
 // Original, circuit-specific architecture. Merge by material and spatial cell;
 // these landmarks add no dynamic lights or per-frame animation work.
-export function addLandmarks(scene:THREE.Scene,track:Track,height:(x:number,z:number)=>number){
+export function addLandmarks(scene:THREE.Scene,track:Track,height:(x:number,z:number)=>number,roadSpace:RoadSpace){
   const groups=new Map<THREE.Material,THREE.BufferGeometry[]>();
   const stone=new THREE.MeshStandardMaterial({color:'#b5b09d',map:tiled('ground-color.png',2),roughness:.87});
   const white=new THREE.MeshStandardMaterial({color:'#e7e0cb',roughness:.62});
@@ -17,7 +18,9 @@ export function addLandmarks(scene:THREE.Scene,track:Track,height:(x:number,z:nu
   const add=(geo:THREE.BufferGeometry,material:THREE.Material,position:THREE.Vector3,yaw=0)=>{geo.rotateY(yaw);geo.translate(position.x,position.y,position.z);const list=groups.get(material)??[];list.push(geo.index?geo.toNonIndexed():geo);if(geo.index)geo.dispose();groups.set(material,list);};
   const block=(center:THREE.Vector3,x:number,y:number,z:number,w:number,h:number,d:number,mat:THREE.Material,yaw=0)=>add(new THREE.BoxGeometry(w,h,d),mat,new THREE.Vector3(x,y,z).applyAxisAngle(new THREE.Vector3(0,1,0),yaw).add(center),yaw);
   if(track.id==='coast'){
-    const s=track.sample(track.length*.87),base=s.position.clone().addScaledVector(s.right,-38);base.y=height(base.x,base.z);
+    const s=track.sample(track.length*.87),base=s.position.clone().addScaledVector(s.right,-38);for(let offset=38;!roadSpace.clear(base.x,base.z,14)&&offset<130;offset+=8)base.copy(s.position).addScaledVector(s.right,-offset);
+    if(!roadSpace.place('lighthouse',base.x,base.z,14))return;
+    base.y=height(base.x,base.z);
     // A raised stone outcrop also supports the tower where the coast meets water.
     base.y=Math.max(-1,base.y);
     add(new THREE.CylinderGeometry(9,14,base.y+12,12),stone,new THREE.Vector3(base.x,(base.y-12)/2,base.z));
@@ -36,7 +39,8 @@ export function addLandmarks(scene:THREE.Scene,track:Track,height:(x:number,z:nu
   }else{
     // Recognizable station canopies and lit street furniture beside the elevated circuit.
     for(const distance of [95,track.length*.42,track.length*.72]){
-      const s=track.sample(distance),base=s.position.clone().addScaledVector(s.right,-17),yaw=s.yaw;
+      const s=track.sample(distance),base=s.position.clone().addScaledVector(s.right,-28),yaw=s.yaw;
+      if(!roadSpace.place('station',base.x,base.z,Math.hypot(10,26)/2))continue;
       block(base,0,-.3,0,10,.6,26,stone,yaw);
       for(const z of [-10,-5,0,5,10])for(const x of [-3.8,3.8])block(base,x,2.6,z,.12,5.2,.12,metal,yaw);
       block(base,0,5.3,0,9,.18,25,glass,yaw);block(base,0,5.5,0,9.3,.18,25.2,metal,yaw);

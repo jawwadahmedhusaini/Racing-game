@@ -1,11 +1,11 @@
 {
-  "version": "2.2.0",
-  "date": "2026-10-23",
+  "version": "2.3.0",
+  "date": "2026-10-24",
   "changes": [
-    "Remodeled long-nose and wide-body vehicle silhouettes",
-    "Coastal lighthouse and city transit landmarks",
-    "Adaptive resolution, pixel budgets and live performance display",
-    "Rotated/lapped-car contacts, skid marks and shadow fixes",
-    "Safer audio/storage failures, reload recovery and competing-tab protection"
+    "Responsive, cancellable race preparation and cached vehicle meshes",
+    "Clear starting straights, widened bends and whole-circuit scenery clearance",
+    "Brake-to-reverse driving, reverse lamps, R gear and wider reverse camera",
+    "Physical ramp surface, solid raised edges and lip-based launches",
+    "Separate records for revised circuits; existing garage progress preserved"
   ]
 }

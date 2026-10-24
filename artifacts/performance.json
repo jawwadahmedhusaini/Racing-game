@@ -1,6 +1,6 @@
 {
-  "version": "2.2.0",
-  "date": "2026-10-23T13:49:41.779Z",
+  "version": "2.3.0",
+  "date": "2026-10-24T00:52:22.386Z",
   "browser": "154.0.8037.57",
   "viewport": "1280x800",
   "samples": [
@@ -8,56 +8,56 @@
       "quality": "low",
       "scene": "garage",
       "frames": 24,
-      "wallTimeMs": 12049.5,
-      "fps": 1.99,
-      "medianFrameMs": 483.4,
-      "p95FrameMs": 949.9,
+      "wallTimeMs": 11382.899999999998,
+      "fps": 2.11,
+      "medianFrameMs": 466.8,
+      "p95FrameMs": 533.3,
       "lastFrame": {
-        "drawCalls": 102,
-        "triangles": 116059,
-        "geometries": 117
+        "drawCalls": 104,
+        "triangles": 116083,
+        "geometries": 119
       }
     },
     {
       "quality": "low",
       "scene": "coast",
       "frames": 24,
-      "wallTimeMs": 27582.1,
+      "wallTimeMs": 27498.9,
       "fps": 0.87,
-      "medianFrameMs": 1133.2,
-      "p95FrameMs": 1299.9,
+      "medianFrameMs": 1166.6,
+      "p95FrameMs": 1283.4,
       "lastFrame": {
-        "drawCalls": 250,
-        "triangles": 182342,
-        "geometries": 668
+        "drawCalls": 360,
+        "triangles": 278018,
+        "geometries": 672
       }
     },
     {
       "quality": "medium",
       "scene": "garage",
       "frames": 24,
-      "wallTimeMs": 19732.5,
-      "fps": 1.22,
-      "medianFrameMs": 783.3,
-      "p95FrameMs": 1583.2,
+      "wallTimeMs": 17599.4,
+      "fps": 1.36,
+      "medianFrameMs": 766.6,
+      "p95FrameMs": 833.3,
       "lastFrame": {
-        "drawCalls": 152,
-        "triangles": 224350,
-        "geometries": 117
+        "drawCalls": 156,
+        "triangles": 224398,
+        "geometries": 119
       }
     },
     {
       "quality": "medium",
       "scene": "coast",
       "frames": 24,
-      "wallTimeMs": 53914.5,
-      "fps": 0.45,
-      "medianFrameMs": 2233.1,
-      "p95FrameMs": 2599.9,
+      "wallTimeMs": 51531.299999999996,
+      "fps": 0.47,
+      "medianFrameMs": 2166.5,
+      "p95FrameMs": 2333.2,
       "lastFrame": {
-        "drawCalls": 348,
-        "triangles": 458034,
-        "geometries": 675
+        "drawCalls": 458,
+        "triangles": 566160,
+        "geometries": 674
       }
     }
   ],

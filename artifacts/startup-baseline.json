@@ -1,0 +1,18 @@
+{
+  "version": "2.2.0",
+  "date": "2026-10-23",
+  "viewport": "1100x720",
+  "quality": "low",
+  "renderer": "Chromium 154 / ANGLE SwiftShader software WebGL 2",
+  "measurement": "One cold Costa quick-race start, click dispatched on the existing Start button; elapsed synchronous handler time and time to the next animation-frame callback. Shared cloud host; not a hardware benchmark.",
+  "timings": [
+    {
+      "stage": "synchronousStart",
+      "ms": 5289.4000000059605
+    },
+    {
+      "stage": "nextAnimationFrame",
+      "ms": 6927.29999999702
+    }
+  ]
+}

@@ -16,8 +16,8 @@ try {
   await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(url);
   const release = await page.request.get(new URL('version.json',url).href);
-  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.2.0');
-  report.version='2.2.0';
+  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.3.0');
+  report.version='2.3.0';
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 60000 });
   expect(await page.evaluate(() => '__apex' in window)).toBe(false);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
@@ -32,6 +32,7 @@ try {
   await page.getByRole('button', { name: 'HIT THE ROAD' }).click();
   await page.locator('[data-action="track"][data-value="city"]').click();
   await page.getByRole('button', { name: 'START YOUR ENGINE' }).click();
+  await page.waitForSelector('#countdown',{timeout:90000});
   await page.keyboard.down('w');
   await expect.poll(async () => Number(await page.locator('#speed').innerText()), { timeout: 120000 }).toBeGreaterThan(20);
   await page.keyboard.up('w');

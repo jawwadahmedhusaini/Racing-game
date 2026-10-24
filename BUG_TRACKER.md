@@ -4,6 +4,13 @@
 
 | Issue | Resolution / evidence |
 | --- | --- |
+| Start Race blocked the UI while constructing the entire scene | Yield between terrain/scenery/car tasks; render a progress card immediately, support cancellation, warm graphics before the countdown. Cached immutable car meshes avoid rebuilding and rear-surface raycasts on replay. |
+| Slope scenery floated above coarse terrain triangles | Use the actual triangle heightfield for props, bury palm bases slightly and extend villa foundations to the lowest corner. Raycast regression checks the interpolation independently. |
+| Costa rocks and buildings intruded into the driving surface | Whole-circuit footprint checks include nearby road sections and each object's size. Terrain is flattened beyond the full road width plus the terrain-grid cell footprint. |
+| Grid sat on a sharp bend; inside road edges folded over themselves | Move the grid 90 m onto the straight, broaden the closing section and smooth the spline. Curvature tests prevent an inverted inner road edge. |
+| No reverse driving | Hold brake at a standstill for 0.35 seconds; signed steering/drag/wall responses, 36 km/h reverse cap, R gear, positive speed display, reverse lamps and wider camera. |
+| Slow cars drove through the ramp, which only triggered an instant jump | Shared ramp height and mesh generation; tires climb the wedge, raised sides/back stop the full vehicle footprint, and fast cars launch at the lip. Drops and recovery cannot farm landing rewards. |
+| Revised circuits would compare times against the old layout | Keep old records and use a separate v2 circuit-record key; credits, ownership, paints and upgrades remain intact. |
 | Wet road formed repeating glossy tiles | Use broad world-space wetness independently of fine aggregate texture scale. Final night capture reviewed. |
 | Skid marks vanished below about 39 m/s at 60 FPS | Accumulate distance from the last emitted stamp; paired marks now follow road pitch. Regression at 20 m/s. |
 | Transparent flames/contact planes cast solid shadows | Preserve authored player shadow flags; disable rival shadows without enabling effects. |
@@ -25,7 +32,7 @@
 | Recovery / camera shortcuts changed a paused race | Accept these actions only during active racing. |
 | Escape from settings resumed the race immediately | Escape returns nested race dialogs to pause before resuming; also works while a select has focus. |
 | Touch players had no recovery action | Added a dedicated RECOVER button. |
-| Driving backward had no clear warning | HUD now displays a wrong-way notice. |
+| Facing against race direction had no clear warning | Wrong-way notice remains; deliberate reverse now shows R and a forward-driving hint. |
 | Night cars reflected a sunny environment | Capture a filtered cubemap from each scene and reuse it on return. |
 | All city buildings shared one facade | Three facade families, stepped crowns and varied interior lighting. |
 | Entire scenery batches rendered when a small portion was visible | Spatial geometry/instance cells, tree LODs, local grass visibility and near-field AO. |
@@ -35,7 +42,7 @@
 | Floating road and sparse scenery | Grounded textured terrain, supported bridges, detailed road furniture, spatially instanced 3D trees, villas and rebuilt city facades. |
 | Excessive horizon bloom during the new art pass | Bounded sky radiance before bloom. Final visual captures verify the result. |
 | Water shader compilation error during development | Corrected the fragment shader; high-quality and production console checks cover compilation. |
-| Test runner collected browser specs as unit tests | Separate Vitest include pattern; 44 simulation/geometry/storage/effects/audio/performance tests pass. |
+| Test runner collected browser specs as unit tests | Separate Vitest include pattern; Unit and browser checks run separately; current counts are in TEST_REPORT.md. |
 | Camera lost the car after large diagnostic time advances | Reset the diagnostic camera and add motion feed-forward to normal chasing; browser race and camera checks pass. |
 | Excessive racing model geometry and interior/shadow work | 30,534-triangle rival LOD, detailed player car, material batching, spatial tree culling and player-only dynamic car shadows. |
 | Coast HDR photograph put nearby buildings in the sky | Use an atmospheric sky shader; retain HDR only for reflections. Final coast screenshot reviewed. |
@@ -56,4 +63,4 @@
 - Static hosting supports a configured subdirectory base; `npm run build:pages` targets `/Racing-game/`. GitHub Pages activation still requires the repository owner's settings change.
 - The Python launcher was executed on Linux. Windows/macOS wrapper commands are included but have not been run on those operating systems.
 
-No unresolved blocker was observed in the tested single-player workflows. These checks do not establish AAA visual parity, universal browser support or real-device performance.
+The release checks and remaining verification gaps are recorded in TEST_REPORT.md. These checks do not establish AAA visual parity, universal browser support or real-device performance.
