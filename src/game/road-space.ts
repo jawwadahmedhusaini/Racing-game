@@ -4,6 +4,7 @@ export interface SceneryFootprint {kind:string;x:number;z:number;radius:number;}
 /** Whole-circuit horizontal exclusion zone, including nearby sections of the same road. */
 export class RoadSpace {
   readonly placements:SceneryFootprint[]=[];
+  private reserved:SceneryFootprint[]=[];
   private cells=new Map<string,number[]>();
   private cellSize=32;
   constructor(readonly track:Track){
@@ -15,6 +16,7 @@ export class RoadSpace {
     }
   }
   clear(x:number,z:number,radius:number){
+    if(this.reserved.some(p=>Math.hypot(p.x-x,p.z-z)<p.radius+radius))return false;
     // Two metres beyond the road edge also protect barriers and provide visual breathing room.
     const extent=this.track.width/2+2+radius,visited=new Set<number>();
     for(let cx=Math.floor((x-extent)/this.cellSize);cx<=Math.floor((x+extent)/this.cellSize);cx++)for(let cz=Math.floor((z-extent)/this.cellSize);cz<=Math.floor((z+extent)/this.cellSize);cz++){
@@ -27,5 +29,6 @@ export class RoadSpace {
     }
     return true;
   }
+  reserve(kind:string,x:number,z:number,radius:number){if(!this.place(kind,x,z,radius))return false;this.reserved.push({kind,x,z,radius});return true;}
   place(kind:string,x:number,z:number,radius:number){if(!this.clear(x,z,radius))return false;this.placements.push({kind,x,z,radius});return true;}
 }

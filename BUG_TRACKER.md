@@ -4,13 +4,24 @@
 
 | Issue | Resolution / evidence |
 | --- | --- |
+| Opponents queued indefinitely behind a stopped car | Evaluate clear lateral escape paths and avoid creeping into a zero target speed. Six-rival full-race regressions cover both circuits and all difficulty levels. |
+| A rival hit the raised ramp side and stalled | Plan a clear line before the ramp; preserve physical ramp collision. Full-race idle-player regression catches permanent stalls. |
+| Immediate lane return cut back toward the overtaken vehicle | Hold the committed passing lane until the other car is behind, including across the lap seam. |
+| Camera lacked landing feedback and could cross roadside barriers | Separate camera director with bounded acceleration/landing response, safe-corridor projection and reduced motion. Full-circuit lens bounds and pause regressions. |
+| Solstice reverse lamps were hidden behind rear bodywork | Move both lenses outside the body and ray-test their visibility from behind in both GLB detail levels. |
+| New car splitter exceeded its initial collision bounds | Measure loaded GLB extents and enlarge the Solstice footprint to contain the entire model. |
+| High-detail drilled brake discs spent tens of thousands of triangles on subpixel holes | Eight-sided drill marks reduce Solstice from 130,356 to 65,844 triangles without changing the body or wheel rig; race LOD is 24,436. |
+| Long-car rotation cropped the nose in portrait; the selected fourth card was off-screen | Fit the garage camera to the vehicle bounds and horizontal field of view, and center the selected card within the horizontal list on selection and viewport resize. |
+| Nitro ratings were presentation-only; engine/HUD could disagree on gear | Apply the rating to boost force and consumption; use a shared drivetrain gear with hysteresis for HUD and audio. |
+| Garage count assumed three cars | Derive totals from the catalog and make the collection scroll within narrow layouts. |
+| Drift could recharge while braking or airborne | Gate drift initiation/rewards to grounded, forward, non-braking travel and recover grip continuously. |
 | Start Race blocked the UI while constructing the entire scene | Yield between terrain/scenery/car tasks; render a progress card immediately, support cancellation, warm graphics before the countdown. Cached immutable car meshes avoid rebuilding and rear-surface raycasts on replay. |
 | Slope scenery floated above coarse terrain triangles | Use the actual triangle heightfield for props, bury palm bases slightly and extend villa foundations to the lowest corner. Raycast regression checks the interpolation independently. |
 | Costa rocks and buildings intruded into the driving surface | Whole-circuit footprint checks include nearby road sections and each object's size. Terrain is flattened beyond the full road width plus the terrain-grid cell footprint. |
 | Grid sat on a sharp bend; inside road edges folded over themselves | Move the grid 90 m onto the straight, broaden the closing section and smooth the spline. Curvature tests prevent an inverted inner road edge. |
 | No reverse driving | Hold brake at a standstill for 0.35 seconds; signed steering/drag/wall responses, 36 km/h reverse cap, R gear, positive speed display, reverse lamps and wider camera. |
 | Slow cars drove through the ramp, which only triggered an instant jump | Shared ramp height and mesh generation; tires climb the wedge, raised sides/back stop the full vehicle footprint, and fast cars launch at the lip. Drops and recovery cannot farm landing rewards. |
-| Revised circuits would compare times against the old layout | Keep old records and use a separate v2 circuit-record key; credits, ownership, paints and upgrades remain intact. |
+| Revised circuits would compare times against the old layout | Keep old records, v2 circuit records and separate v3 handling/grid records; credits, ownership, paints and upgrades remain intact. |
 | Wet road formed repeating glossy tiles | Use broad world-space wetness independently of fine aggregate texture scale. Final night capture reviewed. |
 | Skid marks vanished below about 39 m/s at 60 FPS | Accumulate distance from the last emitted stamp; paired marks now follow road pitch. Regression at 20 m/s. |
 | Transparent flames/contact planes cast solid shadows | Preserve authored player shadow flags; disable rival shadows without enabling effects. |
@@ -55,7 +66,7 @@
 - Hardware performance is unmeasured. SwiftShader in this cloud machine runs much slower than a usable gaming frame rate. Use hardware acceleration and start at Low/Medium on slower devices; validate actual target devices before any FPS guarantee.
 - Extremely slow rendering deliberately slows simulation rather than integrating large unstable physics steps.
 - Chrome/Chromium desktop and emulated touch have been exercised. Real Android/iOS, Safari, Firefox, gamepads and assistive-technology gameplay need separate testing.
-- The three garage choices are remodeled variants of one licensed concept chassis. There are two tracks and four career events.
+- Four garage choices use two underlying designs: three Car Concept variants and original Solstice GT. There are two tracks and four career events. A professional 8–12-car collection remains outstanding.
 - Steering controls world heading manually. Road boundaries still constrain the arcade simulation. There is no off-road free roaming, rigid-body vehicle damage, barrel-roll stunt system or multiplayer.
 - Audio is synthesized. Automated tests verify the application path without exceptions, not subjective audio quality on speakers/headphones.
 - Saves are local to the browser and origin. Clearing data removes progress; private browsing or blocked storage may prevent persistence. The game reports failed save writes.

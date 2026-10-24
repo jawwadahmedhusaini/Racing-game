@@ -4,11 +4,13 @@ A complete, independent single-player browser arcade racer: pick a car, choose a
 
 ## Play online or download
 
-[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.3](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
+[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.4](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
 
-The online link requires the repository's GitHub Pages deployment to be enabled; see [HOSTING.md](HOSTING.md). If your browser still shows the previous build, refresh the page. Version 2.3 adds staged, cancellable race preparation; cached vehicle geometry; proper brake-to-reverse driving; a clearer starting straight; widened closing bends; and whole-circuit scenery clearance. Ramps now have a matching physical surface and solid raised edges. Existing credits, cars, upgrades and manual steering are preserved; revised circuits have separate lap records.
+[Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH-SOURCE.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
 
-![APEX RUSH 2.3 garage](artifacts/garage-final.jpg)
+The online link requires the repository's GitHub Pages deployment to be enabled; see [HOSTING.md](HOSTING.md). If your browser still shows the previous build, refresh the page. Version 2.4 adds the independently authored **Solstice GT** (2,500 credits), six AI opponents, traffic-aware passing, controlled drift recovery, acceleration/landing camera response, a reduced-motion option, circuit braking references and event dressing. Engine firing profiles now vary by car and gears use hysteresis. Credits, cars, paints and upgrades carry forward; new race records are separate from prior handling versions.
+
+![APEX RUSH 2.4 garage](artifacts/garage-final.jpg)
 
 ## Play and develop
 
@@ -36,19 +38,19 @@ The complete static game is in `dist/`. Serve the contents of that directory wit
 
 ## Included
 
-- Reflective 3D garage with three tuned concept-car variants, six paint finishes, unlocks and three upgrade levels.
+- Reflective 3D garage with an original long-bonnet grand tourer and three tuned concept-car variants, six paint finishes, unlocks and three upgrade levels.
 - A professionally authored, licensed car chassis with a modeled cockpit, treaded tires, animated wheels, lights and original aero packages.
 - Costa Aurelia: a coastal circuit with elevation, bridges, palms, ridged terrain and textured hills, 3D vegetation, ocean shading and a captured coastal reflection environment.
 - Neon Harbor: a waterfront city circuit with three facade families, stepped towers, recessed lit rooms, streetlights, headlights and damp asphalt.
 - Detailed player car on Medium/High/Ultra, LED rear lights, clearcoat paint, fitted rear vents, high-quality contact shading and multisample antialiasing.
 - Static filtered reflection probes for the garage and each track, plus spatial scenery culling and distance-based tree detail.
 - Four rendering presets; High/Ultra enable ambient occlusion and restrained bloom.
-- Six-driver quick races, solo time attack, elimination races and a four-event career.
-- Fixed-step arcade dynamics with manual heading-based steering, braking, reverse, drifting, nitro, shockwave, contact, jumps and recovery.
+- Seven-driver quick races (player plus six opponents), solo time attack, elimination races and a four-event career.
+- Fixed-step arcade dynamics with manual heading-based steering, braking, reverse, drift slip and gradual grip recovery, nitro, shockwave, contact, jumps and recovery.
 - Live rivals with speed planning, lane choice, overtaking, boost and collision responses.
 - Countdown, lap progress, minimap, position, speed, timer, results, rewards and replay.
 - Synthesized engine, tire, wind, boost, collision, countdown and background music.
-- Keyboard and touch input, pause/resume, three chase-camera distances, quality presets and audio controls.
+- Keyboard and touch input, pause/resume, three chase-camera distances, a reduced-motion setting, quality presets and audio controls.
 - Validated browser-local progress, settings, best times and purchases.
 
 ## Controls
@@ -78,13 +80,15 @@ npm run build
 
 Browser tests use system Chromium at `/usr/bin/chromium`. Set `CHROMIUM_PATH` to another Chromium executable if necessary. The test configuration uses SwiftShader for reproducible headless WebGL; it is not a hardware-GPU performance benchmark. Browser tests combine real keyboard/touch events with a development-only fixed-step time-advance hook to complete races without waiting in real time. That hook is removed from production builds.
 
+For a steadier view, enable **Reduced Camera Motion** in Settings. This removes camera shake/roll and forward nitro FOV surges. It does not change handling.
+
 See [TEST_REPORT.md](TEST_REPORT.md), [PERFORMANCE_REPORT.md](PERFORMANCE_REPORT.md), [ARCHITECTURE.md](ARCHITECTURE.md), [ASSET_LICENSES.md](ASSET_LICENSES.md), [ROADMAP.md](ROADMAP.md) and [BUG_TRACKER.md](BUG_TRACKER.md).
 
 After building, run `python3 scripts/package-release.py` to produce the browser release and editable source archives in `artifacts/`. The package includes an HTTP launcher because browser modules and 3D assets need a server.
 
 ## Scope
 
-This release provides the complete single-player play loop. Reflection probes are captured once per scene; they do not update with moving cars or provide ray tracing. The three cars derive from a licensed concept chassis. Spectre has a longer front body and rearward cabin; Stratos has wider fenders and a lower cabin. The authored body and glass normals follow these surface changes, while wheel assemblies remain rigid. Aero, performance and progression also differ. They are not three separately licensed manufacturer vehicles. The physics use a track-relative coordinate system with a manually controlled world heading. Forward input does not auto-steer; only rivals use a course-following controller. This is an arcade model with barriers, not a full rigid-body simulator. Multiplayer, branded car collections, photorealistic crash deformation, barrel-roll stunts, a large licensed soundtrack and a major-studio-sized career are not implemented.
+This release provides the complete single-player play loop. Reflection probes are captured once per scene; they do not update with moving cars or provide ray tracing. Vanta, Spectre and Stratos derive from a licensed concept chassis. Solstice is separately authored original geometry with a long bonnet, rearward cabin, its own lights and wheel assemblies; its detailed and race meshes contain 65,844 and 24,436 triangles. The garage has four choices across two underlying vehicle designs, not an 8–12-car premium collection. Spectre has a longer front body and rearward cabin; Stratos has wider fenders and a lower cabin. The authored body and glass normals follow these surface changes, while wheel assemblies remain rigid. Aero, performance and progression also differ. No manufacturer vehicles or badges are represented. The physics use a track-relative coordinate system with a manually controlled world heading. Forward input does not auto-steer; only rivals use a course-following controller. This is an arcade model with barriers, not a full rigid-body simulator. Multiplayer, branded car collections, photorealistic crash deformation, barrel-roll stunts, a large licensed soundtrack and a major-studio-sized career are not implemented.
 
 ## Tuning for your device
 

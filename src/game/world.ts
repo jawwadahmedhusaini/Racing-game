@@ -8,6 +8,7 @@ import {spatialInstances,spatialMesh} from './batching';
 import {addLandmarks} from './landmarks';
 import {RoadSpace} from './road-space';
 import {HeightField} from './heightfield';
+import {addCircuitDetail} from './circuit-detail';
 import {RAMP,rampHeight,rampGeometry} from './ramp';
 
 export interface World {roadSpace:RoadSpace;scene:THREE.Scene;sun:THREE.DirectionalLight;update:(time:number,position:THREE.Vector3,forward?:THREE.Vector3)=>void;}
@@ -92,6 +93,7 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
   instanced(scene,new THREE.CylinderGeometry(.7,1,1,10),darkMetal,poleTransforms,true);instanced(scene,new THREE.BoxGeometry(),darkMetal,armTransforms,true);
   instanced(scene,new THREE.BoxGeometry(),new THREE.MeshStandardMaterial({color:'#fff2d9',emissive:night?'#ffcf8c':'#ffffff',emissiveIntensity:night?4:.3,roughness:.2}),bulbs,false);
 
+  addCircuitDetail(scene,track,roadSpace,groundHeight);
   await checkpoint('Building the surroundings…');
   if(night)addCity(scene,track,rng,roadSpace);else{
     addVillas(scene,track,groundHeight,rng,roadSpace);
@@ -296,5 +298,6 @@ export function auditRoad(world:World,track:Track){
     let distance=Infinity;for(const s of track.samples)distance=Math.min(distance,Math.hypot(item.x-s.position.x,item.z-s.position.z));
     const clearance=distance-track.width/2-item.radius;minSceneryClearance=Math.min(minSceneryClearance,clearance);if(clearance<1.9)violations.push({kind:item.kind,distance,clearance});
   }
-  return {track:track.id,samples,placements:world.roadSpace.placements.length,minTerrainClearance:Number.isFinite(minTerrainClearance)?minTerrainClearance:null,minSceneryClearance,violations};
+  const kinds:Record<string,number>={};for(const p of world.roadSpace.placements)kinds[p.kind]=(kinds[p.kind]??0)+1;
+  return {track:track.id,samples,kinds,placements:world.roadSpace.placements.length,minTerrainClearance:Number.isFinite(minTerrainClearance)?minTerrainClearance:null,minSceneryClearance,violations};
 }

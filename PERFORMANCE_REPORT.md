@@ -1,42 +1,48 @@
-# APEX RUSH 2.3.0 — rendering and performance
+# APEX RUSH 2.4.0 — measured performance
 
-Measured at 2026-10-24T00:52:22.386Z (UTC). Raw evidence: `artifacts/performance.json`.
+Measured at 2026-10-24T16:48:43.111Z UTC. Chromium 154.0.8037.57 on Linux, ANGLE/SwiftShader **software WebGL 2**, shared cloud CPU, no hardware GPU. These are diagnostic observations, not evidence of playable desktop or phone performance.
 
-## Conditions
+## Rendering sample
 
-Chromium 154.0.8037.57, Linux, ANGLE/SwiftShader software WebGL 2 on a shared cloud CPU. No hardware GPU. One browser at a time, 1280×800 CSS pixels, DPR 1, adaptive resolution explicitly disabled. After five warm-up frames, 24 real requestAnimationFrame intervals are collected per scene/preset. The coast sample is a moving six-car race near the opening; this is a short diagnostic with host scheduling variability.
+One browser at a time; 1280×800 CSS pixels, DPR 1, adaptive resolution disabled. Five warm-up frames then 24 real requestAnimationFrame intervals per scene/preset. The coast sample is a moving seven-car grid near the opening. Host scheduling and changed camera/scenery affect comparisons.
 
-| Preset / scene | Wall-clock FPS | Median ms | P95 ms | Last-frame calls | Last-frame triangles |
+| Preset / scene | Wall-clock FPS | Median ms | P95 ms | Last-frame draw calls | Last-frame triangles |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| low / garage | 2.11 | 466.8 | 533.3 | 104 | 116,083 |
-| low / coast | 0.87 | 1166.6 | 1283.4 | 360 | 278,018 |
-| medium / garage | 1.36 | 766.6 | 833.3 | 156 | 224,398 |
-| medium / coast | 0.47 | 2166.5 | 2333.2 | 458 | 566,160 |
+| low / garage | 1.9 | 483.4 | 1099.9 | 104 | 116,083 |
+| low / coast | 0.79 | 1233.3 | 1583.3 | 279 | 247,352 |
+| medium / garage | 1.32 | 750 | 1483.3 | 156 | 224,398 |
+| medium / coast | 0.45 | 2199.9 | 2583.2 | 380 | 537,211 |
 
-These software results do not establish a playable hardware frame rate. There is no claim of a 30/60 FPS target being met on phones or desktop GPUs. Very slow rendering deliberately slows simulation instead of integrating unstable large timesteps.
+The software frame rates are below a playable target. No 30/60 FPS hardware target has been established. The game caps simulation catch-up rather than integrating unstable large physics steps when rendering falls far behind.
 
 ## Race preparation
 
-Raw evidence: `artifacts/startup-review.json`; recorded v2.2 baseline: `artifacts/startup-baseline.json`. At 1100×720 / Low, the earlier synchronous Start Race handler occupied about 5,289 ms before returning. The new runs returned in 12.1 ms, 1 ms, 0.9 ms. Complete preparation took 6.96 s, 2.33 s, 5.89 s for cold coast, cached coast and cold city respectively. The progress screen is visible during that work; countdown and physics remain frozen. These are short software-renderer observations, not guaranteed timings.
+1100×720, Low, same software renderer. The first metric measures synchronous click-handler time; the second includes staged construction, shader waiting, GPU uploads and first-frame warm-up.
 
-Car templates and rear-surface fits are reused. Terrain construction and scenery tasks yield to the browser, reflection capture yields between faces, and shader waiting can be cancelled. GPU uploads/render calls and individual geometry batches can still occupy the main thread. `elapsedSinceYieldMs` includes asynchronous shader waiting and driver work; it is not a CPU-only profiler. Preparation intentionally warms the first race frame before exposing the countdown. The new track layout/camera also changes visible geometry, so frame-rate results are not a controlled before/after speedup claim.
+| Start | Click handler ms | Complete preparation seconds |
+| --- | ---: | ---: |
+| coast (cold) | 8 | 6.79 |
+| coast (cached) | 1.8 | 2.41 |
+| city (cold) | 1.1 | 6.05 |
 
-## Implemented controls
+Preparation is visible and cancellable; countdown/physics begin after warm-up. Keys deliberately held during loading survive the transition. The older 2.2 synchronous handler occupied about 5,289 ms (`startup-baseline.json`). This does not claim that total cold loading is now instant or universally faster. `elapsedSinceYieldMs` includes asynchronous driver/shader waiting and is not a CPU-only profiler.
 
-- Adaptive resolution samples uncapped frame time. After settling, sustained averages above 24 ms reduce render scale by 0.1, down to 0.55; four windows below 17 ms allow a gradual 0.05 increase. Pause/hidden frames are excluded. Changing the preset or disabling adaptive resolution restores full preset resolution.
-- Pixel budgets cap High and lower at 2560×1440 and Ultra at 3840×2160, in addition to the preset/DPR caps. This limits pixel allocation on dense and very large displays.
-- Low uses the 30,534-triangle player mesh and no dynamic shadows/AO/bloom. Medium and above use the 106,391-triangle detailed player; all rivals retain the lighter mesh. Modeled silhouette changes add no triangles.
-- Static geometry is spatially divided; equal-material road strips and landmark meshes are merged. Near/far trees and grass distances control scenery detail. Transparent effects and distant geometry are excluded from contact AO.
-- Reflection probes are 128-pixel cube faces, captured once per scene and cached; race preparation yields between faces. No per-frame cube capture or moving-object reflections.
-- The minimap path and bounds are cached. Instance materials and effect resources are disposed between races; immutable vehicle meshes/maps are cached across six bounded templates; the browser stress flow checks geometry/texture counts after four restarts. Particle and skid buffers are bounded.
+## Budgets and controls
 
-| Preset | DPR cap | Shadow map | Contact AO | Bloom | Near trees |
-| --- | ---: | ---: | --- | --- | ---: |
-| Low | 0.75 | Off | Off | Off | Lower LOD only |
-| Medium | 1.0 | 1024 | Off | Off | 75 m |
-| High | 1.5 | 2048 | Half resolution | On | 115 m |
-| Ultra | 2.0 | 4096 | Three-quarter resolution | On | 170 m |
+- Solstice detailed mesh: 65,844 triangles / 2,419,544 bytes; race mesh: 24,436 / 859,752. Removing subpixel brake-drill geometry reduced the original detailed export from 130,356 triangles. Both retain independent wheel pivots and the same silhouette.
+- Car Concept remains 106,391 detailed / 30,534 race triangles, before original aero/effects. Low uses a race mesh for the player; every rival uses a race mesh. Medium and above use the detailed player.
+- Immutable vehicle geometry/maps are cached across at most eight catalog/detail combinations; instances own cloned materials. Restart and garage-browse tests check bounded geometry/texture counts.
+- Added circuit detail is static and spatially batched, with no new dynamic lights. Existing grass/tree LOD and culling remain. A seventh car increases race work; this release does not claim a net frame-rate speedup.
+- 128-pixel static reflection probes are captured once per scene; no per-frame cube capture or moving-object reflection.
+- Adaptive resolution defaults on, with sustained-frame hysteresis, scale floor 0.55 and recovery toward the selected preset. It changes pixel cost, not CPU work or effect quality. The optional performance display reports wall-clock FPS and render dimensions.
 
-Adaptive resolution affects GPU pixel cost. It does not fix CPU/driver bottlenecks or guarantee a frame rate. The optional display reports rolling wall-clock FPS, approximate frame time, actual render dimensions and the chosen preset. It is not a GPU profiler.
+| Preset | DPR cap | Shadow size | Contact AO / bloom |
+| --- | ---: | ---: | --- |
+| Low | 0.75 | Off | Off |
+| Medium | 1.0 | 1024 | Off |
+| High | 1.5 | 2048 | Half-resolution AO / bloom |
+| Ultra | 2.0 | 4096 | Three-quarter-resolution AO / bloom |
 
-Reproduce with `npm run dev` and `node scripts/measure-performance.mjs`. Physical-device procedure and pending device matrix: [DEVICE_TESTING.md](DEVICE_TESTING.md).
+Pixel allocations are additionally capped at 2560×1440 for High/lower and 3840×2160 for Ultra. Actual phones, integrated/discrete GPUs, Safari/Firefox, sustained thermal performance and subjective audio/handling remain unverified. See [DEVICE_TESTING.md](DEVICE_TESTING.md).
+
+Reproduce: `npm run dev`, `node scripts/measure-startup.mjs`, then `node scripts/measure-performance.mjs` sequentially. Raw reports are in `artifacts/`.

@@ -9,9 +9,9 @@ function profile(x:number,y:number,z:number,shape:Shape){
   const arch=Math.exp(-Math.pow((z*z-1.7)/1.4,2)),archD=arch*(-4*z*(z*z-1.7)/(1.4*1.4));
   return {x:x*(1.05+.045*arch-.12*roof),y:y-.14*roof,z:.98*z+.10*roof,sx:1.05+.045*arch-.12*roof,xy:-.12*x*derivative,xz:.045*x*archD,sy:1-.14*derivative,zy:.10*derivative,sz:.98};
 }
-export function reshapePoint(point:Vector3,shape:Shape){if(shape==='wedge')return point;const p=profile(point.x,point.y,point.z,shape);return point.set(p.x,p.y,p.z);}
+export function reshapePoint(point:Vector3,shape:Shape){if((shape==='wedge'||shape==='grandtourer'))return point;const p=profile(point.x,point.y,point.z,shape);return point.set(p.x,p.y,p.z);}
 export function reshapeGeometry(geometry:BufferGeometry,shape:Shape){
-  if(shape==='wedge')return;
+  if((shape==='wedge'||shape==='grandtourer'))return;
   const positions=geometry.attributes.position,normals=geometry.attributes.normal,n=new Vector3();
   for(let i=0;i<positions.count;i++){
     const p=profile(positions.getX(i),positions.getY(i),positions.getZ(i),shape);

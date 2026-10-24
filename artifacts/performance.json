@@ -1,6 +1,6 @@
 {
-  "version": "2.3.0",
-  "date": "2026-10-24T00:52:22.386Z",
+  "version": "2.4.0",
+  "date": "2026-10-24T16:48:43.111Z",
   "browser": "154.0.8037.57",
   "viewport": "1280x800",
   "samples": [
@@ -8,10 +8,10 @@
       "quality": "low",
       "scene": "garage",
       "frames": 24,
-      "wallTimeMs": 11382.899999999998,
-      "fps": 2.11,
-      "medianFrameMs": 466.8,
-      "p95FrameMs": 533.3,
+      "wallTimeMs": 12649.399999999998,
+      "fps": 1.9,
+      "medianFrameMs": 483.4,
+      "p95FrameMs": 1099.9,
       "lastFrame": {
         "drawCalls": 104,
         "triangles": 116083,
@@ -22,24 +22,24 @@
       "quality": "low",
       "scene": "coast",
       "frames": 24,
-      "wallTimeMs": 27498.9,
-      "fps": 0.87,
-      "medianFrameMs": 1166.6,
-      "p95FrameMs": 1283.4,
+      "wallTimeMs": 30265.399999999994,
+      "fps": 0.79,
+      "medianFrameMs": 1233.3,
+      "p95FrameMs": 1583.3,
       "lastFrame": {
-        "drawCalls": 360,
-        "triangles": 278018,
-        "geometries": 672
+        "drawCalls": 279,
+        "triangles": 247352,
+        "geometries": 669
       }
     },
     {
       "quality": "medium",
       "scene": "garage",
       "frames": 24,
-      "wallTimeMs": 17599.4,
-      "fps": 1.36,
-      "medianFrameMs": 766.6,
-      "p95FrameMs": 833.3,
+      "wallTimeMs": 18166.100000000002,
+      "fps": 1.32,
+      "medianFrameMs": 750,
+      "p95FrameMs": 1483.3,
       "lastFrame": {
         "drawCalls": 156,
         "triangles": 224398,
@@ -50,14 +50,14 @@
       "quality": "medium",
       "scene": "coast",
       "frames": 24,
-      "wallTimeMs": 51531.299999999996,
-      "fps": 0.47,
-      "medianFrameMs": 2166.5,
-      "p95FrameMs": 2333.2,
+      "wallTimeMs": 53047.9,
+      "fps": 0.45,
+      "medianFrameMs": 2199.9,
+      "p95FrameMs": 2583.2,
       "lastFrame": {
-        "drawCalls": 458,
-        "triangles": 566160,
-        "geometries": 674
+        "drawCalls": 380,
+        "triangles": 537211,
+        "geometries": 671
       }
     }
   ],
