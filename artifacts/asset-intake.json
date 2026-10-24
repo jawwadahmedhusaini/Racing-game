@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-25",
+  "scope": "Offline intake tooling; no new playable assets or FPS claims",
+  "pythonUnitTestsPassed": 7,
+  "productionAssetInspections": [
+    {
+      "file": "concept-car.glb",
+      "bytes": 6462376,
+      "sha256": "bcf160d534b872d576b252b8406406095f9cc579b43af42ddd00da83ea21d22a",
+      "activeSceneTriangles": 106391,
+      "activeScenePrimitives": 106,
+      "externalDependencies": []
+    },
+    {
+      "file": "concept-car-lod.glb",
+      "bytes": 2578168,
+      "sha256": "f66c5c0e1b58fbde1bf46285b060bbdc404a45bfd84475ad4c7a21286e23a064",
+      "activeSceneTriangles": 30534,
+      "activeScenePrimitives": 60,
+      "externalDependencies": []
+    },
+    {
+      "file": "solstice-gt.glb",
+      "bytes": 2419544,
+      "sha256": "af20f5d4d20a523b6adde5be04abe39ad556ecd6cb8475f4b1f252489c29e619",
+      "activeSceneTriangles": 65844,
+      "activeScenePrimitives": 690,
+      "externalDependencies": []
+    },
+    {
+      "file": "solstice-gt-lod.glb",
+      "bytes": 859752,
+      "sha256": "c696efd875c24e6718a07882faeccc51e5ce45e3d4c97c86c801dfb72a959e7a",
+      "activeSceneTriangles": 24436,
+      "activeScenePrimitives": 209,
+      "externalDependencies": []
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Ferrari 458 sample",
+      "url": "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/ferrari.glb",
+      "bytes": 1681572,
+      "sha256": "cafe3f48da6797aa9bde75ca768bc5b57db366575fd233e90df186ae988a876e",
+      "activeSceneTriangles": 358788,
+      "activeScenePrimitives": 51,
+      "requiredExtensions": [
+        "KHR_draco_mesh_compression"
+      ],
+      "imported": false
+    },
+    {
+      "name": "Underwater rocks collection",
+      "url": "https://raw.githubusercontent.com/BabylonJS/Assets/master/meshes/Demos/UnderWaterScene/underwaterSceneRocksBarnaclesMussels.glb",
+      "bytes": 9449144,
+      "sha256": "bc6ef3b1f98acd2140d8180598e414b34d1722b7d65ec1343401387ac5760949",
+      "activeSceneTriangles": 365750,
+      "activeScenePrimitives": 5,
+      "requiredExtensions": [],
+      "imported": false
+    }
+  ]
+}

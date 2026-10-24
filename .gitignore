@@ -12,3 +12,7 @@ artifacts/*.zip
 # Generated screenshots and local archive checksums
 artifacts/*.png
 artifacts/SHA256SUMS.txt
+
+# Local asset evaluation and Python inspection tools
+asset-inbox/
+__pycache__/
