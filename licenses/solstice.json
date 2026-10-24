@@ -1,0 +1,21 @@
+{
+  "name": "Solstice GT",
+  "author": "APEX RUSH project",
+  "license": "CC0-1.0",
+  "source": "scripts/build-solstice.py",
+  "description": "Original long-bonnet grand tourer authored for APEX RUSH. No imported vehicle geometry, textures or manufacturer branding. High and race LOD share design and wheel rig.",
+  "assets": [
+    {
+      "file": "assets/solstice-gt.glb",
+      "bytes": 2419544,
+      "triangles": 65844,
+      "sha256": "af20f5d4d20a523b6adde5be04abe39ad556ecd6cb8475f4b1f252489c29e619"
+    },
+    {
+      "file": "assets/solstice-gt-lod.glb",
+      "bytes": 859752,
+      "triangles": 24436,
+      "sha256": "c696efd875c24e6718a07882faeccc51e5ce45e3d4c97c86c801dfb72a959e7a"
+    }
+  ]
+}
