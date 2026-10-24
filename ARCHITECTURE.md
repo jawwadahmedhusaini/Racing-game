@@ -25,7 +25,7 @@ The renderer interpolates camera motion separately from the fixed-step simulatio
 
 ## Assets and lifetime
 
-The 106,391-triangle player/garage GLB and 30,534-triangle rival LOD are parsed once; each prepared template batches static geometry by material, preserving separate wheel pivots. Textures from the asset are shared. Six immutable prepared templates (three shapes × two detail levels) retain geometry and texture maps for the page lifetime; each instance clones its materials. Instance materials and race effects are disposed on restart/exit. Rear-surface fitting samples are cached by detail level. Each world is built once and cached. The garage is kept separate from race scenes. Live processes are not assumed to survive cloud environment publication.
+Car Concept uses 106,391-triangle detailed / 30,534-triangle race GLBs. Original Solstice uses 65,844 / 24,436 triangles. The four source GLBs are parsed once; each prepared template batches static geometry by material, preserving separate wheel pivots. Textures from the asset are shared. Eight immutable prepared templates (four catalog cars × two detail levels) retain geometry and texture maps for the page lifetime; each instance clones its materials. Instance materials and race effects are disposed on restart/exit. Rear-surface fitting samples are cached by detail level. Each world is built once and cached. The garage is kept separate from race scenes. Live processes are not assumed to survive cloud environment publication.
 
 ## Persistence
 
@@ -62,3 +62,13 @@ Only one AbortController may own race preparation. The UI enters `preparing` bef
 Reverse uses signed velocity with a 0.35-second stationary brake dwell. AI braking cannot select reverse. Throttle first arrests backward motion; releasing the pedals coasts toward zero. Steering reverses yaw rate with signed motion, while wheel direction retains the driver's steering input. Camera distance/height widen during reverse and rendering/audio use absolute speed where appropriate. The HUD shows a positive speed and R gear. Reverse cannot activate nitro or ramp launch rewards.
 
 `ramp.ts` supplies the rendered wedge and the physical support height. `rampLift` supports a grounded car; `airborne` describes height during flight. Raised ramp edges check the rotated car footprint. Slow departures fall under gravity, while a fast forward crossing of the lip launches. Only a recorded launch can grant a landing bonus, once per lap; recovery cancels that pending bonus. Revised paths use v2 record keys without deleting historical saves.
+
+## 2.4 audit improvements
+
+- `camera.ts`: presentation-only camera director. Reads the vehicle state, uses actual position deltas, clamps the lens to the clear road corridor, and supports reduced motion. It cannot write to the simulation.
+- `opponents.ts`: pure passing/lane planner using wrapped physical gaps, neighboring traffic and ramp clearance. `simulation.ts` owns steering, acceleration and contacts for all seven drivers.
+- `engine-voice.ts`: deterministic gear hysteresis and RPM/load/firing profiles. `audio.ts` renders the procedural voices after user interaction.
+- `circuit-detail.ts`: static signs, fabric banners and coastal overlook geometry, merged by material and spatial cell; no added dynamic lights.
+- `scripts/build-solstice.py`: original parametric Blender authoring, two GLB LODs and hash metadata. Car Concept adaptations remain separate in `scripts/prepare-car.py`.
+- Vehicle templates are bounded by four catalog cars × two detail levels. Materials are per-instance; immutable geometry/maps are retained until page exit.
+- 2.4 race records use `track-v3-mode`; old and v2 record keys remain readable. Existing garage/economy data are preserved.

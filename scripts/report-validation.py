@@ -1,93 +1,117 @@
-"""Generate release notes only after all machine-readable gates pass."""
+"""Generate release evidence after current-version validation gates succeed."""
 from pathlib import Path
 import json
 root=Path(__file__).resolve().parent.parent
 version=json.loads((root/'package.json').read_text())['version']
-reports={n:json.loads((root/f'artifacts/{n}.json').read_text()) for n in ['startup-review','unit-results','browser-results','visual-review','performance','production-smoke','hosting-smoke','dependency-audit']}
-u=reports['unit-results'];b=reports['browser-results']['stats']
+names=['startup-review','unit-results','browser-results','visual-review','performance','production-smoke','hosting-smoke','dependency-audit','solstice-browser']
+r={n:json.loads((root/f'artifacts/{n}.json').read_text()) for n in names}
+u=r['unit-results'];b=r['browser-results']['stats'];startup=r['startup-review'];perf=r['performance']
 assert u['success'] and u['numFailedTests']==u['numPendingTests']==0
-assert b['expected']==12 and b['unexpected']==b['flaky']==b['skipped']==0
+asset_check=r['solstice-browser']['stats'];assert asset_check['expected']==1 and asset_check['unexpected']==asset_check['flaky']==asset_check['skipped']==0
+assert b['expected']==13 and b['unexpected']==b['flaky']==b['skipped']==0
 for name in ['startup-review','visual-review','performance','production-smoke','hosting-smoke']:
- r=reports[name];assert r['version']==version and r['passed'] and not r['errors'] and not r.get('failedRequests'),name
-assert reports['dependency-audit']['metadata']['vulnerabilities']['total']==0
-startup=reports['startup-review'];assert len(startup['runs'])==3 and all(not run['audit']['violations'] for run in startup['runs'])
-perf=reports['performance'];assert len(perf['samples'])==4
-rows=[]
-for s in perf['samples']:
- rows.append(f"| {s['quality']} / {s['scene']} | {s['fps']} | {s['medianFrameMs']} | {s['p95FrameMs']} | {s['lastFrame']['drawCalls']} | {s['lastFrame']['triangles']:,} |")
-(root/'PERFORMANCE_REPORT.md').write_text(f'''# APEX RUSH {version} — rendering and performance
+ report=r[name];assert report['version']==version and report['passed'] and not report['errors'] and not report.get('failedRequests'),name
+assert r['dependency-audit']['metadata']['vulnerabilities']['total']==0
+assert len(startup['runs'])==3 and startup['heldThrottleDuringLoading']
+assert all(not run['audit']['violations'] for run in startup['runs'])
+assert startup['runs'][0]['audit']['kinds']['belvedere']==1
+assert len(perf['samples'])==4
+assets=json.loads((root/'public/licenses/solstice.json').read_text())['assets']
+rows=['| '+ ' | '.join(map(str,[s['quality']+' / '+s['scene'],s['fps'],s['medianFrameMs'],s['p95FrameMs'],s['lastFrame']['drawCalls'],f"{s['lastFrame']['triangles']:,}"]))+' |' for s in perf['samples']]
+loads=['| '+ ' | '.join(map(str,[run['track']+(' (cached)' if run['cached'] else ' (cold)'),round(run['clickMs'],1),round(run['preparation']['totalMs']/1000,2)]))+' |' for run in startup['runs']]
+(root/'PERFORMANCE_REPORT.md').write_text(f'''# APEX RUSH {version} — measured performance
 
-Measured at {perf['date']} (UTC). Raw evidence: `artifacts/performance.json`.
+Measured at {perf['date']} UTC. Chromium {perf['browser']} on Linux, ANGLE/SwiftShader **software WebGL 2**, shared cloud CPU, no hardware GPU. These are diagnostic observations, not evidence of playable desktop or phone performance.
 
-## Conditions
+## Rendering sample
 
-Chromium {perf['browser']}, Linux, ANGLE/SwiftShader software WebGL 2 on a shared cloud CPU. No hardware GPU. One browser at a time, 1280×800 CSS pixels, DPR 1, adaptive resolution explicitly disabled. After five warm-up frames, 24 real requestAnimationFrame intervals are collected per scene/preset. The coast sample is a moving six-car race near the opening; this is a short diagnostic with host scheduling variability.
+One browser at a time; 1280×800 CSS pixels, DPR 1, adaptive resolution disabled. Five warm-up frames then 24 real requestAnimationFrame intervals per scene/preset. The coast sample is a moving seven-car grid near the opening. Host scheduling and changed camera/scenery affect comparisons.
 
-| Preset / scene | Wall-clock FPS | Median ms | P95 ms | Last-frame calls | Last-frame triangles |
+| Preset / scene | Wall-clock FPS | Median ms | P95 ms | Last-frame draw calls | Last-frame triangles |
 | --- | ---: | ---: | ---: | ---: | ---: |
 {chr(10).join(rows)}
 
-These software results do not establish a playable hardware frame rate. There is no claim of a 30/60 FPS target being met on phones or desktop GPUs. Very slow rendering deliberately slows simulation instead of integrating unstable large timesteps.
+The software frame rates are below a playable target. No 30/60 FPS hardware target has been established. The game caps simulation catch-up rather than integrating unstable large physics steps when rendering falls far behind.
 
 ## Race preparation
 
-Raw evidence: `artifacts/startup-review.json`; recorded v2.2 baseline: `artifacts/startup-baseline.json`. At 1100×720 / Low, the earlier synchronous Start Race handler occupied about 5,289 ms before returning. The new runs returned in {', '.join(str(round(run['clickMs'],1))+' ms' for run in startup['runs'])}. Complete preparation took {', '.join(str(round(run['preparation']['totalMs']/1000,2))+' s' for run in startup['runs'])} for cold coast, cached coast and cold city respectively. The progress screen is visible during that work; countdown and physics remain frozen. These are short software-renderer observations, not guaranteed timings.
+1100×720, Low, same software renderer. The first metric measures synchronous click-handler time; the second includes staged construction, shader waiting, GPU uploads and first-frame warm-up.
 
-Car templates and rear-surface fits are reused. Terrain construction and scenery tasks yield to the browser, reflection capture yields between faces, and shader waiting can be cancelled. GPU uploads/render calls and individual geometry batches can still occupy the main thread. `elapsedSinceYieldMs` includes asynchronous shader waiting and driver work; it is not a CPU-only profiler. Preparation intentionally warms the first race frame before exposing the countdown. The new track layout/camera also changes visible geometry, so frame-rate results are not a controlled before/after speedup claim.
+| Start | Click handler ms | Complete preparation seconds |
+| --- | ---: | ---: |
+{chr(10).join(loads)}
 
-## Implemented controls
+Preparation is visible and cancellable; countdown/physics begin after warm-up. Keys deliberately held during loading survive the transition. The older 2.2 synchronous handler occupied about 5,289 ms (`startup-baseline.json`). This does not claim that total cold loading is now instant or universally faster. `elapsedSinceYieldMs` includes asynchronous driver/shader waiting and is not a CPU-only profiler.
 
-- Adaptive resolution samples uncapped frame time. After settling, sustained averages above 24 ms reduce render scale by 0.1, down to 0.55; four windows below 17 ms allow a gradual 0.05 increase. Pause/hidden frames are excluded. Changing the preset or disabling adaptive resolution restores full preset resolution.
-- Pixel budgets cap High and lower at 2560×1440 and Ultra at 3840×2160, in addition to the preset/DPR caps. This limits pixel allocation on dense and very large displays.
-- Low uses the 30,534-triangle player mesh and no dynamic shadows/AO/bloom. Medium and above use the 106,391-triangle detailed player; all rivals retain the lighter mesh. Modeled silhouette changes add no triangles.
-- Static geometry is spatially divided; equal-material road strips and landmark meshes are merged. Near/far trees and grass distances control scenery detail. Transparent effects and distant geometry are excluded from contact AO.
-- Reflection probes are 128-pixel cube faces, captured once per scene and cached; race preparation yields between faces. No per-frame cube capture or moving-object reflections.
-- The minimap path and bounds are cached. Instance materials and effect resources are disposed between races; immutable vehicle meshes/maps are cached across six bounded templates; the browser stress flow checks geometry/texture counts after four restarts. Particle and skid buffers are bounded.
+## Budgets and controls
 
-| Preset | DPR cap | Shadow map | Contact AO | Bloom | Near trees |
-| --- | ---: | ---: | --- | --- | ---: |
-| Low | 0.75 | Off | Off | Off | Lower LOD only |
-| Medium | 1.0 | 1024 | Off | Off | 75 m |
-| High | 1.5 | 2048 | Half resolution | On | 115 m |
-| Ultra | 2.0 | 4096 | Three-quarter resolution | On | 170 m |
+- Solstice detailed mesh: {assets[0]['triangles']:,} triangles / {assets[0]['bytes']:,} bytes; race mesh: {assets[1]['triangles']:,} / {assets[1]['bytes']:,}. Removing subpixel brake-drill geometry reduced the original detailed export from 130,356 triangles. Both retain independent wheel pivots and the same silhouette.
+- Car Concept remains 106,391 detailed / 30,534 race triangles, before original aero/effects. Low uses a race mesh for the player; every rival uses a race mesh. Medium and above use the detailed player.
+- Immutable vehicle geometry/maps are cached across at most eight catalog/detail combinations; instances own cloned materials. Restart and garage-browse tests check bounded geometry/texture counts.
+- Added circuit detail is static and spatially batched, with no new dynamic lights. Existing grass/tree LOD and culling remain. A seventh car increases race work; this release does not claim a net frame-rate speedup.
+- 128-pixel static reflection probes are captured once per scene; no per-frame cube capture or moving-object reflection.
+- Adaptive resolution defaults on, with sustained-frame hysteresis, scale floor 0.55 and recovery toward the selected preset. It changes pixel cost, not CPU work or effect quality. The optional performance display reports wall-clock FPS and render dimensions.
 
-Adaptive resolution affects GPU pixel cost. It does not fix CPU/driver bottlenecks or guarantee a frame rate. The optional display reports rolling wall-clock FPS, approximate frame time, actual render dimensions and the chosen preset. It is not a GPU profiler.
+| Preset | DPR cap | Shadow size | Contact AO / bloom |
+| --- | ---: | ---: | --- |
+| Low | 0.75 | Off | Off |
+| Medium | 1.0 | 1024 | Off |
+| High | 1.5 | 2048 | Half-resolution AO / bloom |
+| Ultra | 2.0 | 4096 | Three-quarter-resolution AO / bloom |
 
-Reproduce with `npm run dev` and `node scripts/measure-performance.mjs`. Physical-device procedure and pending device matrix: [DEVICE_TESTING.md](DEVICE_TESTING.md).
+Pixel allocations are additionally capped at 2560×1440 for High/lower and 3840×2160 for Ultra. Actual phones, integrated/discrete GPUs, Safari/Firefox, sustained thermal performance and subjective audio/handling remain unverified. See [DEVICE_TESTING.md](DEVICE_TESTING.md).
+
+Reproduce: `npm run dev`, `node scripts/measure-startup.mjs`, then `node scripts/measure-performance.mjs` sequentially. Raw reports are in `artifacts/`.
 ''')
 files=[p for p in (root/'dist').rglob('*') if p.is_file()]
-(root/'TEST_REPORT.md').write_text(f'''# APEX RUSH {version} — validation report
+auditRows=[]
+for run in [startup['runs'][0],startup['runs'][2]]:
+ a=run['audit'];auditRows.append(f"| {a['track']} | {a['samples']} | {a['placements']} | {a['minTerrainClearance']} | {a['minSceneryClearance']:.3f} | {len(a['violations'])} |")
+(root/'TEST_REPORT.md').write_text(f'''# APEX RUSH {version} — validation
 
-Chromium 154 / Playwright 1.64.1 on Linux, Node.js 24.19.0. Software WebGL 2; hardware GPU performance is unmeasured. Machine-readable timestamps are UTC.
+Machine-readable timestamps are UTC. Chromium/Playwright on Linux with software WebGL 2; hardware FPS and subjective flagship quality are not verified.
 
-## Results
+## Release gates
 
-- Unit/simulation checks: **{u['numPassedTests']} passed**, none failed or skipped.
-- Browser workflows: **{b['expected']} passed**, none failed, skipped or flaky, no retries; {b['duration']/60000:.1f} minutes.
-- TypeScript, root build and `/Racing-game/` build: passed.
-- Packaged launcher and Pages-base production smokes: both passed, version {version}, no unexpected page/console errors or HTTP failures. The development test API is absent.
+- **{u['numPassedTests']} unit checks passed**, none failed/skipped.
+- **{b['expected']} browser workflows passed**, none failed/skipped/flaky, no retries; {b['duration']/60000:.1f} minutes.
+- TypeScript, root build and `/Racing-game/` build passed.
+- Actual packaged launcher and Pages-base production smokes passed, current version, zero unexpected page/console errors or HTTP failures; development controls absent.
 - Dependency audit: zero reported vulnerabilities.
 
-## Adversarial coverage
+## New regression coverage
 
-Actual keyboard and emulated multi-touch inputs verify camera-relative left/right movement, front-wheel orientation, forward-only world heading, pause/recovery, brake priority, boost and nested menus. Deterministic driving advances the same fixed-step simulation for full races, rival finishes, career progression, purchases, upgrades, replay and rewards credited once.
+- Solstice's loaded high/low GLBs: exact attribution hashes, finite normals, independent front/rear wheel pivots, measured full bounds contained by the collision footprint, and triangle limits. Full bounds include the splitter/mirrors, not only painted bodywork.
+- Six rivals finish both laps of both circuits on Rookie/Pro/Expert while the player remains idle. Separate planner tests cover occupied passing lanes, blocked traffic, a held overtaking lane and lap-seam gaps. This caught grid queues and ramp-edge stalls during development.
+- Drift slip decays smoothly after release; airborne/braking input cannot earn drift time. Existing manual-steering, reverse, boost, barrier, oriented-body contact, ramp support/edge/launch and reward regressions remain.
+- Camera follows actual displacement without changing physics, stays above the road and within its safe corridor across the full circuit, settles on pause/landing and resets after recovery. Reduced motion removes camera shake/roll and forward nitro FOV surges.
+- Engine gear hysteresis handles threshold jitter, reverse and large speed changes; different car profiles have different firing rates. Partial audio failure and zero-effects allocation tests remain. No subjective speaker/headphone quality is claimed.
+- Existing saves retain Solstice ownership, reduced motion and prior/v2/v3 records. Browser workflow buys Solstice, paints it, changes race detail, finishes a race and reloads the persisted settings.
 
-New checks cover forward braking into reverse, stationary dwell cancellation, reverse steering/coasting/wall contact, brake priority over auto acceleration and nitro, positive speed/R gear on real keyboard and touch inputs, and forward recovery. Terrain raycasts sample five lateral positions every 3 m around the complete coast. A separate heightfield test raycasts rendered triangles across cell diagonals to verify scenery support heights. Independent footprint distances cover accepted rocks, villas, tree trunk zones, buildings and landmarks. Overhead foliage can overhang; arbitrary branch collisions are not simulated. Curvature checks prevent folded inner road edges and verify grid alignment.
+## Browser and release coverage
 
-Ramp tests raycast the actual wedge against its shared height function, drive a slow car over it, stop a reversing car at the raised rear edge using its full footprint, and verify launch/landing/recovery rewards. Old and revised track records survive parsing independently. Idle-player displacement allows less than 2% of the circuit from physical rival impacts; an idle player cannot complete a race.
+Real keyboard and CDP multi-touch events verify camera-relative steering, wheel yaw, reverse, pause/recovery, brake priority, boost and menus. A development-only fixed-step advance hook drives complete races, progression, purchases, replays and single reward crediting. The hook is absent from production.
 
-Browser coverage also retains pause/recovery, garage customization, full races, purchases, upgrades, repeated restarts, resource counts, storage/audio failures, competing tabs, failed downloads and actual context loss. Preparation is cancelled during terrain construction and between car instances, then restarted; duplicate starts cannot create a second race. Countdown and elapsed race time remain unchanged during preparation. The final startup pass also verifies that throttle deliberately held during loading survives the transition into the countdown. Intentional network/audio/context failures are expected in fault-injection flows; normal production checks require zero errors.
+Other workflows cover repeated starts/garage browsing/resource counts, focus loss, nested settings, competing tabs, denied storage, failed assets/retry, unsupported audio and actual graphics-context loss. Loading can be cancelled during terrain and car construction; duplicate starts are rejected and countdown time stays frozen. Startup checks preserve throttle held during loading.
 
-## Visual and release verification
+Production checks use real W/Shift/S input for acceleration, boost, pause/resume and reverse. Solstice is purchased in the packaged production smoke; Ultra is rendered. Layout checks cover 1280×800, 1600×900, 844×390 and 390×844. The Pages-base check loads both vehicle families, surfaces, vegetation, fonts, HDR, previews and license metadata. Build: {len(files)} files, {sum(p.stat().st_size for p in files)/1e6:.1f} MB uncompressed.
 
-High-quality screenshots inspect all three car silhouettes, the coast opening and lighthouse, and the city/transit scenery and revised wet asphalt; additional captures show the loading card, clear starting grids and reverse HUD. The bodies remain derivatives of the credited concept chassis; authored normals are transformed coherently and wheel assemblies remain rigid. Final model widths are checked against their collision footprints. Ultra is rendered in the production smoke.
+After the full browser suite, the two Solstice reverse-lamp meshes were moved outside the rear bodywork and the selected garage card was kept visible after viewport rotation. Both detail levels passed fresh rear-visibility ray tests; the focused browser workflow explicitly checks the complete selected-card bounds in portrait; the Solstice browser workflow and the packaged/Pages production smokes were rerun with those final assets. The driving simulation did not change after the full suite.
 
-Production layouts: 1280×800, 1600×900, 844×390 and 390×844. Build: {len(files)} files, {sum(p.stat().st_size for p in files)/1e6:.1f} MB uncompressed. The production smoke uses real throttle/boost/pause/resume and reverse input. The Pages smoke checks models, surfaces, vegetation, HDR, fonts, previews and attribution links under the subdirectory base.
+## Road geometry
 
-Ten attributed surface/vegetation hashes are verified. Packaging checks ZIP CRCs and SHA-256; the published download is fetched again and compared to the tested archive. Evidence is in `artifacts/`: `startup-review.json`, `startup-baseline.json`, `unit-results.json`, `browser-results.json`, `visual-review.json`, `performance.json`, `production-smoke.json`, `hosting-smoke.json` and `dependency-audit.json`.
+Actual coast terrain triangles are raycast at five lateral positions every 3 m. Prop footprints are checked independently against the entire road. Landmark reservations keep later scenery out of the coastal belvedere. Overhead foliage can overhang; arbitrary branch collisions are not simulated.
 
-## Remaining limits
+| Track | Terrain samples | Footprints | Minimum terrain clearance m | Minimum scenery clearance m | Violations |
+| --- | ---: | ---: | ---: | ---: | ---: |
+{chr(10).join(auditRows)}
 
-Real Android/iOS and desktop GPUs, Safari/Firefox, long thermal sessions, gamepads and subjective audio quality are unverified. Windows/macOS launcher wrappers have not been run on those operating systems. Static probes lack moving-object reflections; cars share a source chassis; scenery and physics remain an arcade approximation. No Asphalt 9 fidelity, universal frame rate or bug-free guarantee is established. See DEVICE_TESTING.md and BUG_TRACKER.md.
+A separate heightfield test checks rendered triangle diagonals; ramp mesh/physics use a shared surface. Grid curvature is checked through the final row of the seven-car grid.
+
+## Evidence and limits
+
+`artifacts/` contains unit/browser JSON, startup, visual, performance, packaged and hosted production reports plus dependency audit. High-quality captures cover all four garage choices, the two circuits, loading and reverse; Solstice rear and mobile views are also inspected. Web/source archives receive CRC and SHA-256 checks, and published downloads are fetched again against the tested files.
+
+Physical Android/iOS devices, desktop GPUs, Safari/Firefox, long thermal sessions and Windows/macOS launcher wrappers remain untested. Camera corridor bounds are not a general dynamic occlusion solver. There are four cars across two underlying designs, synthesized audio, two procedural circuits and four career events. See [AUDIT_RESPONSE.md](AUDIT_RESPONSE.md) for the uncompleted flagship targets.
 ''')
-print('Release reports generated:',version,u['numPassedTests'],'unit checks,',b['expected'],'browser workflows')
+print('Generated',version,u['numPassedTests'],'unit /',b['expected'],'browser validation reports')

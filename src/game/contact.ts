@@ -1,5 +1,5 @@
 import type {Driver} from './simulation';
-export function footprint(driver:Driver){return {width:driver.spec.shape==='track'?1.24:driver.spec.shape==='flow'?1.14:1.19,length:driver.spec.shape==='flow'?2.6:2.3};}
+export function footprint(driver:Driver){if(driver.spec.shape==='grandtourer')return {width:1.24,length:2.48};return {width:driver.spec.shape==='track'?1.24:driver.spec.shape==='flow'?1.14:1.19,length:driver.spec.shape==='flow'?2.6:2.3};}
 // Separating-axis test in the road's local right/forward frame. Race progress is
 // unwrapped; physical contact must wrap at the start line, including lapped cars.
 export function contactOffset(a:Driver,b:Driver,trackLength:number,roadTurn=0){

@@ -1,11 +1,12 @@
 {
-  "version": "2.3.0",
+  "version": "2.4.0",
   "date": "2026-10-24",
   "changes": [
-    "Responsive, cancellable race preparation and cached vehicle meshes",
-    "Clear starting straights, widened bends and whole-circuit scenery clearance",
-    "Brake-to-reverse driving, reverse lamps, R gear and wider reverse camera",
-    "Physical ramp surface, solid raised edges and lip-based launches",
-    "Separate records for revised circuits; existing garage progress preserved"
+    "Original Solstice GT body, cabin, wheel rig and separate race LOD",
+    "Dynamic chase camera, landing compression and reduced-motion setting",
+    "Six opponents with traffic-aware overtaking and ramp avoidance",
+    "Controlled drift recovery, suspension feedback and distinct engine firing profiles",
+    "Circuit braking boards, event banners and coastal overlook",
+    "Separate 2.4 race records; garage progress preserved; editable source download"
   ]
 }

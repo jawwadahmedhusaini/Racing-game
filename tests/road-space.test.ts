@@ -11,8 +11,10 @@ for(const id of ['coast','city'] as const){
     expect(space.clear(1200,1200,50)).toBe(true);
   });
   it(`${id} starts on a straight with enough space for the complete grid`,()=>{
-    const track=new Track(id),front=track.sample(0),back=track.sample(-14);
+    const track=new Track(id),front=track.sample(0),back=track.sample(-21);
     expect(Math.abs(angleDelta(front.yaw,back.yaw))).toBeLessThan(.04);
     expect(Math.max(...track.samples.map(s=>Math.abs(s.curvature)))*track.width/2).toBeLessThan(.6);
   });
 }
+
+it('keeps later foliage and props out of a reserved landmark footprint',()=>{const space=new RoadSpace(new Track('coast'));expect(space.reserve('pavilion',1200,1200,14)).toBe(true);expect(space.place('tree',1215,1200,7)).toBe(false);expect(space.place('tree',1225,1200,7)).toBe(true);expect(space.placements).toHaveLength(2);});

@@ -11,8 +11,8 @@ try {
   await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(process.env.GAME_URL || 'http://127.0.0.1:8000');
   const release = await page.request.get(new URL('version.json',page.url()).href);
-  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.3.0');
-  report.version='2.3.0';
+  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.4.0');
+  report.version='2.4.0';
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 60000 });
   expect(await page.evaluate(() => '__apex' in window)).toBe(false);
   report.testApiAbsent = true;
@@ -28,6 +28,9 @@ try {
     expect(layout.upgradeBottom).toBeLessThan(layout.statsTop);
   }
   await page.setViewportSize({ width: 1280, height: 800 });
+  await page.getByRole('button',{name:'View SOLSTICE GT'}).click();
+  await page.getByRole('button',{name:'UNLOCK · 2,500'}).click();
+  report.solsticePurchased=true;
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.locator('#quality').selectOption('ultra');
   await page.getByRole('button', { name: 'Close settings' }).click();

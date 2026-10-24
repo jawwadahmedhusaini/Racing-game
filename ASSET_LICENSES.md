@@ -20,6 +20,15 @@ To reproduce the preparation, download the source GLB to `/tmp/CarConcept.glb`, 
 
 The detailed model is used for the garage and player car in races. A rival-car LOD is bundled as `public/assets/concept-car-lod.glb` (30,534 triangles, 2,578,168 bytes). It shares the same chassis, with hidden interior geometry removed and additional mesh/texture optimization for racing. SHA-256: `f66c5c0e1b58fbde1bf46285b060bbdc404a45bfd84475ad4c7a21286e23a064`. Reproduce with the same Blender command followed by `-- --race-lod`.
 
+## Solstice GT — original vehicle
+
+Original long-bonnet grand-tourer geometry created for the APEX RUSH project, with no imported vehicle mesh, textures or manufacturer branding. Dedicated to the public domain under **CC0 1.0**: https://creativecommons.org/publicdomain/zero/1.0/. The reproducible authoring source is `scripts/build-solstice.py`; the manifest is `public/licenses/solstice.json`. Run `blender --background --factory-startup --python scripts/build-solstice.py` from the repository (Blender 4.3.2 used).
+
+Body panels, cabin glazing, seats, wheel rig, tire/rim/caliper assemblies, lights and aero are separately authored. The two exports share the design; race geometry removes small details and reduces tessellation. Runtime paint, wheel steering/spin, brake/reverse lamps, body pitch/compression and boost effects are animated by the game. The model is original project art, not a claim of professional scanned-car quality.
+
+- `assets/solstice-gt.glb`: 65,844 triangles, 2,419,544 bytes; SHA-256 `af20f5d4d20a523b6adde5be04abe39ad556ecd6cb8475f4b1f252489c29e619`.
+- `assets/solstice-gt-lod.glb`: 24,436 triangles, 859,752 bytes; SHA-256 `c696efd875c24e6718a07882faeccc51e5ce45e3d4c97c86c801dfb72a959e7a`.
+
 ## Venice Sunset HDR
 
 - Source: Poly Haven, https://polyhaven.com/a/venice_sunset

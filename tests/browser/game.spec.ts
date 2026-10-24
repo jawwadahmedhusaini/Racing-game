@@ -138,17 +138,17 @@ test('blocked storage and a failed audio graph do not stop driving',async({page}
 
 test('asset download failure offers retry and context loss gives a usable reload action',async({page})=>{
   await page.route('**/assets/concept-car.glb',route=>route.abort());await page.goto('/');await expect(page.getByRole('heading',{name:'Game files could not load'})).toBeVisible();
-  await page.unroute('**/assets/concept-car.glb');await page.getByRole('button',{name:'RELOAD GAME'}).click();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
+  await page.unroute('**/assets/concept-car.glb');await Promise.all([page.waitForEvent('domcontentloaded'),page.getByRole('button',{name:'RELOAD GAME'}).click()]);await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible({timeout:60000});await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
   await page.evaluate(()=>{const canvas=document.querySelector<HTMLCanvasElement>('#game-canvas')!;canvas.getContext('webgl2')!.getExtension('WEBGL_lose_context')!.loseContext();});
-  await expect(page.getByRole('heading',{name:'Graphics interrupted'})).toBeVisible();await page.getByRole('button',{name:'RELOAD GAME'}).click();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Graphics interrupted'})).toBeVisible();await Promise.all([page.waitForEvent('domcontentloaded'),page.getByRole('button',{name:'RELOAD GAME'}).click()]);await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible({timeout:60000});await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible();
 });
 
 
 test('race preparation paints immediately, can be cancelled mid-build, ignores duplicate starts and keeps the countdown frozen',async({page})=>{
   test.setTimeout(240_000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);await page.getByRole('button',{name:'HIT THE ROAD'}).click();
-  for(const stage of ['Sculpting the landscape…','Preparing car 3 of 6…']){
+  for(const stage of ['Sculpting the landscape…','Preparing car 3 of ']){
     await page.evaluate(stage=>{
-      const observer=new MutationObserver(()=>{if(document.getElementById('race-load-stage')?.textContent===stage){observer.disconnect();(document.querySelector('[data-action="cancel-load"]') as HTMLButtonElement).click();}});observer.observe(document.getElementById('ui')!,{subtree:true,childList:true,characterData:true});
+      const observer=new MutationObserver(()=>{if(document.getElementById('race-load-stage')?.textContent?.startsWith(stage)){observer.disconnect();(document.querySelector('[data-action="cancel-load"]') as HTMLButtonElement).click();}});observer.observe(document.getElementById('ui')!,{subtree:true,childList:true,characterData:true});
       (document.querySelector('[data-action="start"]') as HTMLButtonElement).click();
     },stage);
     await expect(page.getByRole('button',{name:'START YOUR ENGINE'})).toBeVisible({timeout:90000});expect((await state(page)).screen).toBe('race-select');expect((await state(page)).player).toBeNull();expect((await state(page)).credits).toBe(2500);
@@ -168,4 +168,17 @@ test('reverse works with real keys, auto acceleration, a positive speed display 
   expect((await state(page)).player.speed).toBeLessThan(-5);expect((await state(page)).player.boost).toBe(0);await expect(page.locator('#gear')).toHaveText('R');expect(Number(await page.locator('#speed').textContent())).toBeGreaterThan(0);
   await page.keyboard.up('ArrowDown');await page.keyboard.up('Shift');await page.keyboard.down('w');await page.evaluate(()=>(window as any).__apex.advance(1,null));await page.keyboard.up('w');expect((await state(page)).player.speed).toBeGreaterThan(5);await expect(page.locator('#gear')).not.toHaveText('R');
   const audit=await page.evaluate(()=>(window as any).__apex.auditRoad());expect(audit.violations).toEqual([]);expect(audit.placements).toBeGreaterThan(100);expect(errors).toEqual([]);
+});
+
+test('original Solstice selection, paint, six opponents and reduced-motion preference survive racing and reload',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
+ await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await page.getByRole('button',{name:'UNLOCK · 2,500'}).click();expect((await state(page)).credits).toBe(0);
+ await page.setViewportSize({width:390,height:844});
+ await expect.poll(()=>page.evaluate(()=>{const list=document.querySelector('.car-list')!.getBoundingClientRect(),card=document.querySelector('.car-card.active')!.getBoundingClientRect();return card.left>=list.left-.5&&card.right<=list.right+.5;})).toBe(true);
+ await page.screenshot({path:'artifacts/solstice-mobile.png'});await page.setViewportSize({width:1280,height:800});
+ await page.getByRole('button',{name:'Paint blue'}).click();await page.getByRole('button',{name:'Settings',exact:true}).click();await page.locator('#reducedMotion').check();await page.getByRole('button',{name:'Close settings'}).click();
+ await start(page);let s=await state(page);expect(s.player.spec).toBe('solstice');expect(s.opponents).toBe(6);expect(s.reducedMotion).toBe(true);
+ await advance(page,7,{throttle:1},true);await page.keyboard.press('Escape');await page.getByRole('button',{name:'SETTINGS',exact:true}).click();await page.locator('#quality').selectOption('medium');await page.getByRole('button',{name:'Close settings'}).click();await page.getByRole('button',{name:'RESUME RACE'}).click();
+ await advance(page,120,{throttle:1,nitro:true},true);await expect(page.getByText('FINAL STANDINGS')).toBeVisible();await page.getByRole('button',{name:'BACK TO GARAGE'}).click();await page.reload();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
+ expect((await state(page)).selected).toBe('solstice');await expect(page.getByRole('button',{name:'Paint blue'})).toHaveAttribute('aria-pressed','true');await page.getByRole('button',{name:'Settings',exact:true}).click();await expect(page.locator('#reducedMotion')).toBeChecked();expect(errors).toEqual([]);
 });

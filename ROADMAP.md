@@ -19,7 +19,7 @@ Warm Mediterranean coastal sunset and cool architectural showroom; black, ivory 
 Single-player first. No backend, purchases or public deployment required. Free-driving feel uses track-relative arcade dynamics rather than full rigid-body crash simulation. Major-studio asset fidelity, multiplayer, extensive cinematic content and device-wide performance guarantees are outside the first independently verified release.
 
 ## Current status
-All eight implementation stages are delivered for the scoped single-player release, including both circuits, progression, keyboard/touch controls and local packaging. See TEST_REPORT.md, PERFORMANCE_REPORT.md and BUG_TRACKER.md for the exact verified outcomes and limits. The built site is published to the gh-pages branch; GitHub Pages must be enabled by the owner. Real-device performance validation remains open. The 2.3 race-start, road-clearance and reverse upgrade is specified in UPGRADE_PLAN.md.
+All eight implementation stages are delivered for the scoped single-player release, including both circuits, progression, keyboard/touch controls and local packaging. See TEST_REPORT.md, PERFORMANCE_REPORT.md and BUG_TRACKER.md for the exact verified outcomes and limits. The built site is published to the gh-pages branch; GitHub Pages must be enabled by the owner. Real-device performance validation remains open. The 2.4 audit-led vehicle, camera and racing upgrade is specified in UPGRADE_PLAN.md.
 
 ## Potential next releases
 
@@ -27,3 +27,5 @@ All eight implementation stages are delivered for the scoped single-player relea
 2. Add individually authored vehicle bodies and richer roadside scenery, with explicit asset licenses and download budgets.
 3. Extend the career with additional tracks, ghost replays and more stunt mechanics.
 4. Consider network racing only after defining hosting, authoritative simulation, matchmaking and abuse prevention requirements.
+
+The 2.4 scope and remaining flagship gates are reconciled in [AUDIT_RESPONSE.md](AUDIT_RESPONSE.md). One independently authored car and six rivals are delivered; 8–12 distinct vehicles and physical-device FPS targets remain open.

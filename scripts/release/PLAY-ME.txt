@@ -1,4 +1,4 @@
-APEX RUSH 2.3 — browser racing game
+APEX RUSH 2.4 — browser racing game
 
 1. Unzip the complete download.
 2. Install Python 3 if it is not already on your computer.
@@ -40,3 +40,13 @@ Close other APEX RUSH tabs before opening another session; this protects saves.
 
 Race preparation shows progress and can be cancelled with Escape or Cancel.
 The countdown begins only after the first race frame is prepared.
+
+EDITABLE SOURCE AND TESTS
+This play ZIP contains the compiled game. The editable TypeScript project,
+asset-build scripts and automated tests are maintained separately:
+https://github.com/jawwadahmedhusaini/Racing-game
+Source ZIP: https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH-SOURCE.zip
+
+2.4: SOLSTICE GT is a separately authored long-bonnet car, available for 2,500 credits.
+Settings > Reduced Camera Motion gives a steadier driving view.
+Races now field six opponents; old credits, cars and upgrades are retained.
