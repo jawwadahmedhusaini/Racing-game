@@ -11,8 +11,8 @@ try {
   await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(process.env.GAME_URL || 'http://127.0.0.1:8000');
   const release = await page.request.get(new URL('version.json',page.url()).href);
-  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.2.0');
-  report.version='2.2.0';
+  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.3.0');
+  report.version='2.3.0';
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 60000 });
   expect(await page.evaluate(() => '__apex' in window)).toBe(false);
   report.testApiAbsent = true;
@@ -39,6 +39,7 @@ try {
   await page.setViewportSize({ width: 960, height: 600 });
   await page.getByRole('button', { name: 'HIT THE ROAD' }).click();
   await page.getByRole('button', { name: 'START YOUR ENGINE' }).click();
+  await page.waitForSelector('#countdown',{timeout:90000});
   await page.keyboard.down('w');
   await expect.poll(async () => Number(await page.locator('#speed').innerText()), { timeout: 120000 }).toBeGreaterThan(20);
   report.keyboardAcceleration = true;
@@ -53,6 +54,10 @@ try {
   await page.getByRole('button', { name: 'RESUME RACE' }).click();
   await expect(page.getByRole('button', { name: 'Pause race' })).toBeVisible();
   report.resume = true;
+  await page.keyboard.down('s');
+  await expect(page.locator('#gear')).toHaveText('R',{timeout:120000});
+  expect(Number(await page.locator('#speed').innerText())).toBeGreaterThanOrEqual(0);
+  await page.keyboard.up('s');report.reverse=true;
   await page.screenshot({ path: 'artifacts/production-race.png' });
   expect(report.errors).toEqual([]);
   expect(report.failedRequests).toEqual([]);

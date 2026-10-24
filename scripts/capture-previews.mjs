@@ -2,6 +2,7 @@ import {chromium} from '@playwright/test';
 import {readFile,writeFile} from 'node:fs/promises';
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const page=await browser.newPage({viewport:{width:1280,height:800}});
+try {
 const previews=[],cityOnly=process.argv.includes('--city-only');
 const report=cityOnly?JSON.parse(await readFile('artifacts/visual-review.json','utf8')):{version:JSON.parse(await readFile('package.json','utf8')).version,date:new Date().toISOString(),quality:'high',errors:[],scenes:[],vehicles:[]};
 if(cityOnly){report.cityRecheck=new Date().toISOString();report.errors=[];}
@@ -11,10 +12,10 @@ await page.goto('http://127.0.0.1:5173');await page.waitForSelector('.loading',{
 for(const [name,file] of cityOnly?[]:[['SPECTRE S','spectre-final'],['STRATOS R','stratos-final']]){await page.getByRole('button',{name:`View ${name}`}).click();await page.screenshot({path:`artifacts/${file}.png`});report.vehicles.push({name,bounds:(await page.evaluate(()=>window.__apex.state())).carBounds});}
 await page.getByRole('button',{name:'View VANTA GT'}).click();
 for(const track of cityOnly?['city']:['coast','city']){
- await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator(`[data-action="track"][data-value="${track}"]`).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await page.evaluate(track=>window.__apex.advance(track==='city'?5.5:7,{throttle:1},true),track);
+ await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator(`[data-action="track"][data-value="${track}"]`).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await page.waitForSelector('#countdown',{timeout:90000});await page.evaluate(track=>window.__apex.advance(track==='city'?5.5:7,{throttle:1},true),track);
  if(track==='coast'){
   await page.screenshot({path:'artifacts/coast-start.png'});
-  await page.evaluate(()=>{while(window.__apex.state().player.distance<1660)window.__apex.advance(1,{throttle:1},true);});
+  await page.evaluate(()=>{for(let i=0;i<200&&window.__apex.state().player.distance<1660;i++)window.__apex.advance(1,{throttle:1},true);if(window.__apex.state().player.distance<1660)throw new Error('Capture driver did not reach the coastal viewpoint: '+JSON.stringify(window.__apex.state()));});
   await page.keyboard.press('r');await page.evaluate(()=>window.__apex.advance(2.3,{throttle:.4},true));
  }
  await page.getByRole('button',{name:'Pause race'}).click();await page.evaluate(()=>document.querySelector('#modal').style.visibility='hidden');
@@ -27,3 +28,5 @@ for(const track of cityOnly?['city']:['coast','city']){
 await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.screenshot({path:'artifacts/track-selection.png'});await browser.close();
 for(const {track,data} of previews)await writeFile(`public/assets/${track}-preview.jpg`,data);
 report.passed=report.errors.length===0;await writeFile('artifacts/visual-review.json',JSON.stringify(report,null,2));if(!report.passed)throw new Error(report.errors.join('\n'));
+
+}finally{await browser.close();}

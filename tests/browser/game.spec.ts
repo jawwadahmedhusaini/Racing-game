@@ -1,11 +1,12 @@
 import {test,expect,type Page} from '@playwright/test';
-const state=(page:Page)=>page.evaluate(()=>(window as any).__apex.state());
-const advance=(page:Page,seconds:number,input:Record<string,number|boolean>={},center=false)=>page.evaluate(({seconds,input,center})=>(window as any).__apex.advance(seconds,input,center),{seconds,input,center});
+const raceReady=(page:Page)=>page.waitForFunction(()=>!(window as any).__apex.state().preparing,null,{timeout:90000});
+const state=async(page:Page)=>{await raceReady(page);return page.evaluate(()=>(window as any).__apex.state());};
+const advance=async(page:Page,seconds:number,input:Record<string,number|boolean>={},center=false)=>{await raceReady(page);return page.evaluate(({seconds,input,center})=>(window as any).__apex.advance(seconds,input,center),{seconds,input,center});};
 async function boot(page:Page){
   await page.addInitScript(()=>{if(!localStorage.getItem('apex-rush-save-v1'))localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{adaptiveResolution:false,quality:'low',difficulty:'rookie',music:0,engine:0,effects:0}}));});
   await page.goto('/');await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
 }
-async function start(page:Page){await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await expect(page.locator('#countdown')).toBeVisible();}
+async function start(page:Page){await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await expect(page.locator('#countdown')).toBeVisible({timeout:90000});}
 const pose=(page:Page)=>page.evaluate(()=>(window as any).__apex.pose());
 function assertDirection(before:any,after:any,direction:number){
   const across=after.position.reduce((sum:number,x:number,i:number)=>sum+(x-before.position[i])*before.cameraRight[i],0);
@@ -76,6 +77,9 @@ test('mobile layout and touch input work without overflowing the viewport',async
     expect((await state(page)).input.steer).toBe(0);
   }
   await page.getByRole('button',{name:'Recover car',exact:true}).tap();expect(Math.abs((await state(page)).player.lateral)).toBeLessThan(.1);
+  const brake=(await page.getByRole('button',{name:'Brake and reverse',exact:true}).boundingBox())!;
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:brake.x+brake.width/2,y:brake.y+brake.height/2}]});await page.evaluate(()=>(window as any).__apex.advance(4,null));expect((await state(page)).player.speed).toBeLessThan(0);await expect(page.locator('#gear')).toHaveText('R');
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});expect((await state(page)).input.brake).toBe(0);
   await page.screenshot({path:'artifacts/mobile-race.png'});await page.getByRole('button',{name:'Pause race'}).tap();await expect(page.getByRole('button',{name:'RESUME RACE'})).toBeVisible();expect(errors).toEqual([]);await context.close();
 });
 
@@ -137,4 +141,31 @@ test('asset download failure offers retry and context loss gives a usable reload
   await page.unroute('**/assets/concept-car.glb');await page.getByRole('button',{name:'RELOAD GAME'}).click();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
   await page.evaluate(()=>{const canvas=document.querySelector<HTMLCanvasElement>('#game-canvas')!;canvas.getContext('webgl2')!.getExtension('WEBGL_lose_context')!.loseContext();});
   await expect(page.getByRole('heading',{name:'Graphics interrupted'})).toBeVisible();await page.getByRole('button',{name:'RELOAD GAME'}).click();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible();
+});
+
+
+test('race preparation paints immediately, can be cancelled mid-build, ignores duplicate starts and keeps the countdown frozen',async({page})=>{
+  test.setTimeout(240_000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);await page.getByRole('button',{name:'HIT THE ROAD'}).click();
+  for(const stage of ['Sculpting the landscape…','Preparing car 3 of 6…']){
+    await page.evaluate(stage=>{
+      const observer=new MutationObserver(()=>{if(document.getElementById('race-load-stage')?.textContent===stage){observer.disconnect();(document.querySelector('[data-action="cancel-load"]') as HTMLButtonElement).click();}});observer.observe(document.getElementById('ui')!,{subtree:true,childList:true,characterData:true});
+      (document.querySelector('[data-action="start"]') as HTMLButtonElement).click();
+    },stage);
+    await expect(page.getByRole('button',{name:'START YOUR ENGINE'})).toBeVisible({timeout:90000});expect((await state(page)).screen).toBe('race-select');expect((await state(page)).player).toBeNull();expect((await state(page)).credits).toBe(2500);
+  }
+  const immediate=await page.evaluate(()=>{
+    const start=performance.now(),button=document.querySelector('[data-action="start"]') as HTMLButtonElement;button.click();button.click();
+    return {elapsed:performance.now()-start,screen:(window as any).__apex.state().screen,loading:!!document.querySelector('[aria-label="Preparing race"]')};
+  });expect(immediate.screen).toBe('preparing');expect(immediate.loading).toBe(true);expect(immediate.elapsed).toBeLessThan(250);
+  await raceReady(page);const loaded=await state(page);expect(loaded.status).toBe('countdown');expect(loaded.elapsed).toBe(0);expect(loaded.player.speed).toBe(0);expect(loaded.credits).toBe(2500);
+  const audit=await page.evaluate(()=>(window as any).__apex.auditRoad());expect(audit.violations).toEqual([]);expect(audit.samples).toBeGreaterThan(3000);expect(audit.placements).toBeGreaterThan(100);expect(errors).toEqual([]);
+});
+
+test('reverse works with real keys, auto acceleration, a positive speed display and safe forward recovery; city scenery clears the road',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);await page.getByRole('button',{name:'Settings',exact:true}).click();await page.locator('#autoAccelerate').check();await page.getByRole('button',{name:'Close settings'}).click();
+  await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.locator('[data-action="mode"][data-value="time"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await advance(page,4);
+  await page.keyboard.down('ArrowDown');await page.keyboard.down('Shift');await page.evaluate(()=>(window as any).__apex.advance(2,null));
+  expect((await state(page)).player.speed).toBeLessThan(-5);expect((await state(page)).player.boost).toBe(0);await expect(page.locator('#gear')).toHaveText('R');expect(Number(await page.locator('#speed').textContent())).toBeGreaterThan(0);
+  await page.keyboard.up('ArrowDown');await page.keyboard.up('Shift');await page.keyboard.down('w');await page.evaluate(()=>(window as any).__apex.advance(1,null));await page.keyboard.up('w');expect((await state(page)).player.speed).toBeGreaterThan(5);await expect(page.locator('#gear')).not.toHaveText('R');
+  const audit=await page.evaluate(()=>(window as any).__apex.auditRoad());expect(audit.violations).toEqual([]);expect(audit.placements).toBeGreaterThan(100);expect(errors).toEqual([]);
 });

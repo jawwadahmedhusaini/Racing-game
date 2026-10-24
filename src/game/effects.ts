@@ -13,7 +13,7 @@ export class Effects {
   }
   update(dt:number,driver:Driver,position:THREE.Vector3,yaw:number,pitch=0,roadNormal?:THREE.Vector3){
     const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw)),back=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
-    if(Math.abs(driver.drift)>.18&&driver.speed>15&&driver.airborne<.1) {
+    if(Math.abs(driver.drift)>.18&&driver.speed>15&&driver.airborne<.1&&driver.rampLift<.1) {
       const stamp=!this.lastSkid||position.distanceTo(this.lastSkid)>.65;
       const roadRotation=new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch,yaw,0,'YXZ'));
       if(roadNormal){const forward=new THREE.Vector3(Math.sin(yaw),0,Math.cos(yaw)).projectOnPlane(roadNormal).normalize(),across=new THREE.Vector3().crossVectors(roadNormal,forward).normalize();roadRotation.setFromRotationMatrix(new THREE.Matrix4().makeBasis(across,roadNormal,forward));}

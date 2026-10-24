@@ -11,7 +11,7 @@ export function parseSave(raw:string|null):SaveData {
     base.owned=Array.isArray(data.owned)?CARS.filter(c=>c.price===0||data.owned.includes(c.id)).map(c=>c.id):base.owned;
     if(base.owned.includes(data.selected))base.selected=data.selected;
     for(const car of CARS){const paint=data.paints?.[car.id];if(typeof paint==='string'&&/^#[0-9a-f]{6}$/i.test(paint))base.paints[car.id]=paint;const up=data.upgrades?.[car.id];if(Number.isInteger(up)&&up>=0&&up<=3)base.upgrades[car.id]=up;}
-    if(data.bestTimes&&typeof data.bestTimes==='object')for(const [key,value] of Object.entries(data.bestTimes))if(/^(coast|city)-(time|quick|career|elimination)$/.test(key)&&typeof value==='number'&&Number.isFinite(value)&&value>0)base.bestTimes[key]=value;
+    if(data.bestTimes&&typeof data.bestTimes==='object')for(const [key,value] of Object.entries(data.bestTimes))if(/^(coast|city)-(v2-)?(time|quick|career|elimination)$/.test(key)&&typeof value==='number'&&Number.isFinite(value)&&value>0)base.bestTimes[key]=value;
     const settings=data.settings??{};
     if(['low','medium','high','ultra'].includes(settings.quality))base.settings.quality=settings.quality;
     if(['rookie','pro','expert'].includes(settings.difficulty))base.settings.difficulty=settings.difficulty;

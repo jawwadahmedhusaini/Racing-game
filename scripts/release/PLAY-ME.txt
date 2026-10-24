@@ -1,4 +1,4 @@
-APEX RUSH 2.2 — browser racing game
+APEX RUSH 2.3 — browser racing game
 
 1. Unzip the complete download.
 2. Install Python 3 if it is not already on your computer.
@@ -10,12 +10,13 @@ The launcher only serves files on your own computer. No game account, backend,
 API key, additional package download or internet connection is needed to play.
 The first Python installation, if needed, is a separate prerequisite.
 
-Controls: W/Up accelerate, S/Down brake, A/D or Left/Right steer,
+Controls: W/Up accelerate, hold S/Down brake then reverse, A/D or Left/Right steer,
 Space + steering drift, Shift nitro, C camera, R recover, Escape pause.
 Manual driving: brake before corners and steer through them. Forward does not
 automatically turn the car. Left/right match the chase camera.
 Drift to fill nitro. Activate at a full meter for shockwave boost.
-Touch controls include RECOVER. Brake overrides auto-acceleration and nitro.
+Hold brake after stopping to reverse; accelerate to drive forward.
+Touch controls include BRAKE / REV and RECOVER. Brake overrides auto-acceleration and nitro.
 Release an empty boost to recharge.
 
 The bundled `web` directory is also ready for any static web host at its domain
@@ -36,3 +37,6 @@ Settings now include Adaptive Resolution and a live Performance Display.
 Adaptive Resolution keeps your effects preset and adjusts render sharpness
 under sustained load. Lower the graphics preset if the frame rate stays low.
 Close other APEX RUSH tabs before opening another session; this protects saves.
+
+Race preparation shows progress and can be cancelled with Escape or Cancel.
+The countdown begins only after the first race frame is prepared.

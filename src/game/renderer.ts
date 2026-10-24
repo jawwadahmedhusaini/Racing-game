@@ -72,6 +72,22 @@ export class RenderSystem {
       const probe=generator.fromCubemap(target.texture);this.probes.set(scene,probe);scene.environment=probe.texture;
     }finally{hidden.forEach((o,i)=>o.visible=visibility[i]);probeOnly.forEach(o=>o.visible=false);this.renderer.shadowMap.enabled=shadows;target.dispose();generator.dispose();}
   }
+  async captureEnvironmentStaged(scene:THREE.Scene,position:THREE.Vector3,checkpoint:(label:string)=>Promise<void>){
+    if(this.probes.has(scene))return;
+    const renderer=this.renderer,target=new THREE.WebGLCubeRenderTarget(128,{type:THREE.HalfFloatType});
+    const cube=new THREE.CubeCamera(.25,1500,target);cube.position.copy(position);cube.coordinateSystem=renderer.coordinateSystem;cube.updateCoordinateSystem();cube.updateMatrixWorld(true);
+    const oldTarget=renderer.getRenderTarget(),oldFace=renderer.getActiveCubeFace(),oldMip=renderer.getActiveMipmapLevel(),shadows=renderer.shadowMap.enabled;
+    const generator=new THREE.PMREMGenerator(renderer);target.texture.generateMipmaps=false;
+    try{
+      renderer.shadowMap.enabled=false;scene.updateMatrixWorld(true);
+      for(let face=0;face<6;face++){
+        await checkpoint(`Lighting the circuit · ${face+1} / 6`);
+        renderer.setRenderTarget(target,face);renderer.render(scene,cube.children[face] as THREE.Camera);renderer.setRenderTarget(oldTarget,oldFace,oldMip);
+      }
+      await checkpoint('Finishing the reflections…');
+      const probe=generator.fromCubemap(target.texture);this.probes.set(scene,probe);scene.environment=probe.texture;
+    }finally{renderer.setRenderTarget(oldTarget,oldFace,oldMip);renderer.shadowMap.enabled=shadows;target.dispose();generator.dispose();}
+  }
   setQuality(quality:Quality) {
     this.quality=quality;
     this.governor.reset();

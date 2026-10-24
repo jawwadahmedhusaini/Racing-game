@@ -3,13 +3,14 @@ from pathlib import Path
 import json
 root=Path(__file__).resolve().parent.parent
 version=json.loads((root/'package.json').read_text())['version']
-reports={n:json.loads((root/f'artifacts/{n}.json').read_text()) for n in ['unit-results','browser-results','visual-review','performance','production-smoke','hosting-smoke','dependency-audit']}
+reports={n:json.loads((root/f'artifacts/{n}.json').read_text()) for n in ['startup-review','unit-results','browser-results','visual-review','performance','production-smoke','hosting-smoke','dependency-audit']}
 u=reports['unit-results'];b=reports['browser-results']['stats']
 assert u['success'] and u['numFailedTests']==u['numPendingTests']==0
-assert b['expected']==10 and b['unexpected']==b['flaky']==b['skipped']==0
-for name in ['visual-review','performance','production-smoke','hosting-smoke']:
+assert b['expected']==12 and b['unexpected']==b['flaky']==b['skipped']==0
+for name in ['startup-review','visual-review','performance','production-smoke','hosting-smoke']:
  r=reports[name];assert r['version']==version and r['passed'] and not r['errors'] and not r.get('failedRequests'),name
 assert reports['dependency-audit']['metadata']['vulnerabilities']['total']==0
+startup=reports['startup-review'];assert len(startup['runs'])==3 and all(not run['audit']['violations'] for run in startup['runs'])
 perf=reports['performance'];assert len(perf['samples'])==4
 rows=[]
 for s in perf['samples']:
@@ -28,14 +29,20 @@ Chromium {perf['browser']}, Linux, ANGLE/SwiftShader software WebGL 2 on a share
 
 These software results do not establish a playable hardware frame rate. There is no claim of a 30/60 FPS target being met on phones or desktop GPUs. Very slow rendering deliberately slows simulation instead of integrating unstable large timesteps.
 
+## Race preparation
+
+Raw evidence: `artifacts/startup-review.json`; recorded v2.2 baseline: `artifacts/startup-baseline.json`. At 1100×720 / Low, the earlier synchronous Start Race handler occupied about 5,289 ms before returning. The new runs returned in {', '.join(str(round(run['clickMs'],1))+' ms' for run in startup['runs'])}. Complete preparation took {', '.join(str(round(run['preparation']['totalMs']/1000,2))+' s' for run in startup['runs'])} for cold coast, cached coast and cold city respectively. The progress screen is visible during that work; countdown and physics remain frozen. These are short software-renderer observations, not guaranteed timings.
+
+Car templates and rear-surface fits are reused. Terrain construction and scenery tasks yield to the browser, reflection capture yields between faces, and shader waiting can be cancelled. GPU uploads/render calls and individual geometry batches can still occupy the main thread. `elapsedSinceYieldMs` includes asynchronous shader waiting and driver work; it is not a CPU-only profiler. Preparation intentionally warms the first race frame before exposing the countdown. The new track layout/camera also changes visible geometry, so frame-rate results are not a controlled before/after speedup claim.
+
 ## Implemented controls
 
 - Adaptive resolution samples uncapped frame time. After settling, sustained averages above 24 ms reduce render scale by 0.1, down to 0.55; four windows below 17 ms allow a gradual 0.05 increase. Pause/hidden frames are excluded. Changing the preset or disabling adaptive resolution restores full preset resolution.
 - Pixel budgets cap High and lower at 2560×1440 and Ultra at 3840×2160, in addition to the preset/DPR caps. This limits pixel allocation on dense and very large displays.
 - Low uses the 30,534-triangle player mesh and no dynamic shadows/AO/bloom. Medium and above use the 106,391-triangle detailed player; all rivals retain the lighter mesh. Modeled silhouette changes add no triangles.
 - Static geometry is spatially divided; equal-material road strips and landmark meshes are merged. Near/far trees and grass distances control scenery detail. Transparent effects and distant geometry are excluded from contact AO.
-- Reflection probes are 128-pixel cube faces, captured once per scene and cached. No per-frame cube capture or moving-object reflections.
-- The minimap path and bounds are cached. Car/effect resources are disposed between races; the browser stress flow checks geometry/texture counts after four restarts. Particle and skid buffers are bounded.
+- Reflection probes are 128-pixel cube faces, captured once per scene and cached; race preparation yields between faces. No per-frame cube capture or moving-object reflections.
+- The minimap path and bounds are cached. Instance materials and effect resources are disposed between races; immutable vehicle meshes/maps are cached across six bounded templates; the browser stress flow checks geometry/texture counts after four restarts. Particle and skid buffers are bounded.
 
 | Preset | DPR cap | Shadow map | Contact AO | Bloom | Near trees |
 | --- | ---: | ---: | --- | --- | ---: |
@@ -65,17 +72,19 @@ Chromium 154 / Playwright 1.64.1 on Linux, Node.js 24.19.0. Software WebGL 2; ha
 
 Actual keyboard and emulated multi-touch inputs verify camera-relative left/right movement, front-wheel orientation, forward-only world heading, pause/recovery, brake priority, boost and nested menus. Deterministic driving advances the same fixed-step simulation for full races, rival finishes, career progression, purchases, upgrades, replay and rewards credited once.
 
-New checks cover accumulated skid spacing at 20 m/s, sloped and sideways tire marks, rotated/lapped-car contact across the start line, failed audio initialization and zero-volume tones, old-save migration and stale writes, bounded adaptive resolution, cached minimaps, repeated car selection, four restarts with stable geometry/texture counts, blur clearing input, settings persistence, competing tabs, denied storage and audio, asset-download retry and actual WebGL context loss followed by reload.
+New checks cover forward braking into reverse, stationary dwell cancellation, reverse steering/coasting/wall contact, brake priority over auto acceleration and nitro, positive speed/R gear on real keyboard and touch inputs, and forward recovery. Terrain raycasts sample five lateral positions every 3 m around the complete coast. A separate heightfield test raycasts rendered triangles across cell diagonals to verify scenery support heights. Independent footprint distances cover accepted rocks, villas, tree trunk zones, buildings and landmarks. Overhead foliage can overhang; arbitrary branch collisions are not simulated. Curvature checks prevent folded inner road edges and verify grid alignment.
 
-The blocked-storage run exposed a warning that vanished during a garage redraw; it now remains outside the replaceable UI. The long stress workflow exceeded the standard 180-second software-renderer timeout at its final reload, so that workflow alone has a 300-second budget. Final assertions and all four restart cycles remain enabled. Intentional network/audio/context failures in fault-injection tests are expected; normal production tests require zero errors.
+Ramp tests raycast the actual wedge against its shared height function, drive a slow car over it, stop a reversing car at the raised rear edge using its full footprint, and verify launch/landing/recovery rewards. Old and revised track records survive parsing independently. Idle-player displacement allows less than 2% of the circuit from physical rival impacts; an idle player cannot complete a race.
+
+Browser coverage also retains pause/recovery, garage customization, full races, purchases, upgrades, repeated restarts, resource counts, storage/audio failures, competing tabs, failed downloads and actual context loss. Preparation is cancelled during terrain construction and between car instances, then restarted; duplicate starts cannot create a second race. Countdown and elapsed race time remain unchanged during preparation. The final startup pass also verifies that throttle deliberately held during loading survives the transition into the countdown. Intentional network/audio/context failures are expected in fault-injection flows; normal production checks require zero errors.
 
 ## Visual and release verification
 
-High-quality screenshots inspect all three car silhouettes, the coast opening and lighthouse, and the city/transit scenery and revised wet asphalt. The bodies remain derivatives of the credited concept chassis; authored normals are transformed coherently and wheel assemblies remain rigid. Final model widths are checked against their collision footprints. Ultra is rendered in the production smoke.
+High-quality screenshots inspect all three car silhouettes, the coast opening and lighthouse, and the city/transit scenery and revised wet asphalt; additional captures show the loading card, clear starting grids and reverse HUD. The bodies remain derivatives of the credited concept chassis; authored normals are transformed coherently and wheel assemblies remain rigid. Final model widths are checked against their collision footprints. Ultra is rendered in the production smoke.
 
-Production layouts: 1280×800, 1600×900, 844×390 and 390×844. Build: {len(files)} files, {sum(p.stat().st_size for p in files)/1e6:.1f} MB uncompressed. The production smoke uses real throttle/boost/pause/resume input. The Pages smoke checks models, surfaces, vegetation, HDR, fonts, previews and attribution links under the subdirectory base.
+Production layouts: 1280×800, 1600×900, 844×390 and 390×844. Build: {len(files)} files, {sum(p.stat().st_size for p in files)/1e6:.1f} MB uncompressed. The production smoke uses real throttle/boost/pause/resume and reverse input. The Pages smoke checks models, surfaces, vegetation, HDR, fonts, previews and attribution links under the subdirectory base.
 
-Ten attributed surface/vegetation hashes are verified. Packaging checks ZIP CRCs and SHA-256; the published download is fetched again and compared to the tested archive. Evidence is in `artifacts/`: `unit-results.json`, `browser-results.json`, `visual-review.json`, `performance.json`, `production-smoke.json`, `hosting-smoke.json` and `dependency-audit.json`.
+Ten attributed surface/vegetation hashes are verified. Packaging checks ZIP CRCs and SHA-256; the published download is fetched again and compared to the tested archive. Evidence is in `artifacts/`: `startup-review.json`, `startup-baseline.json`, `unit-results.json`, `browser-results.json`, `visual-review.json`, `performance.json`, `production-smoke.json`, `hosting-smoke.json` and `dependency-audit.json`.
 
 ## Remaining limits
 

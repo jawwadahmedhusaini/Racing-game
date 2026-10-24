@@ -26,6 +26,7 @@ try {
       if (scene === 'coast') {
         await page.getByRole('button', { name: 'HIT THE ROAD' }).click();
         await page.getByRole('button', { name: 'START YOUR ENGINE' }).click();
+        await page.waitForSelector('#countdown',{timeout:90000});
         await page.evaluate(() => window.__apex.advance(7, { throttle: 1 }, true));
         await page.keyboard.down('w');
       }
