@@ -1,12 +1,11 @@
 {
-  "version": "2.4.0",
-  "date": "2026-10-24",
+  "version": "2.4.1",
+  "date": "2026-10-25",
   "changes": [
-    "Original Solstice GT body, cabin, wheel rig and separate race LOD",
-    "Dynamic chase camera, landing compression and reduced-motion setting",
-    "Six opponents with traffic-aware overtaking and ramp avoidance",
-    "Controlled drift recovery, suspension feedback and distinct engine firing profiles",
-    "Circuit braking boards, event banners and coastal overlook",
-    "Separate 2.4 race records; garage progress preserved; editable source download"
+    "Progressive slowdown after nitro release and exhaustion",
+    "Directional car-contact response including head-on and reverse collisions",
+    "Finish crossing interpolation and elimination survival-order standings",
+    "Keyboard menu activation, accessible dialog links and focus restoration",
+    "Separate v4 handling records; existing cars, circuits and progression preserved"
   ]
 }

@@ -4,13 +4,15 @@ A complete, independent single-player browser arcade racer: pick a car, choose a
 
 ## Play online or download
 
-[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.4](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
+[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.4.1](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
 
 [Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH-SOURCE.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
 
-The next free-asset upgrade is tracked in [ASSET_UPGRADE_PLAN.md](ASSET_UPGRADE_PLAN.md), including verified candidate findings, blocked downloads and the offline GLB inspection command. The playable release remains 2.4 while candidate assets are evaluated.
+The next free-asset upgrade is tracked in [ASSET_UPGRADE_PLAN.md](ASSET_UPGRADE_PLAN.md), including verified candidate findings, blocked downloads and the offline GLB inspection command. The asset upgrade remains pending candidate files; 2.4.1 improves the existing game independently.
 
 The online link requires the repository's GitHub Pages deployment to be enabled; see [HOSTING.md](HOSTING.md). If your browser still shows the previous build, refresh the page. Version 2.4 adds the independently authored **Solstice GT** (2,500 credits), six AI opponents, traffic-aware passing, controlled drift recovery, acceleration/landing camera response, a reduced-motion option, circuit braking references and event dressing. Engine firing profiles now vary by car and gears use hysteresis. Credits, cars, paints and upgrades carry forward; new race records are separate from prior handling versions.
+
+Version **2.4.1** fixes sudden slowdown after boost, head-on/reverse contact response, close-finish timing, elimination standings and keyboard navigation. Older records remain saved; corrected handling uses separate v4 records. See [DEEP_AUDIT.md](DEEP_AUDIT.md) for reproduced defects, validation and remaining limits.
 
 ![APEX RUSH 2.4 garage](artifacts/garage-final.jpg)
 

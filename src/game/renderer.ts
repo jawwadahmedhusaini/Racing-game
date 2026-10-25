@@ -42,7 +42,7 @@ export class RenderSystem {
   constructor(container:HTMLElement) {
     this.renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-    this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFShadowMap;
     this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=.85;
     this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.info.autoReset=false;
     this.renderer.domElement.id='game-canvas';this.renderer.domElement.setAttribute('aria-label','3D racing game');container.append(this.renderer.domElement);

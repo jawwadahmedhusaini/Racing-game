@@ -1,6 +1,6 @@
 import {CARS,type CarSpec,type RaceMode,type Difficulty} from './content';
 import {Track,angleDelta} from './track';
-import {contactOffset,footprint} from './contact';
+import {contactOffset,footprint,resolveContactSpeed} from './contact';
 import {rampHeight,RAMP} from './ramp';
 import {planOpponent} from './opponents';
 import {shiftGear} from './engine-voice';
@@ -10,7 +10,7 @@ export const NO_INPUT:Controls={throttle:0,brake:0,steer:0,drift:false,nitro:fal
 export interface Driver {
   id:number; name:string; spec:CarSpec; distance:number; lateral:number; speed:number; heading:number; yawVelocity:number;
   nitro:number; boost:number; drift:number; driftTotal:number; airborne:number; verticalSpeed:number; rampLift:number; jumpRewardPending:boolean;
-  finishTime:number|null; eliminated:boolean; collision:number; steer:number; lap:number;
+  finishTime:number|null; eliminated:boolean; eliminationPosition:number|null; collision:number; steer:number; lap:number;
   targetLane:number; lastRamp:number; boostCooldown:number; boostPrevious:boolean; jumpTotal:number; reverseHold:number; slipAngle:number; acceleration:number; landingImpact:number; throttle:number; gear:number;
 }
 export interface RaceOptions {car:CarSpec;track:Track;mode:RaceMode;difficulty:Difficulty;upgrade:number; laps?:number;}
@@ -21,11 +21,16 @@ export class RaceSimulation {
   constructor(options:RaceOptions) {
     this.track=options.track;this.mode=options.mode;this.difficulty=options.difficulty;this.upgrade=options.upgrade;this.laps=options.laps??(options.mode==='time'?1:2);
     const names=['YOU','M. KOVA','J. SANTOS','R. WOLFF','A. RIVERA','K. MORI','L. COSTA'];
-    for(let i=0;i<(this.mode==='time'?1:7);i++)this.drivers.push({id:i,name:names[i],spec:i===0?options.car:CARS[(i-1)%CARS.length],distance:-Math.floor(i/2)*7,lateral:(i%2===0?-1:1)*3,speed:0,heading:0,yawVelocity:0,nitro:65,boost:0,drift:0,driftTotal:0,airborne:0,verticalSpeed:0,rampLift:0,jumpRewardPending:false,finishTime:null,eliminated:false,collision:0,steer:0,lap:1,targetLane:(i%2===0?-1:1)*3,lastRamp:-1,boostCooldown:0,boostPrevious:false,jumpTotal:0,reverseHold:0,slipAngle:0,acceleration:0,landingImpact:0,throttle:0,gear:1});
+    for(let i=0;i<(this.mode==='time'?1:7);i++)this.drivers.push({id:i,name:names[i],spec:i===0?options.car:CARS[(i-1)%CARS.length],distance:-Math.floor(i/2)*7,lateral:(i%2===0?-1:1)*3,speed:0,heading:0,yawVelocity:0,nitro:65,boost:0,drift:0,driftTotal:0,airborne:0,verticalSpeed:0,rampLift:0,jumpRewardPending:false,finishTime:null,eliminated:false,eliminationPosition:null,collision:0,steer:0,lap:1,targetLane:(i%2===0?-1:1)*3,lastRamp:-1,boostCooldown:0,boostPrevious:false,jumpTotal:0,reverseHold:0,slipAngle:0,acceleration:0,landingImpact:0,throttle:0,gear:1});
     this.updateRank();
   }
   get player(){return this.drivers[0];}
-  get ordered(){return [...this.drivers].sort((a,b)=>Number(a.eliminated)-Number(b.eliminated)||(a.finishTime!==null&&b.finishTime!==null?a.finishTime-b.finishTime:b.distance-a.distance));}
+  get ordered(){return [...this.drivers].sort((a,b)=>{
+    if(a.eliminated!==b.eliminated)return Number(a.eliminated)-Number(b.eliminated);
+    if(a.eliminated)return (a.eliminationPosition??Infinity)-(b.eliminationPosition??Infinity);
+    if(a.finishTime!==null||b.finishTime!==null)return a.finishTime===null?1:b.finishTime===null?-1:a.finishTime-b.finishTime;
+    return b.distance-a.distance;
+  });}
   updateRank(){this.rank=this.ordered.findIndex(d=>d.id===0)+1;}
   event(text:string){this.lastEvent=text;this.eventTimer=2.1;}
   turnCapacity(d:Driver){return Math.sign(d.speed)*Math.min(Math.abs(d.speed)/9,1)*1.75/(1+Math.abs(d.speed)*.018)*(d.spec.handling/90);}
@@ -50,16 +55,22 @@ export class RaceSimulation {
     this.elapsed+=dt;this.eventTimer=Math.max(0,this.eventTimer-dt);
     for(const d of this.drivers) {
       if(d.eliminated||d.finishTime!==null)continue;
-      const controls=d.id===0?input:this.aiInput(d);this.integrate(d,dt,controls);
-      if(d.distance>=this.track.length*this.laps){d.finishTime=this.elapsed;d.speed=0;}
+      const before=d.distance,controls=d.id===0?input:this.aiInput(d);this.integrate(d,dt,controls);
+      if(d.distance>=this.track.length*this.laps){
+        const fraction=clamp((this.track.length*this.laps-before)/Math.max(1e-9,d.distance-before),0,1);
+        d.finishTime=this.elapsed-dt+dt*fraction;d.speed=0;d.boost=0;
+      }
     }
     // Broadphase for seven cars: physical separation and speed exchange on close contact.
     for(let i=0;i<this.drivers.length;i++)for(let j=i+1;j<this.drivers.length;j++) {
       const a=this.drivers[i],b=this.drivers[j];if(a.eliminated||b.eliminated||a.finishTime!==null||b.finishTime!==null||Math.abs(a.airborne+a.rampLift-b.airborne-b.rampLift)>1)continue;
-      const contact=contactOffset(a,b,this.track.length,angleDelta(this.track.sample(a.distance).yaw,this.track.sample(b.distance).yaw));
+      const aYaw=this.track.sample(a.distance).yaw,bYaw=this.track.sample(b.distance).yaw,roadTurn=angleDelta(aYaw,bYaw);
+      const contact=contactOffset(a,b,this.track.length,roadTurn);
       if(contact){
+        resolveContactSpeed(a,b,contact,roadTurn);
         a.lateral+=contact.x;b.lateral-=contact.x;a.distance+=contact.z;b.distance-=contact.z;
-        if(Math.abs(contact.dz)>2.5){const rear=contact.dz>0?b:a,front=contact.dz>0?a:b;const impulse=Math.max(0,rear.speed-front.speed)*.55;rear.speed-=impulse;front.speed+=impulse*.3;}
+        a.heading=angleDelta(0,a.heading-angleDelta(aYaw,this.track.sample(a.distance).yaw));
+        b.heading=angleDelta(0,b.heading-angleDelta(bYaw,this.track.sample(b.distance).yaw));
         a.collision=b.collision=.4;
       }
     }
@@ -67,12 +78,12 @@ export class RaceSimulation {
     for(const d of this.drivers)if(!d.eliminated&&d.finishTime===null)this.constrainToRoad(d,0);
     if(this.mode==='elimination'&&this.elapsed>=this.nextElimination) {
       const active=this.ordered.filter(d=>!d.eliminated&&d.finishTime===null);
-      if(active.length>1){const last=active[active.length-1];last.eliminated=true;last.speed=0;this.event(last.id===0?'ELIMINATED':`${last.name} ELIMINATED`);}
+      if(active.length>1){const last=active[active.length-1];last.eliminationPosition=this.drivers.filter(d=>!d.eliminated).length;last.eliminated=true;last.speed=0;last.boost=0;this.event(last.id===0?'ELIMINATED':`${last.name} ELIMINATED`);}
       this.eliminatedAt=this.elapsed;this.nextElimination+=22;
     }
     this.updateRank();this.bestSpeed=Math.max(this.bestSpeed,this.player.speed*3.6);
     if(this.player.finishTime!==null||this.player.eliminated||(this.mode==='elimination'&&this.drivers.filter(d=>!d.eliminated).length===1)) {
-      this.resultPosition=this.player.eliminated?this.drivers.filter(d=>!d.eliminated).length+1:this.rank;
+      this.resultPosition=this.player.eliminated?this.player.eliminationPosition!:this.rank;
       this.player.finishTime??=this.elapsed;this.status='finished';this.finishedAt=this.elapsed;
     }
   }
@@ -110,7 +121,9 @@ export class RaceSimulation {
     }else if(d.reverseHold>=.35){d.speed=Math.max(-10,d.speed-dt*8*c.brake);}
     else {
       const power=throttle*accel*(1-Math.pow(d.speed/(max+(d.boost?25*nitroRating:0)),2));
-      d.speed=clamp(d.speed+dt*(power-c.brake*39-(throttle?1.4:5.2)-Math.abs(d.drift)*5.5+(d.boost===2?32:d.boost?21:0)*nitroRating),0,max+(d.boost===2?30:d.boost?19:0)*nitroRating);
+      const ceiling=max+(d.boost===2?30:d.boost?19:0)*nitroRating;
+      // Releasing/exhausting boost lowers the power ceiling, not existing momentum.
+      d.speed=clamp(d.speed+dt*(power-c.brake*39-(throttle?1.4:5.2)-Math.abs(d.drift)*5.5+(d.boost===2?32:d.boost?21:0)*nitroRating),0,Math.max(d.speed,ceiling));
     }
     // Integrate the car's own world heading. Curved road coordinates never steer it.
     // Positive control means physical right, which is negative world-Y yaw.

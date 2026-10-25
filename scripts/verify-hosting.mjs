@@ -1,8 +1,9 @@
 import { chromium, expect } from '@playwright/test';
-import { writeFile } from 'node:fs/promises';
+import { writeFile, readFile } from 'node:fs/promises';
 
 const url = process.env.GAME_URL || 'http://127.0.0.1:8010/Racing-game/';
 const report = { date: new Date().toISOString(), url, errors: [], failedRequests: [], assetPaths: [] };
+const version=JSON.parse(await readFile('package.json','utf8')).version;
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 try {
   const page = await browser.newPage({ viewport: { width: 960, height: 600 } });
@@ -16,8 +17,8 @@ try {
   await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(url);
   const release = await page.request.get(new URL('version.json',url).href);
-  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.4.0');
-  report.version='2.4.0';
+  expect(release.status()).toBe(200);expect((await release.json()).version).toBe(version);
+  report.version=version;
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 60000 });
   expect(await page.evaluate(() => '__apex' in window)).toBe(false);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();

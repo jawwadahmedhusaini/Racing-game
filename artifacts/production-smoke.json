@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-24T21:47:52.019Z",
+  "date": "2026-10-25T08:31:06.211Z",
   "production": true,
   "errors": [],
   "layouts": [
@@ -33,7 +33,7 @@
     }
   ],
   "failedRequests": [],
-  "version": "2.4.0",
+  "version": "2.4.1",
   "testApiAbsent": true,
   "solsticePurchased": true,
   "ultraRendered": true,

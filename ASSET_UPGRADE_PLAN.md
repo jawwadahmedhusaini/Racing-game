@@ -45,4 +45,4 @@ FBX/Blend/glTF sources must first be inspected and exported as GLB using Blender
 
 The intended vehicle and road archives are needed, with the license/creator information supplied by the download. They can be attached directly to this project; then geometry, wheel separation, materials and the actual licence can be evaluated. More permission or a paid purchase is not needed. A plain source-page link does not resolve this environment's blocked download access.
 
-No new visual game release is claimed by this intake work. The published playable release remains 2.4.
+No new visual game release is claimed by this intake work. At completion of this asset-intake work, the published playable release was 2.4; subsequent audit patches are tracked in DEEP_AUDIT.md.

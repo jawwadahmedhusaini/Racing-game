@@ -1,4 +1,4 @@
-APEX RUSH 2.4 — browser racing game
+APEX RUSH 2.4.1 — browser racing game
 
 1. Unzip the complete download.
 2. Install Python 3 if it is not already on your computer.
@@ -50,3 +50,6 @@ Source ZIP: https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/mai
 2.4: SOLSTICE GT is a separately authored long-bonnet car, available for 2,500 credits.
 Settings > Reduced Camera Motion gives a steadier driving view.
 Races now field six opponents; old credits, cars and upgrades are retained.
+
+2.4.1: smoother boost release, corrected head-on/reverse contact and race standings,
+keyboard menu fixes. Garage progress is preserved; race records use v4 keys.

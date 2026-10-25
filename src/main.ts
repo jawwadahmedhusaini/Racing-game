@@ -45,7 +45,7 @@ class Game {
     this.render.renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();this.graphicsLost=true;this.preparation?.abort();this.input.clear();this.audio.muted=true;if(this.simulation)this.pause();showFatal('Graphics interrupted','The browser lost its graphics connection. Reload to restart the game. Your last saved garage and completed races will be restored.');});
     document.addEventListener('visibilitychange',()=>{this.audio.muted=document.hidden||this.graphicsLost;if(document.hidden&&this.preparation)this.pauseAfterLoad=true;if(document.hidden&&this.ui.screen==='racing'&&!this.paused)this.pause();});window.addEventListener('blur',()=>{if(this.preparation)this.pauseAfterLoad=true;if(this.ui.screen==='racing'&&!this.paused)this.pause();});
     window.addEventListener('storage',e=>{if(e.key===SAVE_KEY)this.saveConflict();});
-    document.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const modal=document.getElementById('modal');if(!modal)return;const elements=[...modal.querySelectorAll<HTMLElement>('button:not([disabled]),input,select')];if(!elements.length)return;const first=elements[0],last=elements.at(-1)!;if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+    document.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const modal=document.getElementById('modal');if(!modal)return;const elements=[...modal.querySelectorAll<HTMLElement>('button:not([disabled]),input:not([disabled]),select:not([disabled]),a[href]')];if(!elements.length)return;const first=elements[0],last=elements.at(-1)!;if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
     this.ready=Promise.all([this.render.ready,document.fonts.ready]).then(()=>{this.render.captureEnvironment(this.showroom.scene,new THREE.Vector3(0,1.2,0),[this.showroom.group]);loading.style.opacity='0';setTimeout(()=>loading.remove(),600);});
     requestAnimationFrame(t=>this.frame(t));
   }
@@ -151,7 +151,7 @@ class Game {
     const stars=sim.player.eliminated?0:pos===1?3:pos<=3?2:1;let careerBonus=0;
     if(sim.mode==='career'){const e=EVENTS[this.lastRace.event];if(this.lastRace.event===this.save.career&&pos<=e.target&&!sim.player.eliminated){careerBonus=e.reward;this.save.career++;this.save.stars+=stars;}}
     this.save.credits+=reward+careerBonus;this.save.races++;if(pos===1&&!sim.player.eliminated)this.save.wins++;
-    const key=`${sim.track.id}-v3-${sim.mode}`,time=sim.player.finishTime??sim.elapsed,best=!sim.player.eliminated&&(!this.save.bestTimes[key]||time<this.save.bestTimes[key]);if(best)this.save.bestTimes[key]=time;
+    const key=`${sim.track.id}-v4-${sim.mode}`,time=sim.player.finishTime??sim.elapsed,best=!sim.player.eliminated&&(!this.save.bestTimes[key]||time<this.save.bestTimes[key]);if(best)this.save.bestTimes[key]=time;
     this.persist();this.result={position:pos,reward,careerBonus,stars,time,best,eliminated:sim.player.eliminated};this.audio.tone(pos===1?880:440,.6,.25);this.ui.results(sim,this.result);this.input.clear();
   }
   updateRaceView(dt:number,time:number){
