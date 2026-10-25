@@ -11,3 +11,5 @@ it('preserves old circuit records separately from the revised circuit records',(
 });
 
 it('retains Solstice ownership, reduced motion and separate 2.4 records across parsing',()=>{const save=freshSave();save.owned.push('solstice');save.selected='solstice';save.settings.reducedMotion=true;save.bestTimes={'coast-v2-quick':85,'coast-v3-quick':84};expect(parseSave(JSON.stringify(save))).toEqual(save);});
+
+it('retains all earlier record versions alongside the audited v4 handling records',()=>{const save=freshSave();save.bestTimes={'coast-time':30,'coast-v2-time':31,'coast-v3-time':32,'coast-v4-time':33};expect(parseSave(JSON.stringify(save))).toEqual(save);});

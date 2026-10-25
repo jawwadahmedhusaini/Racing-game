@@ -1,47 +1,32 @@
-# APEX RUSH 2.4.0 — validation
+# APEX RUSH 2.4.1 — validation
 
-Machine-readable timestamps are UTC. Chromium/Playwright on Linux with software WebGL 2; hardware FPS and subjective flagship quality are not verified.
+## Current release checks
 
-## Release gates
-
-- **90 unit checks passed**, none failed/skipped.
-- **13 browser workflows passed**, none failed/skipped/flaky, no retries; 11.5 minutes.
-- TypeScript, root build and `/Racing-game/` build passed.
-- Actual packaged launcher and Pages-base production smokes passed, current version, zero unexpected page/console errors or HTTP failures; development controls absent.
+- **105 unit checks passed**, no failures or skipped tests.
+- **14 Chromium browser workflows passed**, no failures, skips, retries or flaky outcomes; 11.8 minutes. Run started 2026-10-24T22:25:36.252Z (UTC).
+- TypeScript, root production build and `/Racing-game/` production build passed.
+- Packaged Python launcher smoke and Pages-base smoke passed on 2.4.1, with zero unexpected page/console errors or HTTP failures; development test controls absent.
 - Dependency audit: zero reported vulnerabilities.
+- The separate Python asset-intake suite passed all seven checks; it does not validate driving physics.
 
-## New regression coverage
+## Defects reproduced and repaired
 
-- Solstice's loaded high/low GLBs: exact attribution hashes, finite normals, independent front/rear wheel pivots, measured full bounds contained by the collision footprint, and triangle limits. Full bounds include the splitter/mirrors, not only painted bodywork.
-- Six rivals finish both laps of both circuits on Rookie/Pro/Expert while the player remains idle. Separate planner tests cover occupied passing lanes, blocked traffic, a held overtaking lane and lap-seam gaps. This caught grid queues and ramp-edge stalls during development.
-- Drift slip decays smoothly after release; airborne/braking input cannot earn drift time. Existing manual-steering, reverse, boost, barrier, oriented-body contact, ramp support/edge/launch and reward regressions remain.
-- Camera follows actual displacement without changing physics, stays above the road and within its safe corridor across the full circuit, settles on pause/landing and resets after recovery. Reduced motion removes camera shake/roll and forward nitro FOV surges.
-- Engine gear hysteresis handles threshold jitter, reverse and large speed changes; different car profiles have different firing rates. Partial audio failure and zero-effects allocation tests remain. No subjective speaker/headphone quality is claimed.
-- Existing saves retain Solstice ownership, reduced motion and prior/v2/v3 records. Browser workflow buys Solstice, paints it, changes race detail, finishes a race and reloads the persisted settings.
+Six new regression cases failed before the fixes: nitro release/exhaustion speed discontinuities, head-on contact, reversing contact, same-step finish ranking and elimination survival order. They now pass. Eight additional stress cases cover every car on both tracks with deterministic mixed braking/reverse, steering, drift, boost and recovery for 90 simulated seconds per case. State stays finite, cars stay within road bounds, and altitude/nitro remain valid.
 
-## Browser and release coverage
+A real browser test failed to open Settings with Space before the input fix. It now verifies native button activation, accessible dialog names, Tab access to credit links, focus restoration, Space/Enter holds on touch pedals and release on blur. All earlier browser workflows also ran against the corrected physics/input files. After the suite, a deprecated shadow enum was replaced by PCFShadowMap, the exact fallback already used by Three.js. Both builds and the packaged/Pages smokes were rerun after this one-line renderer cleanup; the packaged Ultra check rejects the old deprecation warning.
 
-Real keyboard and CDP multi-touch events verify camera-relative steering, wheel yaw, reverse, pause/recovery, brake priority, boost and menus. A development-only fixed-step advance hook drives complete races, progression, purchases, replays and single reward crediting. The hook is absent from production.
+Existing coverage includes manual camera-relative steering; reverse; drift, boost, ramp surfaces and landing rewards; six AI rivals finishing both circuits on all three difficulties; save parsing/conflicts; purchases and upgrades; single reward crediting; repeated starts/resource counts; loading cancellation and duplicate starts; focus loss; multitouch; blocked storage; audio failure; asset failure/retry; actual graphics-context loss; and Solstice selection, paint, quality changes and persisted settings.
 
-Other workflows cover repeated starts/garage browsing/resource counts, focus loss, nested settings, competing tabs, denied storage, failed assets/retry, unsupported audio and actual graphics-context loss. Loading can be cancelled during terrain and car construction; duplicate starts are rejected and countdown time stays frozen. Startup checks preserve throttle held during loading.
+## Production and visual checks
 
-Production checks use real W/Shift/S input for acceleration, boost, pause/resume and reverse. Solstice is purchased in the packaged production smoke; Ultra is rendered. Layout checks cover 1280×800, 1600×900, 844×390 and 390×844. The Pages-base check loads both vehicle families, surfaces, vegetation, fonts, HDR, previews and license metadata. Build: 41 files, 29.8 MB uncompressed.
+The packaged build uses real W/Shift/S keys to verify acceleration, nitro, pause/resume and reverse. It purchases Solstice, renders Ultra and checks four layouts (1280×800, 1600×900, 844×390, 390×844). The Pages-base build loads both vehicle families, both previews, HDR, surfaces, vegetation and licence files, then starts and drives the city race. Screenshots are included in the source ZIP.
 
-After the full browser suite, the two Solstice reverse-lamp meshes were moved outside the rear bodywork and the selected garage card was kept visible after viewport rotation. Both detail levels passed fresh rear-visibility ray tests; the focused browser workflow explicitly checks the complete selected-card bounds in portrait; the Solstice browser workflow and the packaged/Pages production smokes were rerun with those final assets. The driving simulation did not change after the full suite.
+The full browser suite checks coastal terrain/scenery clearance and city scenery clearance. Geometry, textures and track layouts are unchanged. The only renderer change selects the supported shadow enum directly, preserving Three.js's prior fallback behaviour. The older `startup-review.json`, `visual-review.json`, `solstice-browser.json` and `performance.json` retain their 2.4 timestamps/results; they are historical evidence, not newly measured 2.4.1 benchmarks. No new hardware FPS or graphics-quality improvement is claimed.
 
-## Road geometry
+## Scope and limits
 
-Actual coast terrain triangles are raycast at five lateral positions every 3 m. Prop footprints are checked independently against the entire road. Landmark reservations keep later scenery out of the coastal belvedere. Overhead foliage can overhang; arbitrary branch collisions are not simulated.
+Chromium on Linux uses ANGLE/SwiftShader software WebGL 2. Real desktop/mobile GPU performance, Android/iOS thermals, Safari/Firefox, subjective handling/audio and Windows/macOS launcher wrappers remain unverified. The published 2.4 software FPS results are below playable targets and do not predict hardware FPS.
 
-| Track | Terrain samples | Footprints | Minimum terrain clearance m | Minimum scenery clearance m | Violations |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| coast | 3460 | 562 | 0.633625655712347 | 2.350 | 0 |
-| city | 0 | 284 | None | 2.358 | 0 |
+The physics remain a track-relative arcade model, not a swept rigid-body simulation. A complete game audit cannot prove the absence of defects. See [DEEP_AUDIT.md](DEEP_AUDIT.md) for findings and remaining weaknesses. Existing garage progress is retained, and prior race records remain stored separately from v4 handling records.
 
-A separate heightfield test checks rendered triangle diagonals; ramp mesh/physics use a shared surface. Grid curvature is checked through the final row of the seven-car grid.
-
-## Evidence and limits
-
-`artifacts/` contains unit/browser JSON, startup, visual, performance, packaged and hosted production reports plus dependency audit. High-quality captures cover all four garage choices, the two circuits, loading and reverse; Solstice rear and mobile views are also inspected. Web/source archives receive CRC and SHA-256 checks, and published downloads are fetched again against the tested files.
-
-Physical Android/iOS devices, desktop GPUs, Safari/Firefox, long thermal sessions and Windows/macOS launcher wrappers remain untested. Camera corridor bounds are not a general dynamic occlusion solver. There are four cars across two underlying designs, synthesized audio, two procedural circuits and four career events. See [AUDIT_RESPONSE.md](AUDIT_RESPONSE.md) for the uncompleted flagship targets.
+Raw current results: `unit-results.json`, `browser-results.json`, `production-smoke.json`, `hosting-smoke.json`, `dependency-audit.json`, `audit-review.json` under `artifacts/`. Release archive CRC/hash and post-publication download checks are performed separately.

@@ -3,6 +3,11 @@
 ## Resolved during validation
 
 | Issue | Resolution / evidence |
+| Releasing or exhausting boost instantly removed excess speed | Preserve momentum and let engine drag/coasting reduce speed. Regression checks both release and exhaustion. |
+| Head-on and reversing cars retained inappropriate closing speed | Project a normal contact impulse onto signed travel directions; preserve world yaw after separation. |
+| Same-step finish ties preferred driver array order | Interpolate finish crossing time within the fixed step and sort by finish time. |
+| Eliminated cars were ranked by distance rather than survival order | Store the position at elimination and use it in standings. |
+| Space could not activate menu buttons; credit links were trapped outside keyboard navigation | Preserve native activation, support hold controls with Space/Enter, include links in focus trapping, label dialogs and restore their opener focus. |
 | --- | --- |
 | Opponents queued indefinitely behind a stopped car | Evaluate clear lateral escape paths and avoid creeping into a zero target speed. Six-rival full-race regressions cover both circuits and all difficulty levels. |
 | A rival hit the raised ramp side and stalled | Plan a clear line before the ramp; preserve physical ramp collision. Full-race idle-player regression catches permanent stalls. |

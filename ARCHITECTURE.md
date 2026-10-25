@@ -72,3 +72,9 @@ Reverse uses signed velocity with a 0.35-second stationary brake dwell. AI braki
 - `scripts/build-solstice.py`: original parametric Blender authoring, two GLB LODs and hash metadata. Car Concept adaptations remain separate in `scripts/prepare-car.py`.
 - Vehicle templates are bounded by four catalog cars × two detail levels. Materials are per-instance; immutable geometry/maps are retained until page exit.
 - 2.4 race records use `track-v3-mode`; old and v2 record keys remain readable. Existing garage/economy data are preserved.
+
+## 2.4.1 audit corrections
+
+Boost changes the available speed ceiling without clamping existing momentum on release. Car contact uses signed travel vectors and an inelastic normal impulse projected onto each drive direction; the simulation still has no independent lateral velocity or rigid-body suspension. Separation compensates heading for the change in road frame. Finish times interpolate the crossing within a fixed step, and eliminated drivers retain their finishing position.
+
+Race records now use `track-v4-mode`. Unversioned and v2/v3 records remain readable; garage progress is preserved. Menu Space activation is independent of driving shortcuts, and focused touch pedals accept Space/Enter hold and release. Dialogs preserve opener focus through nested settings/credits and include links in the Tab cycle.

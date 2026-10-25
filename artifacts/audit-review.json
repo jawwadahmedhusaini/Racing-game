@@ -1,0 +1,19 @@
+{
+  "version": "2.4.1",
+  "date": "2026-10-25T08:33:54.840049+00:00",
+  "unitPassed": 105,
+  "browserPassed": 14,
+  "browserStarted": "2026-10-24T22:25:36.252Z",
+  "browserDurationMs": 709169.169,
+  "reproducedBeforeFix": {
+    "physicsAndStandingsTests": 6,
+    "keyboardWorkflow": 1
+  },
+  "mixedInputStressCases": 8,
+  "secondsPerStressCase": 90,
+  "productionPassed": true,
+  "hostingBasePassed": true,
+  "historicalPerformanceVersion": "2.4.0",
+  "hardwarePerformanceVerified": false,
+  "passed": true
+}

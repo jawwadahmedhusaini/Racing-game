@@ -1,18 +1,19 @@
 import { chromium, expect } from '@playwright/test';
-import { writeFile } from 'node:fs/promises';
+import { writeFile, readFile } from 'node:fs/promises';
 
+const version=JSON.parse(await readFile('package.json','utf8')).version;
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 const report = { date: new Date().toISOString(), production: true, errors: [], layouts: [], failedRequests: [] };
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   page.on('pageerror', e => report.errors.push(e.message));
-  page.on('console', m => { if (m.type() === 'error') report.errors.push(m.text()); });
+  page.on('console', m => { if (m.type() === 'error' || /PCFSoftShadowMap has been removed/.test(m.text())) report.errors.push(m.text()); });
   page.on('response', response => { if (response.status() >= 400) report.failedRequests.push({ url: response.url(), status: response.status() }); });
   await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(process.env.GAME_URL || 'http://127.0.0.1:8000');
   const release = await page.request.get(new URL('version.json',page.url()).href);
-  expect(release.status()).toBe(200);expect((await release.json()).version).toBe('2.4.0');
-  report.version='2.4.0';
+  expect(release.status()).toBe(200);expect((await release.json()).version).toBe(version);
+  report.version=version;
   await expect(page.locator('.loading')).toHaveCount(0, { timeout: 60000 });
   expect(await page.evaluate(() => '__apex' in window)).toBe(false);
   report.testApiAbsent = true;

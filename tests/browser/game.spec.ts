@@ -182,3 +182,21 @@ test('original Solstice selection, paint, six opponents and reduced-motion prefe
  await advance(page,120,{throttle:1,nitro:true},true);await expect(page.getByText('FINAL STANDINGS')).toBeVisible();await page.getByRole('button',{name:'BACK TO GARAGE'}).click();await page.reload();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
  expect((await state(page)).selected).toBe('solstice');await expect(page.getByRole('button',{name:'Paint blue'})).toHaveAttribute('aria-pressed','true');await page.getByRole('button',{name:'Settings',exact:true}).click();await expect(page.locator('#reducedMotion')).toBeChecked();expect(errors).toEqual([]);
 });
+
+test('keyboard buttons, dialog links and focus restoration work without injecting driving controls',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
+ const settings=page.getByRole('button',{name:'Settings',exact:true});await settings.focus();await page.keyboard.press('Space');
+ await expect(page.getByRole('dialog')).toBeVisible();expect((await state(page)).input.drift).toBe(false);
+ await page.getByRole('button',{name:'ASSET CREDITS & LICENSES'}).click();
+ await expect(page.getByRole('dialog')).toHaveAccessibleName('ASSET CREDITS.');
+ await page.getByRole('button',{name:'Close credits'}).focus();await page.keyboard.press('Tab');
+ await expect(page.getByRole('link',{name:'CC BY 4.0',exact:true})).toBeFocused();
+ await page.keyboard.press('Escape');await expect(settings).toBeFocused();
+ await start(page);await advance(page,4);
+ // Visible touch controls also accept a keyboard/switch device activation.
+ await page.addStyleTag({content:'.touch-controls {display:flex !important}'});
+ const go=page.getByRole('button',{name:'Accelerate',exact:true});await go.focus();await page.keyboard.down('Space');
+ expect((await state(page)).input).toMatchObject({throttle:1,drift:false});await page.keyboard.up('Space');expect((await state(page)).input.throttle).toBe(0);
+ await page.keyboard.down('Enter');expect((await state(page)).input.throttle).toBe(1);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
+ expect((await state(page)).input.throttle).toBe(0);await page.keyboard.up('Enter');expect(errors).toEqual([]);
+});
