@@ -1,0 +1,62 @@
+{
+  "license": "CC0-1.0",
+  "creator": "Neubi",
+  "adaptedBy": "CryHam (Stunt Rally), APEX RUSH",
+  "sourceListing": "https://www.blendswap.com/blends/view/19869",
+  "sourceCredits": "https://github.com/stuntrally/blendfiles/blob/251bc67d5ff52ce535525e144a4a1304e3b2b5ef/cars/XZ/about.txt",
+  "originalCreditText": "Car from blendswap\n\nModel by Neubi\nLicense: CC Zero\nhttp://www.blendswap.com/blends/view/19869\n\t\nImport, settings and interior by CryHam\n",
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/XZ/textures/XZ_interior.png",
+      "sha256": "9aa1eb759a12d3c289a450455a819c7f8383a34e6a546e38fa90f48bbae506bd"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/XZ/textures/XZ_glass.png",
+      "sha256": "0693c46c00da64b7b115f78486e16df051cf1772fd965d163a3799943c64ddeb"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/XZ/textures/XZ_Tire.png",
+      "sha256": "ed2f6791639fbef96425368203b9c19951418ff1d7f5c47dab41de4243e745e9"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/XZ/textures/XZ_Tire_norm.png",
+      "sha256": "e4f6bd5b2ea8ba3d2613d902ffaa9ac1d750fb228fdc10f535a218250b54b92c"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/XZ/textures/XZ_body_red.png",
+      "sha256": "23293704239cdfe91552d4d3f4072d22b8f8be80cf340a7e4747bf53ca55bd85"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/XZ/textures/XZ_body_brake.png",
+      "sha256": "713814b01846a7f3658e2fc27588c662af7db50d47c7cfe82d811cede869b9db"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/stuntrally/blendfiles/251bc67d5ff52ce535525e144a4a1304e3b2b5ef/cars/XZ/about.txt",
+      "sha256": "c0c7041452c9ed3988cfcabea87fd4acec3236ba4e08ad84e75736317f19089d"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/stuntrally/blendfiles/251bc67d5ff52ce535525e144a4a1304e3b2b5ef/cars/XZ/bmw_m3_gt3.blend",
+      "sha256": "5e7c4dcc02652e05957a4129cb3dec8a8017c83bf56be5b57fb472777eb24836"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/stuntrally/blendfiles/251bc67d5ff52ce535525e144a4a1304e3b2b5ef/cars/XZ/bmw_m3_gt3_wheel.blend",
+      "sha256": "46e43d420722a813f39261ebec0b031f37b66244160cad8d04dbc27cd1e1227d"
+    }
+  ],
+  "modifications": "Coordinate conversion, PBR materials, remapped existing interior/wheel textures, rigged four wheels and fixed calipers, functional lamps, two LODs. Performance and sound are game tuning, not manufacturer specifications.",
+  "trademarkNotice": "Unofficial community model. BMW is a trademark of its owner; no endorsement or manufacturer sound recording is claimed.",
+  "assets": [
+    {
+      "triangles": 31947,
+      "file": "assets/bmw-m3.glb",
+      "sha256": "37ec7f9f5007952a420d9b7a2a9d1f8f5a4f867a380ca313ae37165793a4389b",
+      "bytes": 1775908
+    },
+    {
+      "triangles": 20010,
+      "file": "assets/bmw-m3-lod.glb",
+      "sha256": "81f79552831c4e1cb5dabb2239c9e8a636ed0391552244070534d1ff714c7f79",
+      "bytes": 1482536
+    }
+  ]
+}
