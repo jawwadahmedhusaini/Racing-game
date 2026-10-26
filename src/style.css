@@ -26,3 +26,4 @@
 
 /* Keep the collection browsable as more unique vehicles are added. */
 .car-list{min-width:0;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#46606d transparent;scroll-snap-type:x proximity}.car-card{min-width:155px;scroll-snap-align:start}.car-card-info{min-width:0}.car-card-info b{white-space:nowrap}@media(max-width:600px){.car-card{min-width:108px;flex:1 0 108px}}@media(max-width:900px) and (orientation:landscape) and (max-height:550px){.car-card{min-width:132px}}
+.maker .engine-preview{margin:0 0 0 12px;padding:2px 0 2px 14px;border-left:1px solid #31434d;font-size:9px;letter-spacing:1.5px;color:#b8dce0;white-space:nowrap}

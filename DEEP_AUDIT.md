@@ -1,5 +1,7 @@
 # APEX RUSH 2.4.1 — deep review, 25 October 2026
 
+This is the historical 2.4.1 audit. The current sound/contact/BMW changes and updated limitations are in [SOUND_AND_CONTACT.md](SOUND_AND_CONTACT.md).
+
 The review covered simulation, vehicle contact, ramp support, opponent planning, standings/rewards, keyboard/touch input, persistence and session conflicts, camera/material/rendering code, loading/cancellation and resource lifetime. The release fixes reproduced defects in the existing game. It adds no vehicle or circuit assets and does not establish flagship visual quality.
 
 ## Confirmed defects and changes

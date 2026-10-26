@@ -1,7 +1,7 @@
 import {test,expect,type Page} from '@playwright/test';
 const raceReady=(page:Page)=>page.waitForFunction(()=>!(window as any).__apex.state().preparing,null,{timeout:90000});
 const state=async(page:Page)=>{await raceReady(page);return page.evaluate(()=>(window as any).__apex.state());};
-const advance=async(page:Page,seconds:number,input:Record<string,number|boolean>={},center=false)=>{await raceReady(page);return page.evaluate(({seconds,input,center})=>(window as any).__apex.advance(seconds,input,center),{seconds,input,center});};
+const advance=async(page:Page,seconds:number,input:Record<string,number|boolean>={},center:boolean|'race'=false)=>{await raceReady(page);return page.evaluate(({seconds,input,center})=>(window as any).__apex.advance(seconds,input,center),{seconds,input,center});};
 async function boot(page:Page){
   await page.addInitScript(()=>{if(!localStorage.getItem('apex-rush-save-v1'))localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{adaptiveResolution:false,quality:'low',difficulty:'rookie',music:0,engine:0,effects:0}}));});
   await page.goto('/');await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
@@ -48,7 +48,7 @@ test('real keyboard controls, pause, boost, complete race, rewards and replay',a
 
 test('career unlock, purchase, exact car selection, upgrades and persistent settings',async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
-  await page.getByRole('button',{name:'CAREER',exact:true}).click();await expect(page.locator('[data-action="event"][data-value="1"]')).toBeDisabled();await page.locator('[data-action="event"][data-value="0"]').click();await advance(page,130,{throttle:1,nitro:true},true);await expect(page.getByText('FINAL STANDINGS')).toBeVisible();
+  await page.getByRole('button',{name:'CAREER',exact:true}).click();await expect(page.locator('[data-action="event"][data-value="1"]')).toBeDisabled();await page.locator('[data-action="event"][data-value="0"]').click();await advance(page,130,{throttle:1,nitro:true},'race');expect((await state(page)).credits).toBeGreaterThanOrEqual(6000);await expect(page.getByText('FINAL STANDINGS')).toBeVisible();
   await page.getByRole('button',{name:'BACK TO GARAGE'}).click();await page.getByRole('button',{name:'View SPECTRE S'}).click();await page.getByRole('button',{name:'UNLOCK · 6,000'}).click();expect((await state(page)).selected).toBe('spectre');
   await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.locator('[data-action="mode"][data-value="time"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();expect((await state(page)).player.spec).toBe('spectre');await advance(page,90,{throttle:1,nitro:true},true);await expect(page.getByText('FINAL STANDINGS')).toBeVisible();await page.getByRole('button',{name:'RACE AGAIN'}).click();await advance(page,90,{throttle:1,nitro:true},true);await page.getByRole('button',{name:'BACK TO GARAGE'}).click();await page.getByRole('button',{name:'UPGRADE · 1,800'}).click();await expect(page.getByText('STAGE 1 / 3')).toBeVisible();
   await page.getByRole('button',{name:'CAREER',exact:true}).click();await expect(page.locator('[data-action="event"][data-value="1"]')).toBeEnabled();await page.getByRole('button',{name:'GARAGE',exact:true}).click();
@@ -62,7 +62,7 @@ test('city elimination completes and camera stays operational across camera mode
 
 test('mobile layout and touch input work without overflowing the viewport',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true,deviceScaleFactor:1});const page=await context.newPage();const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);expect(await page.evaluate(()=>document.body.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'artifacts/mobile-garage.png'});
-  await start(page);await advance(page,4);await expect(page.getByRole('button',{name:'Accelerate',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="mode"][data-value="time"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await advance(page,4);await expect(page.getByRole('button',{name:'Accelerate',exact:true})).toBeVisible();
   const box=(await page.getByRole('button',{name:'Accelerate',exact:true}).boundingBox())!;const cdp=await context.newCDPSession(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2}]});await expect.poll(async()=>(await state(page)).player.speed).toBeGreaterThan(0);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   // Independent fingers may share one action; releasing one must not release the other.
   const ax=box.x+box.width/2,ay=box.y+box.height/2;
@@ -72,7 +72,7 @@ test('mobile layout and touch input work without overflowing the viewport',async
   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});expect((await state(page)).input.throttle).toBe(0);
   await advance(page,3,{throttle:1},true);
   for(const [name,direction] of [['Steer left',-1],['Steer right',1]] as const){
-    await page.keyboard.press('r');await advance(page,0);const before=await pose(page),control=(await page.getByRole('button',{name,exact:true}).boundingBox())!;
+    await page.keyboard.press('r');await advance(page,1,{throttle:1},true);expect((await state(page)).player.speed).toBeGreaterThan(15);const before=await pose(page),control=(await page.getByRole('button',{name,exact:true}).boundingBox())!;
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:control.x+control.width/2,y:control.y+control.height/2}]});await page.evaluate(()=>(window as any).__apex.advance(.65,null));const after=await pose(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});assertDirection(before,after,direction);
     expect((await state(page)).input.steer).toBe(0);
   }
@@ -199,4 +199,19 @@ test('keyboard buttons, dialog links and focus restoration work without injectin
  expect((await state(page)).input).toMatchObject({throttle:1,drift:false});await page.keyboard.up('Space');expect((await state(page)).input.throttle).toBe(0);
  await page.keyboard.down('Enter');expect((await state(page)).input.throttle).toBe(1);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
  expect((await state(page)).input.throttle).toBe(0);await page.keyboard.up('Enter');expect(errors).toEqual([]);
+});
+
+test('BMW model, garage rev audition and sampled race audio work with saved selection',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');await expect(page.locator('.loading')).toHaveCount(0,{timeout:90000});
+ await page.getByRole('button',{name:'View M3 GTR'}).click();await page.getByRole('button',{name:'UNLOCK · 2,200'}).click();
+ await page.getByRole('button',{name:'Settings',exact:true}).click();
+ for(const key of ['engine','effects'])await page.locator('#'+key).evaluate((input:HTMLInputElement)=>{input.value='.6';input.dispatchEvent(new Event('change',{bubbles:true}));});
+ await page.getByRole('button',{name:'Close settings'}).click();await page.getByRole('button',{name:'Rev selected car'}).click();
+ await expect.poll(async()=>(await state(page)).audio.samples).toBe('ready');await expect.poll(async()=>(await state(page)).audio.rpm).toBeGreaterThan(1500);
+ await page.screenshot({path:'artifacts/bmw-garage.png'});
+ await page.setViewportSize({width:390,height:844});await expect(page.getByRole('button',{name:'Rev selected car'})).toBeVisible();expect(await page.evaluate(()=>document.body.scrollWidth>innerWidth)).toBe(false);await page.screenshot({path:'artifacts/bmw-mobile.png'});
+ await page.setViewportSize({width:960,height:600});await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await raceReady(page);await advance(page,8,{throttle:1},true);
+ expect((await state(page)).player.spec).toBe('bmw-m3');expect((await state(page)).audio.samples).toBe('ready');await page.keyboard.down('w');await expect.poll(async()=>(await state(page)).audio.engineLayers).toBeGreaterThanOrEqual(10);await page.keyboard.up('w');
+ await page.screenshot({path:'artifacts/bmw-race.png'});await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'RESUME RACE'})).toBeVisible();await page.getByRole('button',{name:'QUIT TO GARAGE'}).click();
+ await page.reload();await expect(page.locator('.loading')).toHaveCount(0,{timeout:90000});expect((await state(page)).selected).toBe('bmw-m3');expect(errors).toEqual([]);
 });

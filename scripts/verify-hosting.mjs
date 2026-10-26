@@ -39,11 +39,15 @@ try {
   await page.keyboard.up('w');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: 'RESUME RACE' })).toBeVisible();
+  for(const file of ['v8f-9.wav','v12d-9.wav','b-v8-7.wav','b-i6r-8.wav','impact-heavy.wav','scrape.wav'])expect(report.assetPaths.some(path=>path.endsWith('/audio/'+file))).toBe(true);
+  const audioLicense=await page.request.get(new URL('licenses/audio.json',url).href);expect(audioLicense.status()).toBe(200);expect((await audioLicense.json()).assets.length).toBe(23);
+  const bmwLicense=await page.request.get(new URL('licenses/bmw-m3.json',url).href);expect(bmwLicense.status()).toBe(200);expect((await bmwLicense.json()).license).toBe('CC0-1.0');
+  report.sampledAudioPaths=true;report.bmwAssets=true;
   report.keyboardAcceleration = true;
   report.pause = true;
   expect(report.assetPaths.some(path => path.endsWith('/concept-car.glb'))).toBe(true);
   expect(report.assetPaths.some(path => path.endsWith('/concept-car-lod.glb'))).toBe(true);
-  for(const model of ['solstice-gt.glb','solstice-gt-lod.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(true);
+  for(const model of ['solstice-gt.glb','solstice-gt-lod.glb','bmw-m3.glb','bmw-m3-lod.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(true);
   const solstice=await page.request.get(new URL('licenses/solstice.json',url).href);expect(solstice.status()).toBe(200);expect((await solstice.json()).license).toBe('CC0-1.0');
   expect(report.assetPaths.some(path => path.endsWith('/venice_sunset_1k.hdr'))).toBe(true);
   expect(report.assetPaths.some(path => path.endsWith('/vegetation.json'))).toBe(true);

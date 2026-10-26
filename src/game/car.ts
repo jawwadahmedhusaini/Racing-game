@@ -7,10 +7,10 @@ import {random} from './materials';
 import {wingGeometry} from './aero';
 import {reshapeGeometry,reshapePoint} from './vehicle-shape';
 export interface CarModel {group:THREE.Group;body:THREE.Group;wheels:THREE.Group[];dimensions:THREE.Vector3;paint:THREE.MeshPhysicalMaterial;brake:THREE.MeshStandardMaterial;headlamps:THREE.MeshStandardMaterial;flames:THREE.Mesh[];update:(speed:number,steer:number,drift:number,boost:number,braking:boolean,time:number,acceleration?:number,landing?:number)=>void;dispose:()=>void;}
-let garageTemplate:THREE.Group|undefined,raceTemplate:THREE.Group|undefined,solsticeTemplate:THREE.Group|undefined,solsticeRaceTemplate:THREE.Group|undefined;
-export async function loadVehicleAsset(){const loader=new GLTFLoader();const models=await Promise.all(['concept-car.glb','concept-car-lod.glb','solstice-gt.glb','solstice-gt-lod.glb'].map(file=>loader.loadAsync(publicUrl(`assets/${file}`))));[garageTemplate,raceTemplate,solsticeTemplate,solsticeRaceTemplate]=models.map(model=>model.scene);models.forEach(model=>model.scene.updateMatrixWorld(true));}
+let garageTemplate:THREE.Group|undefined,raceTemplate:THREE.Group|undefined,solsticeTemplate:THREE.Group|undefined,solsticeRaceTemplate:THREE.Group|undefined,bmwTemplate:THREE.Group|undefined,bmwRaceTemplate:THREE.Group|undefined;
+export async function loadVehicleAsset(){const loader=new GLTFLoader();const models=await Promise.all(['concept-car.glb','concept-car-lod.glb','solstice-gt.glb','solstice-gt-lod.glb','bmw-m3.glb','bmw-m3-lod.glb'].map(file=>loader.loadAsync(publicUrl(`assets/${file}`))));[garageTemplate,raceTemplate,solsticeTemplate,solsticeRaceTemplate,bmwTemplate,bmwRaceTemplate]=models.map(model=>model.scene);models.forEach(model=>model.scene.updateMatrixWorld(true));}
 
-// Immutable prepared meshes are bounded to four designs × two detail levels.
+// Immutable prepared meshes are bounded to five designs × two detail levels.
 // Instances own their materials; geometry and texture maps stay alive for reuse.
 const prepared=new Map<string,CarModel>();
 const rearSurfaces=new Map<string,number>();
@@ -27,7 +27,7 @@ export function createCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
 // Car Concept by Eric Chadwick / DGG (CC BY 4.0), adapted for this game.
 // Model preparation and license details are in scripts/prepare-car.py and ASSET_LICENSES.md.
 function buildCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
-  const original=spec.shape==='grandtourer',template=original?(racing?solsticeRaceTemplate:solsticeTemplate):(racing?raceTemplate:garageTemplate);if(!template)throw new Error('Vehicle assets must load before creating cars.');
+  const original=spec.shape==='grandtourer',template=spec.id==='bmw-m3'?(racing?bmwRaceTemplate:bmwTemplate):original?(racing?solsticeRaceTemplate:solsticeTemplate):(racing?raceTemplate:garageTemplate);if(!template)throw new Error('Vehicle assets must load before creating cars.');
   const group=new THREE.Group(),body=new THREE.Group();group.name=spec.name;body.name='vehicle-body';group.add(body);
   const materials=new Map<THREE.Material,THREE.Material>();
   let paint!:THREE.MeshPhysicalMaterial,brake!:THREE.MeshStandardMaterial,headlamps!:THREE.MeshStandardMaterial;
@@ -125,7 +125,7 @@ function animateCar(group:THREE.Group,body:THREE.Group,wheels:THREE.Group[],dime
   const reverse=group.getObjectByName('reverse-lamp') as THREE.Mesh;
   return {group,body,wheels,dimensions,paint,brake,headlamps,flames,dispose,update(speed,steer,drift,boost,braking,time,acceleration=0,landing=0){
     const delta=previousTime?Math.max(0,Math.min(.1,time-previousTime)):1/60;previousTime=time;wheelAngle+=speed*delta/.38;wheels.forEach((w,i)=>{w.children[0].rotation.x=wheelAngle;if(i>=2)w.rotation.y=-steer*.26;});
-    const settle=1-Math.exp(-delta*9);body.rotation.z=THREE.MathUtils.lerp(body.rotation.z,-steer*Math.min(Math.abs(speed)/600,.045)-drift*.02,settle);body.rotation.x=THREE.MathUtils.lerp(body.rotation.x,THREE.MathUtils.clamp(acceleration*.001,-.035,.025),settle);body.position.y=THREE.MathUtils.lerp(body.position.y,-landing*.045,settle);brake.emissiveIntensity=braking&&speed>=0?6:2.4;
+    const settle=1-Math.exp(-delta*9);body.rotation.z=THREE.MathUtils.lerp(body.rotation.z,-steer*Math.min(Math.abs(speed)/600,.045)-drift*.02,settle);body.rotation.x=THREE.MathUtils.lerp(body.rotation.x,THREE.MathUtils.clamp(-acceleration*.001,-.035,.025),settle);body.position.y=THREE.MathUtils.lerp(body.position.y,-landing*.045,settle);brake.emissiveIntensity=braking&&speed>=0?6:2.4;
     if(reverse)(reverse.material as THREE.MeshStandardMaterial).emissiveIntensity=speed<-.1?5:0;
     flames.forEach((f,i)=>{f.visible=boost>0;f.scale.y=(.75+Math.sin(time*70+i)*.15)*(boost===2?1.65:1);(f.material as THREE.MeshBasicMaterial).color.set(i%2?'#ffffff':boost===2?'#b56bff':'#53c5ff');});
   }};

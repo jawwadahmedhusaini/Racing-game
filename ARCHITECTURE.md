@@ -2,7 +2,7 @@
 
 ## Boundaries
 - `src/main.ts`: lifecycle, scene selection, fixed-step scheduler, camera, UI actions, completion rewards and persistence. Only one simulation runs at a time.
-- `src/game/simulation.ts`: deterministic 60 Hz race logic. Independent of browser rendering. Six drivers, contact handling, AI inputs, finish and elimination rules.
+- `src/game/simulation.ts`: deterministic race logic with contact substeps at up to 1/120 second. Independent of browser rendering. Seven drivers, contact handling, AI inputs, finish and elimination rules.
 - `src/game/track.ts`: closed Catmull–Rom paths and arc-length lookup tables. The same path, width, direction, ramp and progress coordinates drive the rendered world and gameplay.
 - `src/game/car.ts`: loaded licensed model, material customization, static geometry batching, steering/rolling wheel groups, brake illumination, aero and boost exhausts.
 - `src/game/renderer.ts`: WebGL 2 renderer, local HDR environment, showroom, tone mapping, quality presets, MSAA, GTAO contact shading and bloom.
@@ -11,7 +11,7 @@
 - `src/game/vegetation.ts`: compact tree LOD loading and spatially culled instanced groves.
 - `src/game/effects.ts`: reusable particle pool and bounded skid-mark buffer.
 - `src/game/input.ts`: keyboard and pointer controls, pointer capture and input reset on focus loss.
-- `src/game/audio.ts`: gesture-activated Web Audio synthesis. No external audio sample dependencies.
+- `src/game/audio.ts`: gesture-activated Web Audio sample mixer with locally bundled files, synthesis fallback and bounded one-shot nodes.
 - `src/game/storage.ts`: versioned save schema, defensive parsing and economy transactions.
 - `src/ui/`: escaped-by-construction content, screen rendering, HUD, settings and dialogs. Saved strings are strictly validated before interpolation.
 
@@ -25,7 +25,7 @@ The renderer interpolates camera motion separately from the fixed-step simulatio
 
 ## Assets and lifetime
 
-Car Concept uses 106,391-triangle detailed / 30,534-triangle race GLBs. Original Solstice uses 65,844 / 24,436 triangles. The four source GLBs are parsed once; each prepared template batches static geometry by material, preserving separate wheel pivots. Textures from the asset are shared. Eight immutable prepared templates (four catalog cars × two detail levels) retain geometry and texture maps for the page lifetime; each instance clones its materials. Instance materials and race effects are disposed on restart/exit. Rear-surface fitting samples are cached by detail level. Each world is built once and cached. The garage is kept separate from race scenes. Live processes are not assumed to survive cloud environment publication.
+Car Concept uses 106,391-triangle detailed / 30,534-triangle race GLBs. Original Solstice uses 65,844 / 24,436 triangles. BMW M3 uses independent detailed/race meshes; the six source GLBs are parsed once; each prepared template batches static geometry by material, preserving separate wheel pivots. Textures from the asset are shared. Ten immutable prepared templates (five catalog cars × two detail levels) retain geometry and texture maps for the page lifetime; each instance clones its materials. Instance materials and race effects are disposed on restart/exit. Rear-surface fitting samples are cached by detail level. Each world is built once and cached. The garage is kept separate from race scenes. Live processes are not assumed to survive cloud environment publication.
 
 ## Persistence
 
@@ -78,3 +78,11 @@ Reverse uses signed velocity with a 0.35-second stationary brake dwell. AI braki
 Boost changes the available speed ceiling without clamping existing momentum on release. Car contact uses signed travel vectors and an inelastic normal impulse projected onto each drive direction; the simulation still has no independent lateral velocity or rigid-body suspension. Separation compensates heading for the change in road frame. Finish times interpolate the crossing within a fixed step, and eliminated drivers retain their finishing position.
 
 Race records now use `track-v4-mode`. Unversioned and v2/v3 records remain readable; garage progress is preserved. Menu Space activation is independent of driving shortcuts, and focused touch pedals accept Space/Enter hold and release. Dialogs preserve opener focus through nested settings/credits and include links in the Tab cycle.
+
+## 2.5 audio and contact
+
+`EngineVoice` derives RPM from shared gear state and ratios, with clutch slip near rest and free revs during jumps/audition. `engineLayers` uses constant-power adjacent-layer crossfades; playback-rate changes are smoothed. Twenty PCM engine loops and three metal effects share a decoded buffer cache. The graph has engine/effects/music buses, master fade and a compressor. There are at most three active sample voices (player plus two nearest opponents), five loops each, and twelve transient nodes. Replaced-bank loops fade/stop after 60 ms. All sample requests use the configured hosting base and a timeout; failure leaves a procedural fallback without blocking race preparation. No sound starts before a gesture. OfflineAudioContext tests measure the actual mixed waveform, stereo energy, clipping headroom and pause/mute tails.
+
+Each driver now has signed longitudinal and lateral velocity. Equal-mass planar contact impulses remove closing normal velocity; grip dissipates lateral recoil. Three separation passes and road constraints run after each bounded contact substep. Barriers remove inward normal velocity while mostly retaining tangential motion, with friction and impact severity. Impacts carry monotonically increasing event IDs so audio is event-driven rather than replayed on a timer. Small stationary overlaps remain silent. Airborne movement retains horizontal inertia and uses reduced steering; road height changes affect the relative flight height. Landings damp movement, trigger one sound/compression event and reward only clean, aligned jumps. This remains a road-coordinate arcade approximation, not a rigid-body/rollover solver.
+
+Airborne nitro applies separate arcade thrust while tire throttle/braking remain ineffective in flight; releasing boost retains momentum. A regression verifies that fuel consumed during a jump produces acceleration.

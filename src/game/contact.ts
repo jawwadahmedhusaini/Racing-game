@@ -1,20 +1,21 @@
 import type {Driver} from './simulation';
-export function footprint(driver:Driver){if(driver.spec.shape==='grandtourer')return {width:1.24,length:2.48};return {width:driver.spec.shape==='track'?1.24:driver.spec.shape==='flow'?1.14:1.19,length:driver.spec.shape==='flow'?2.6:2.3};}
-/** Inelastic normal impulse projected onto each car's signed drive direction.
- * The arcade controller has no independent sideways velocity; this is not a rigid-body solver.
+export function footprint(driver:Driver){if(driver.spec.id==='bmw-m3')return {width:1.1,length:2.48};if(driver.spec.shape==='grandtourer')return {width:1.24,length:2.48};return {width:driver.spec.shape==='track'?1.24:driver.spec.shape==='flow'?1.14:1.19,length:driver.spec.shape==='flow'?2.6:2.3};}
+export function velocity(d:Driver,turn=0){const h=d.heading+(d.speed>0?d.slipAngle:0)+turn;return {x:-Math.sin(h)*d.speed+Math.cos(h)*d.sideSpeed,z:Math.cos(h)*d.speed+Math.sin(h)*d.sideSpeed};}
+function impulse(d:Driver,x:number,z:number,turn=0){const h=d.heading+(d.speed>0?d.slipAngle:0)+turn;d.speed+=-Math.sin(h)*x+Math.cos(h)*z;d.sideSpeed+=Math.cos(h)*x+Math.sin(h)*z;}
+/** Equal-mass, inelastic planar impulse. Lateral recoil is dissipated by tire grip.
+ * This remains an arcade solver: no angular inertia, rollover or damage simulation.
  */
 export function resolveContactSpeed(a:Driver,b:Driver,normal:{x:number;z:number},roadTurn=0){
-  const length=Math.hypot(normal.x,normal.z);if(!length)return;
+  const length=Math.hypot(normal.x,normal.z);if(!length)return 0;
   const nx=normal.x/length,nz=normal.z/length;
-  const ap=-Math.sin(a.heading)*nx+Math.cos(a.heading)*nz;
-  const bp=-Math.sin(b.heading+roadTurn)*nx+Math.cos(b.heading+roadTurn)*nz;
-  const closing=a.speed*ap-b.speed*bp;
-  if(closing>=0)return;
-  const impulse=-closing/2;
-  a.speed+=impulse*ap;b.speed-=impulse*bp;
+  const av=velocity(a),bv=velocity(b,roadTurn),closing=(av.x-bv.x)*nx+(av.z-bv.z)*nz;
+  if(closing>=0)return 0;
+  const force=-closing/2;
+  impulse(a,force*nx,force*nz);impulse(b,-force*nx,-force*nz,roadTurn);
   // Rivals cannot engage reverse; player recoil retains its physical sign.
   if(a.id!==0)a.speed=Math.max(0,a.speed);
   if(b.id!==0)b.speed=Math.max(0,b.speed);
+  return -closing;
 }
 // Separating-axis test in the road's local right/forward frame. Race progress is
 // unwrapped; physical contact must wrap at the start line, including lapped cars.
