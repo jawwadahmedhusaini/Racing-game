@@ -130,12 +130,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4470,
+                  "duration": 4463,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:28:10.920Z",
+                  "startTime": "2026-10-26T15:11:11.005Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -164,12 +164,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 575,
+                  "duration": 578,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:28:15.617Z",
+                  "startTime": "2026-10-26T15:11:15.690Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -206,12 +206,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 30100,
+                  "duration": 26579,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:28:16.226Z",
+                  "startTime": "2026-10-26T15:11:16.297Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -240,12 +240,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 87112,
+                  "duration": 86268,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:28:46.334Z",
+                  "startTime": "2026-10-26T15:11:42.885Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -274,12 +274,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 75312,
+                  "duration": 77156,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:30:13.465Z",
+                  "startTime": "2026-10-26T15:13:09.179Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -308,12 +308,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 31793,
+                  "duration": 33987,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:31:28.794Z",
+                  "startTime": "2026-10-26T15:14:26.345Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -342,12 +342,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 41398,
+                  "duration": 39595,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:32:00.629Z",
+                  "startTime": "2026-10-26T15:15:00.351Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -376,12 +376,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 51697,
+                  "duration": 53348,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:32:42.065Z",
+                  "startTime": "2026-10-26T15:15:39.971Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -410,12 +410,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 127054,
+                  "duration": 128086,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:33:33.775Z",
+                  "startTime": "2026-10-26T15:16:33.346Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -444,12 +444,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 28429,
+                  "duration": 26702,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:35:40.849Z",
+                  "startTime": "2026-10-26T15:18:41.452Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -478,12 +478,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 41378,
+                  "duration": 41447,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:36:09.293Z",
+                  "startTime": "2026-10-26T15:19:08.171Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -512,12 +512,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 43593,
+                  "duration": 42720,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:36:50.714Z",
+                  "startTime": "2026-10-26T15:19:49.644Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -546,12 +546,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 28329,
+                  "duration": 28378,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:37:34.335Z",
+                  "startTime": "2026-10-26T15:20:32.385Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -580,12 +580,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 33850,
+                  "duration": 33917,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:38:02.679Z",
+                  "startTime": "2026-10-26T15:21:00.788Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -614,12 +614,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 76612,
+                  "duration": 76173,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:38:36.554Z",
+                  "startTime": "2026-10-26T15:21:34.743Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -648,12 +648,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 29695,
+                  "duration": 28847,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:39:53.186Z",
+                  "startTime": "2026-10-26T15:22:50.935Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -668,7 +668,7 @@
         },
         {
           "title": "BMW model, garage rev audition and sampled race audio work with saved selection",
-          "ok": true,
+          "ok": false,
           "tags": [],
           "tests": [
             {
@@ -681,18 +681,53 @@
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 74184,
-                  "errors": [],
+                  "status": "failed",
+                  "duration": 47669,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1500\u001b[39m\nReceived:   \u001b[31m950.0000000001172\u001b[39m\n\nCall Log:\n- Timeout 20000ms exceeded while waiting on the predicate",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1500\u001b[39m\nReceived:   \u001b[31m950.0000000001172\u001b[39m\n\nCall Log:\n- Timeout 20000ms exceeded while waiting on the predicate\n    at /workspace/Racing-game/tests/browser/game.spec.ts:210:136",
+                    "location": {
+                      "file": "/workspace/Racing-game/tests/browser/game.spec.ts",
+                      "column": 136,
+                      "line": 210
+                    },
+                    "snippet": "  208 |  for(const key of ['engine','effects'])await page.locator('#'+key).evaluate((input:HTMLInputElement)=>{input.value='.6';input.dispatchEvent(new Event('change',{bubbles:true}));});\n  209 |  await page.getByRole('button',{name:'Close settings'}).click();await page.getByRole('button',{name:'Rev selected car'}).click();\n> 210 |  await expect.poll(async()=>(await state(page)).audio.samples).toBe('ready');await expect.poll(async()=>(await state(page)).audio.rpm).toBeGreaterThan(1500);\n      |                                                                                                                                        ^\n  211 |  await page.screenshot({path:'artifacts/bmw-garage.png'});\n  212 |  await page.setViewportSize({width:390,height:844});await expect(page.getByRole('button',{name:'Rev selected car'})).toBeVisible();expect(await page.evaluate(()=>document.body.scrollWidth>innerWidth)).toBe(false);await page.screenshot({path:'artifacts/bmw-mobile.png'});\n  213 |  await page.setViewportSize({width:960,height:600});await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await raceReady(page);await advance(page,8,{throttle:1},true);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/workspace/Racing-game/tests/browser/game.spec.ts",
+                        "column": 136,
+                        "line": 210
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1500\u001b[39m\nReceived:   \u001b[31m950.0000000001172\u001b[39m\n\nCall Log:\n- Timeout 20000ms exceeded while waiting on the predicate\n\n  208 |  for(const key of ['engine','effects'])await page.locator('#'+key).evaluate((input:HTMLInputElement)=>{input.value='.6';input.dispatchEvent(new Event('change',{bubbles:true}));});\n  209 |  await page.getByRole('button',{name:'Close settings'}).click();await page.getByRole('button',{name:'Rev selected car'}).click();\n> 210 |  await expect.poll(async()=>(await state(page)).audio.samples).toBe('ready');await expect.poll(async()=>(await state(page)).audio.rpm).toBeGreaterThan(1500);\n      |                                                                                                                                        ^\n  211 |  await page.screenshot({path:'artifacts/bmw-garage.png'});\n  212 |  await page.setViewportSize({width:390,height:844});await expect(page.getByRole('button',{name:'Rev selected car'})).toBeVisible();expect(await page.evaluate(()=>document.body.scrollWidth>innerWidth)).toBe(false);await page.screenshot({path:'artifacts/bmw-mobile.png'});\n  213 |  await page.setViewportSize({width:960,height:600});await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await raceReady(page);await advance(page,8,{throttle:1},true);\n    at /workspace/Racing-game/tests/browser/game.spec.ts:210:136"
+                    }
+                  ],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-26T09:40:22.936Z",
+                  "startTime": "2026-10-26T15:23:19.791Z",
                   "annotations": [],
-                  "attachments": []
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/workspace/Racing-game/test-results/game-BMW-model-garage-rev--c1e75-o-work-with-saved-selection/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/workspace/Racing-game/test-results/game-BMW-model-garage-rev--c1e75-o-work-with-saved-selection/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/workspace/Racing-game/tests/browser/game.spec.ts",
+                    "column": 136,
+                    "line": 210
+                  }
                 }
               ],
-              "status": "expected"
+              "status": "unexpected"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-07f5caf16c0747570737",
@@ -701,15 +736,91 @@
           "column": 1
         }
       ]
+    },
+    {
+      "title": "ramp.spec.ts",
+      "file": "ramp.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "coast: full ramp-edge approach launches, lands and escapes raised-face contact",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 44403,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-26T15:24:08.170Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2b18674e25e7e9633274-58e3e12ec5b54cde35d3",
+          "file": "ramp.spec.ts",
+          "line": 4,
+          "column": 37
+        },
+        {
+          "title": "city: full ramp-edge approach launches, lands and escapes raised-face contact",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 37276,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-26T15:24:52.769Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2b18674e25e7e9633274-0073ab666661cf327beb",
+          "file": "ramp.spec.ts",
+          "line": 4,
+          "column": 37
+        }
+      ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-26T09:28:10.064Z",
-    "duration": 808085.852,
-    "expected": 17,
+    "startTime": "2026-10-26T15:11:10.206Z",
+    "duration": 860431.354,
+    "expected": 18,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 1,
     "flaky": 0
   }
 }

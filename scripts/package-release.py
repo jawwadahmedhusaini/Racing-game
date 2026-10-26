@@ -26,7 +26,7 @@ with ZipFile(root/'artifacts'/'apex-rush-source.zip','w',ZIP_DEFLATED,compressle
     for file in sorted(root.iterdir()):
         if file.is_file() and (file.suffix in ['.md','.json','.ts','.html'] or file.name=='.gitignore'):
             archive.write(file,Path('Racing-game')/file.name)
-    evidence = ['audio-render.json','engine-demo.wav','bmw-garage.png','bmw-mobile.png','bmw-race.png','sound-contact-review.json','audit-review.json','asset-intake.json','solstice-browser.json','startup-baseline.json','startup-review.json','unit-results.json','browser-results.json','dependency-audit.json','performance.json','production-smoke.json','hosting-smoke.json','visual-review.json',
+    evidence = ['browser-rerun.json','ramp-before.txt','ramp-review.json','ramp-coast-browser.json','ramp-city-browser.json','ramp-coast-climb.png','ramp-coast-jump.png','ramp-city-climb.png','ramp-city-jump.png','audio-render.json','engine-demo.wav','bmw-garage.png','bmw-mobile.png','bmw-race.png','sound-contact-review.json','audit-review.json','asset-intake.json','solstice-browser.json','startup-baseline.json','startup-review.json','unit-results.json','browser-results.json','dependency-audit.json','performance.json','production-smoke.json','hosting-smoke.json','visual-review.json',
                 'garage-final.png','spectre-final.png','stratos-final.png','solstice-final.png','solstice-rear.png','solstice-mobile.png','garage-final.jpg','ultra-garage.png','race-loading.png','reverse-driving.png','coast-grid.png','city-grid.png','coast-start.png','coast-final.png','city-final.png','mobile-garage.png','mobile-race.png','results.png','production-race.png']
     for name in evidence:
         file=root/'artifacts'/name

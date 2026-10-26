@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.5.1 — ramp edge and escape fixes (2026-10-26)
+
+- Fixed cars getting permanently stuck when straddling a ramp edge. Partial-width approaches now climb and launch.
+- Replaced whole-movement rollback with directional contact response, allowing forward/reverse escape and glancing slides along raised faces.
+- Constrained ramp contact after rival pushes; corrected direction-sensitive takeoff, landing impact and chassis slope orientation.
+- Added full approach, stop/restart, boost, reverse, traffic and browser regressions. See RAMP_FIXES.md and TEST_REPORT.md.
+
 ## 2.5.0 — sound, contact and BMW import (2026-10-26)
 
 - Added four licensed engine sample banks with RPM blending, load/shift response, garage rev previews, braking/tire feedback, metal impacts and stereo nearby opponents.

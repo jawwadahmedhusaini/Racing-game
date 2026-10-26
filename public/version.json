@@ -1,11 +1,11 @@
 {
-  "version": "2.5.0",
+  "version": "2.5.1",
   "date": "2026-10-26",
   "changes": [
-    "Layered sampled engines, garage/grid revving, braking, spatial rivals and impact audio",
-    "Imported CC0 BMW M3 community model with two detail levels and functional wheel/light rig",
-    "120 Hz contact substeps, lateral recoil and angle-sensitive barrier response",
-    "Airborne momentum, reduced air steering and clean-landing validation",
-    "Existing garage and circuits preserved; separate v5 handling records"
+    "Fixed ramp-edge trapping with footprint-based support",
+    "Raised-face contacts permit sliding and forward/reverse escape",
+    "Ramp constraints after traffic pushes; direction-sensitive lip crossing",
+    "Road-relative landing response and heading-correct chassis tilt",
+    "Existing cars, sound assets, progress and v5 records retained"
   ]
 }

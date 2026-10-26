@@ -4,7 +4,7 @@ A complete, independent single-player browser arcade racer: pick a car, choose a
 
 ## Play online or download
 
-[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.5.0](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
+[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.5.1](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
 
 [Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH-SOURCE.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
 
@@ -15,6 +15,10 @@ The online link requires the repository's GitHub Pages deployment to be enabled;
 Version **2.4.1** fixes sudden slowdown after boost, head-on/reverse contact response, close-finish timing, elimination standings and keyboard navigation. Older records remain saved; corrected handling uses separate v4 records. See [DEEP_AUDIT.md](DEEP_AUDIT.md) for reproduced defects, validation and remaining limits.
 
 ![APEX RUSH 2.4 garage](artifacts/garage-final.jpg)
+
+## Fixed in 2.5.1 — ramp edges
+
+Cars straddling the ramp now climb and jump without getting stuck. Raised-side and rear impacts preserve movement along/away from the obstacle, including reverse escape. Full approaches are covered for every car on both circuits. [Ramp fix details](RAMP_FIXES.md).
 
 ## New in 2.5 — sound and contact
 

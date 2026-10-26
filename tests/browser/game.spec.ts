@@ -206,8 +206,14 @@ test('BMW model, garage rev audition and sampled race audio work with saved sele
  await page.getByRole('button',{name:'View M3 GTR'}).click();await page.getByRole('button',{name:'UNLOCK · 2,200'}).click();
  await page.getByRole('button',{name:'Settings',exact:true}).click();
  for(const key of ['engine','effects'])await page.locator('#'+key).evaluate((input:HTMLInputElement)=>{input.value='.6';input.dispatchEvent(new Event('change',{bubbles:true}));});
- await page.getByRole('button',{name:'Close settings'}).click();await page.getByRole('button',{name:'Rev selected car'}).click();
- await expect.poll(async()=>(await state(page)).audio.samples).toBe('ready');await expect.poll(async()=>(await state(page)).audio.rpm).toBeGreaterThan(1500);
+ await page.getByRole('button',{name:'Close settings'}).click();
+ await expect.poll(async()=>(await state(page)).audio.samples).toBe('ready');
+ // Capture the short rev in-page. Sequential remote polls can miss the whole
+ // audition while software WebGL is rendering or samples are decoding.
+ await page.evaluate(()=>{const w=window as any;w.__revPeak=0;w.__observeRev=true;const sample=()=>{if(!w.__observeRev)return;w.__revPeak=Math.max(w.__revPeak,w.__apex.state().audio.rpm);requestAnimationFrame(sample);};requestAnimationFrame(sample);});
+ await page.getByRole('button',{name:'Rev selected car'}).click();
+ await expect.poll(()=>page.evaluate(()=>(window as any).__revPeak)).toBeGreaterThan(1500);
+ await page.evaluate(()=>(window as any).__observeRev=false);
  await page.screenshot({path:'artifacts/bmw-garage.png'});
  await page.setViewportSize({width:390,height:844});await expect(page.getByRole('button',{name:'Rev selected car'})).toBeVisible();expect(await page.evaluate(()=>document.body.scrollWidth>innerWidth)).toBe(false);await page.screenshot({path:'artifacts/bmw-mobile.png'});
  await page.setViewportSize({width:960,height:600});await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await raceReady(page);await advance(page,8,{throttle:1},true);
