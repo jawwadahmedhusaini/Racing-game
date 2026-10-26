@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-26T09:41:38.688Z",
+  "date": "2026-10-26T15:28:59.608Z",
   "production": true,
   "errors": [],
   "layouts": [
@@ -33,7 +33,7 @@
     }
   ],
   "failedRequests": [],
-  "version": "2.5.0",
+  "version": "2.5.1",
   "testApiAbsent": true,
   "solsticePurchased": true,
   "bmwAndAudioAssets": true,

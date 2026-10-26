@@ -1,5 +1,12 @@
 # APEX RUSH — release notes and known limits
 
+## 2.5.1 ramp regression fixes
+
+- Reproduced and fixed permanent ramp-edge deadlock: center-only support disagreed with full-footprint collision.
+- Replaced ramp rollback with normal separation/velocity response, allowing sliding and reverse escape.
+- Apply ramp constraints after rival contact; validate lip crossings by direction; align chassis tilt with heading and measure road-relative landing strength.
+- Baseline: 12 failing approach/escape reproductions. Current release results are in TEST_REPORT.md; detailed scope is in RAMP_FIXES.md.
+
 ## 2.5 sound/contact fixes
 
 - Two simple engine oscillators replaced by four credited sample banks, with RPM blending, throttle/overrun, shifting, tire/brake sounds, metal impacts and spatial rivals. Mixer output is tested for clipping and mute/pause tails.

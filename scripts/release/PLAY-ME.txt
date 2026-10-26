@@ -1,4 +1,4 @@
-APEX RUSH 2.5.0 — browser racing game
+APEX RUSH 2.5.1 — browser racing game
 
 1. Unzip the complete download.
 2. Install Python 3 if it is not already on your computer.
@@ -57,3 +57,6 @@ keyboard menu fixes. Garage progress is preserved; race records use v4 keys.
 2.5.0: sampled engine/impact audio, garage and starting-grid revs, BMW M3 community
 model (2,200 credits), improved car/barrier contact and jump momentum. Use HEAR THE
 ENGINE in the garage. Existing saves remain; handling records now use v5.
+
+2.5.1: fixes ramp-edge trapping, raised-face sliding/reverse escape, traffic pushes,
+       direction-sensitive takeoff, landing response and chassis slope orientation.

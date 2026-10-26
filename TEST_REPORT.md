@@ -1,35 +1,41 @@
-# APEX RUSH 2.5.0 — validation
+# APEX RUSH 2.5.1 — validation
 
 ## Current release gates
 
-- **129 unit tests passed**, no failures or skipped tests.
-- **17 Chromium browser workflows passed**, no failures, skips, retries or flaky outcomes; 13.5 minutes. Started 2026-10-26T09:28:10.064Z (UTC).
-- TypeScript and both root/Pages production builds passed before the full browser run; runtime files were frozen and fingerprinted throughout final validation.
-- Packaged Python launcher and `/Racing-game/` production smoke checks passed on 2.5.0; no unexpected page/console errors or failed HTTP responses; development test controls absent.
-- Seven separate Python asset-intake tests passed. Dependency audit reports zero vulnerabilities.
+- **170 unit tests passed**, no failures or skipped tests.
+- **19 distinct Chromium browser workflows verified**: the full run passed 18 of 19 (14.3 minutes); the remaining BMW workflow passed a targeted rerun after correcting its transient-rev observation. No runtime files changed between runs. Initial run started 2026-10-26T15:11:10.206Z (UTC). Both raw reports are retained.
+- TypeScript and root/Pages production builds passed; final runtime files were frozen and fingerprinted during release validation.
+- Packaged Python launcher and `/Racing-game/` production checks passed on 2.5.1; no unexpected page/console errors or failed HTTP responses. Development controls are absent from production.
+- Dependency audit reports zero vulnerabilities. No dependencies or external assets changed in this patch.
 
-## Sound waveform checks
+## Reproduced ramp defect
 
-The real Web Audio graph rendered seven eight-second OfflineAudioContext scenarios: V8 acceleration/shift/overrun, V12, engine-muted tire/brake/impact effects, master mute, pause, stereo rivals and a maximum-strength mix with repeated impacts/landings plus two opponents. The loudest measured sample was **0.916**, below the digital clipping threshold of 1.0. Muted output and settled paused driving output were zero; right-side rivals increased right-channel energy. Voice limits held at 15 steady-state engine sample layers and 12 transient nodes. A separate browser case aborts all sample requests and verifies the fallback engine/context stays usable.
+Before the fix, all ten full approaches (five cars on both tracks) stalled when the car's center was just left of the ramp. Forward and reverse attempts from an already wedged position also failed. These **12 failed baseline reproductions** are retained in `artifacts/ramp-before.txt`.
 
-Unit checks cover all four banks' adjacent-layer crossfades, finite pitch ratios, free revving/release, tire/brake input, airborne/rest silence and every distributed WAV hash/PCM header/loop seam. This is signal/behaviour validation, not subjective listening or proof of flagship sound. `artifacts/engine-demo.wav` is an actual render from the new graph.
+The earlier lip-only launch test and forced-speed slow test did not exercise this condition. New regressions drive the whole approach with normal throttle and steering inputs. The fix combines footprint-based support with normal separation and removal of inward velocity, preserving motion along or away from a raised ramp face.
 
-## Driving/contact coverage
+## New coverage
 
-New tests exercise glancing versus perpendicular wall hits, steering away, lateral momentum transfer without energy gain, already-separating bodies, high closing speed over a long supplied frame, silent stationary overlaps, airborne braking, single landing events, airborne nitro thrust, recovery and invalidating the clean bonus after an in-flight impact. Two older tests now create actual angled wall impacts instead of teleporting a parallel-facing car outside the wall and expecting arbitrary speed loss.
+**41 ramp regression cases** cover all cars and both tracks for edge approaches, stopping/restarting on the slope and outside-lane boost. They also cover glancing/perpendicular side hits without energy gain, forward/reverse escape, reversing down the slope, landing on top once, overhead clearance, traffic pushes, consistent 30/60/120 Hz callers and chassis tilt matching the surface at different headings.
 
-All previous simulation regressions still pass: manual steering, boost release/exhaustion, head-on/reverse contact, finish interpolation, elimination survival order, ramp surfaces/reverse support, drifting, six AI finishers on both tracks/all difficulties and save/reward handling. Ten deterministic 90-second mixed-input runs cover all five cars on both circuits with braking, reverse, steering, drift, nitro and recovery.
+Two new browser workflows reproduce the pictured approach on Costa Aurelia and Neon Harbor, capture climbing and airborne views, verify one landing and exercise side/rear escape. They use keyboard throttle/brake, with development-only positioning and steering/time advancement for repeatability. They do not claim a complete human driving session or use production progression cheats.
 
-## BMW and browser flows
+## Browser test correction
 
-Both BMW GLBs match their provenance hashes and have geometry within collision bounds, separate front/rear wheel pivots, fixed caliper attachments and triangle budgets. Geometry-only Node tests omit texture decoding; actual textured appearance, selection, purchase, garage audition, race audio, mobile layout and persisted selection are exercised in Chromium. Existing garage/career/rewards, touch/keyboard, pause/restart/resource reuse, second-tab protection, blocked storage/audio, asset failure/retry, actual context loss and load cancellation also pass.
+The initial BMW test waited for sample readiness and then polled the current RPM of a 2.5-second audition. Under software rendering, the audition could already have ended before that observation. The revised test waits for decoded samples first, then records the peak RPM inside the page while clicking the real rev button. The original >1,500 RPM assertion and the remaining purchase/race/persistence checks are retained. Only this affected workflow was rerun; the earlier passing workflows remain valid against the identical runtime fingerprint.
 
-Production checks use real W/Shift/S keys, render Ultra, exercise four layouts and load the additional BMW and sound files under the correct hosting base. Screenshot evidence is included in the source ZIP.
+## Existing regressions
 
-## Limits and historical evidence
+All prior checks still pass: manual steering, reverse, boost, drift, collisions, six AI finishers on both tracks/all difficulties, career rewards, elimination/finish order, purchases and persistent saves. Ten 90-second deterministic mixed-input runs cover all five cars on both circuits.
 
-Chromium on Linux uses ANGLE/SwiftShader software WebGL2. Real desktop/mobile GPU frame pacing, thermal behaviour, Safari/Firefox, listening quality and Windows/macOS launcher wrappers remain unverified. No new FPS/performance claim is made. `performance.json`, `startup-review.json`, `visual-review.json`, `solstice-browser.json` and `audit-review.json` retain their earlier release dates and are historical evidence.
+Browser coverage retains touch/keyboard controls, pause/restart/resource reuse, loading cancellation, second-tab protection, blocked storage/audio, missing assets and real WebGL context loss. BMW selection and garage/race audio still pass.
 
-The model is community art, engine banks are simulated-engine renders, and contact remains a planar arcade approximation. See [SOUND_AND_CONTACT.md](SOUND_AND_CONTACT.md). Existing saves and earlier times are retained; new handling records use v5. Archive CRC/SHA checks and public download verification are separate final delivery gates.
+Seven real OfflineAudioContext scenarios remain below clipping (maximum sample **0.916**), with mute/pause silence, stereo rivals, bounded voices and failed-download fallback. Production checks use real W/Shift/S keys, render Ultra, exercise four layouts and check hosted asset paths.
 
-Current raw results: `unit-results.json`, `browser-results.json`, `audio-render.json`, `production-smoke.json`, `hosting-smoke.json`, `dependency-audit.json`, `sound-contact-review.json` in `artifacts/`.
+## Scope and evidence
+
+This remains track-relative arcade physics with forgiving partial ramp support, constrained outer track boundaries and no independent-wheel suspension/full rigid-body solver. Chromium uses Linux software WebGL. Physical desktop/mobile GPU performance, thermals, Safari/Firefox and subjective sound/handling remain unverified. No new FPS or flagship-quality claim is made.
+
+Current evidence: `unit-results.json`, `browser-results.json`, `browser-rerun.json`, `ramp-review.json`, `ramp-coast-browser.json`, `ramp-city-browser.json`, ramp screenshots, `audio-render.json`, `production-smoke.json`, `hosting-smoke.json`, and `dependency-audit.json` under `artifacts/`. The source archive includes these files. Archive CRC/SHA and public-download checks are final delivery gates.
+
+`sound-contact-review.json` and older audit/performance/visual reports retain their previous release versions and dates. Existing progress and v5 records remain. See [RAMP_FIXES.md](RAMP_FIXES.md).

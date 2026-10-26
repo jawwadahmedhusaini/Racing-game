@@ -1,0 +1,26 @@
+{
+  "version": "2.5.1",
+  "date": "2026-10-26T15:31:25.070047+00:00",
+  "baselineVersion": "2.5.0",
+  "baselineFailedReproductions": 12,
+  "rampUnitCases": 41,
+  "unitPassed": 170,
+  "browserPassed": 19,
+  "initialBrowserPassed": 18,
+  "initialBrowserFailed": 1,
+  "targetedRerunPassed": 1,
+  "rerunReason": "Test measurement missed the brief garage rev; wait for decoded samples and capture peak RPM in-page. Runtime unchanged.",
+  "browserStarted": "2026-10-26T15:11:10.206Z",
+  "browserDurationMs": 860431.354,
+  "rampBrowserTracks": [
+    "coast",
+    "city"
+  ],
+  "mixedInputStressCases": 10,
+  "secondsPerStressCase": 90,
+  "maximumAudioPeak": 0.9157342314720154,
+  "productionPassed": true,
+  "hostingBasePassed": true,
+  "hardwarePerformanceVerified": false,
+  "passed": true
+}

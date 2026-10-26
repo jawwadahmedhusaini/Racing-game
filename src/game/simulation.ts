@@ -1,7 +1,7 @@
 import {CARS,type CarSpec,type RaceMode,type Difficulty} from './content';
 import {Track,angleDelta} from './track';
-import {contactOffset,footprint,resolveContactSpeed,velocity} from './contact';
-import {rampHeight,RAMP} from './ramp';
+import {contactOffset,footprint,resolveContactSpeed,resolveStaticContactSpeed,velocity} from './contact';
+import {rampSupport,rampContact,RAMP} from './ramp';
 import {planOpponent} from './opponents';
 import {shiftGear} from './engine-voice';
 
@@ -83,7 +83,7 @@ export class RaceSimulation {
       }
     }
     // Rival contact can push a car across the wall after its own integration.
-    for(const d of this.drivers)if(!d.eliminated&&d.finishTime===null)this.constrainToRoad(d,0);
+    for(const d of this.drivers)if(!d.eliminated&&d.finishTime===null){this.constrainRamp(d);this.constrainToRoad(d,0);}
     }
     if(this.mode==='elimination'&&this.elapsed>=this.nextElimination) {
       const active=this.ordered.filter(d=>!d.eliminated&&d.finishTime===null);
@@ -97,7 +97,7 @@ export class RaceSimulation {
     }
   }
   integrate(d:Driver,dt:number,c:Controls) {
-    const previousDistance=d.distance,previousLateral=d.lateral,previousLift=d.rampLift,previousSpeed=d.speed;
+    const previousDistance=d.distance,previousLift=d.rampLift,previousSpeed=d.speed;
     d.landingImpact=Math.max(0,d.landingImpact-dt*3);d.impact=Math.max(0,d.impact-dt*2);d.impactCooldown=Math.max(0,d.impactCooldown-dt);d.scrape=Math.max(0,d.scrape-dt*5);d.brakeInput=clamp(c.brake,0,1);
     const inAir=d.airborne>0||d.verticalSpeed>0;
     const sample=this.track.sample(d.distance),up=d.id===0?this.upgrade:0;
@@ -154,20 +154,15 @@ export class RaceSimulation {
     d.heading=angleDelta(0,d.heading-roadTurn);
     d.collision=Math.max(0,d.collision-dt);
     this.constrainToRoad(d,dt);
-    let floor=rampHeight(this.track,d.distance,d.lateral);
-    // Raised sides and the back of the wedge are solid. Its low leading edge is climbable.
-    const shape=footprint(d);let highestRamp=floor;
-    for(const x of [-shape.width,shape.width])for(const z of [-shape.length,shape.length])highestRamp=Math.max(highestRamp,rampHeight(this.track,d.distance+x*Math.sin(d.heading)+z*Math.cos(d.heading),d.lateral+x*Math.cos(d.heading)-z*Math.sin(d.heading)));
-    if(highestRamp>previousLift+d.airborne+.35+Math.abs(d.speed)*dt*RAMP.rise/RAMP.length){
-      d.distance=previousDistance;d.lateral=previousLateral;d.heading=angleDelta(0,d.heading+roadTurn);this.registerImpact(d,Math.abs(d.speed));d.speed*=.12;d.sideSpeed*=.3;d.boost=0;d.collision=.4;floor=rampHeight(this.track,d.distance,d.lateral);
-    }
+    this.constrainRamp(d,advance);
+    const floor=rampSupport(this.track,d,footprint(d));
     const lap=Math.floor(Math.max(0,d.distance)/this.track.length);
     if(d.airborne===0&&d.verticalSpeed===0){
       if(previousLift>floor+.03){
         d.airborne=previousLift;d.rampLift=0;
-        const lip=this.track.length*RAMP.fraction+RAMP.length,progress=((d.distance%this.track.length)+this.track.length)%this.track.length;
-        const launch=d.speed>25&&previousLift>1.05&&progress>=lip&&progress<lip+5&&d.lateral>=RAMP.left&&d.lateral<=RAMP.right;
-        d.verticalSpeed=launch?8+d.speed*.04+sample.tangent.y*d.speed:0;
+        const lip=this.track.length*RAMP.fraction+RAMP.length+lap*this.track.length,forward=velocity(d).z;
+        const launch=forward>25&&previousLift>1.05&&previousDistance<lip&&d.distance>=lip;
+        d.verticalSpeed=launch?8+forward*.04+sample.tangent.y*forward:0;
         if(launch&&d.lastRamp!==lap){d.lastRamp=lap;d.jumpTotal++;d.jumpRewardPending=true;d.jumpClean=true;if(d.id===0)this.event('AIR TIME');}
       }else d.rampLift=floor;
     }
@@ -175,7 +170,8 @@ export class RaceSimulation {
       if(inAir)d.airborne-=this.track.sample(d.distance).position.y-sample.position.y;
       d.verticalSpeed-=dt*15;d.airborne+=d.verticalSpeed*dt;
       if(d.airborne<=floor){
-        d.landingImpact=clamp(-d.verticalSpeed/18,0,1);d.landingSerial++;
+        const roadVerticalSpeed=(this.track.sample(d.distance).position.y-sample.position.y)/dt;
+        d.landingImpact=clamp((roadVerticalSpeed-d.verticalSpeed)/18,0,1);d.landingSerial++;
         d.speed*=1-d.landingImpact*.035;d.sideSpeed*=.45;d.airborne=0;d.verticalSpeed=0;d.rampLift=floor;
         if(d.jumpRewardPending){if(d.jumpClean&&Math.abs(d.heading)<.8&&d.impact<.3){d.nitro=Math.min(100,d.nitro+12);if(d.id===0)this.event('CLEAN LANDING · +12 NITRO');}else if(d.id===0)this.event('ROUGH LANDING · LINE UP YOUR APPROACH');d.jumpRewardPending=false;d.jumpClean=false;}
       }
@@ -189,6 +185,14 @@ export class RaceSimulation {
     // Project the full rotated car footprint, including the wider track aero package.
     const {width:halfWidth,length:halfLength}=footprint(d);
     return this.track.width/2-(Math.abs(Math.cos(d.heading))*halfWidth+Math.abs(Math.sin(d.heading))*halfLength)-.06;
+  }
+  constrainRamp(d:Driver,travel=0){
+    const contact=rampContact(this.track,d,footprint(d),d.rampLift+d.airborne,travel);
+    if(!contact)return;
+    const yaw=this.track.sample(d.distance).yaw,closing=resolveStaticContactSpeed(d,contact);
+    d.lateral+=contact.x;d.distance+=contact.z;
+    d.heading=angleDelta(0,d.heading-angleDelta(yaw,this.track.sample(d.distance).yaw));
+    if(closing>1){this.registerImpact(d,closing);d.collision=Math.max(d.collision,.12);if(closing>8)d.boost=0;}
   }
   registerImpact(d:Driver,closing:number){
     if(closing<1)return;
