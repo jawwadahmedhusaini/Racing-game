@@ -32,6 +32,8 @@ try {
   await page.getByRole('button',{name:'View SOLSTICE GT'}).click();
   await page.getByRole('button',{name:'UNLOCK · 2,500'}).click();
   report.solsticePurchased=true;
+  for(const file of ['assets/bmw-m3.glb','assets/bmw-m3-lod.glb','assets/audio/v8f-9.wav','licenses/audio.json','licenses/bmw-m3.json']){const response=await page.request.get(new URL(file,page.url()).href);expect(response.status()).toBe(200);}
+  report.bmwAndAudioAssets=true;
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.locator('#quality').selectOption('ultra');
   await page.getByRole('button', { name: 'Close settings' }).click();

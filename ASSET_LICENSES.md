@@ -56,8 +56,22 @@ Rajdhani and Inter are bundled locally through the pinned `@fontsource/rajdhani`
 
 ## Original project content
 
-The game code, UI, fictional names, track layouts, road/scenery meshes, shader effects, procedural textures, aero additions, mini-car illustrations, icons and synthesized audio were created for this project. Track preview images are screenshots captured from the running game. No Asphalt, Need for Speed, real manufacturer logos, ripped vehicle models or proprietary game assets are included.
+The game code, UI, fictional names, track layouts, road/scenery meshes, shader effects, procedural textures, aero additions, mini-car illustrations, icons and synthesized audio were created for this project. Track preview images are screenshots captured from the running game. No assets were extracted from Asphalt, Need for Speed or another proprietary racing game. The community BMW model is identified separately below; its model license does not imply manufacturer endorsement.
 
 ## Software
 
 Three.js, Vite, TypeScript, Vitest and Playwright retain their respective upstream licenses. Dependency versions are fixed in `package-lock.json`. See installed package license files for details.
+
+## BMW M3 community model — 2.5
+
+Model by **Neubi**, marked **CC Zero** in the original asset credit record; import/interior adaptation by **CryHam**. Original listing: https://www.blendswap.com/blends/view/19869. Source credit: https://github.com/stuntrally/blendfiles/blob/251bc67d5ff52ce535525e144a4a1304e3b2b5ef/cars/XZ/about.txt. The car and wheel Blend sources and associated Stunt Rally textures are individually hashed in `public/licenses/bmw-m3.json`; original credit text is preserved there. CC0 terms: https://creativecommons.org/publicdomain/zero/1.0/.
+
+APEX RUSH adaptations: normalized coordinates, game-ready PBR materials, existing interior/wheel textures, separately pivoted wheels and fixed calipers, lamps seated against the body, emissive existing rear-light faces, paint and two detail levels. `python3 scripts/fetch-bmw-source.py` downloads and verifies the pinned inputs; `scripts/prepare-bmw.py` reproduces the conversion in Blender 4.3.2 with automatic source scripts disabled. The manifest records exact source revisions and final mesh hashes/counts. This is an unofficial community vehicle, not a scan or manufacturer-approved recreation. BMW names/designs remain their owners' property; no endorsement, manufacturer licence, exact performance or authentic recording is implied.
+
+## Engine and metal sound samples — 2.5
+
+- **CryHam / Stunt Rally**: engine banks `v8f`, `v12d`, `b-v8`, `b-i6r`, **CC BY 4.0**. Rendered using **Engine Simulator 0.1.14** at steady RPM, then edited/equalized by CryHam. They are simulated-engine renders, not real-car field recordings.
+- **Halleck**, edited by **CryHam**: medium/heavy metal impacts and scraping, **CC BY 4.0**. Original Freesound author/source links are retained verbatim in `public/licenses/stunt-rally_crash.txt`.
+- Upstream sound attribution is retained in `public/licenses/stunt-rally_sounds.txt`. Immutable source revision: `fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8` of https://github.com/stuntrally/stuntrally3. `public/licenses/audio.json` gives individual original/adapted SHA-256 hashes and URLs. The CC BY 4.0 legal text is bundled and linked in-game.
+- Adaptations: mono 44.1 kHz PCM16, DC removal, normalized gain, shorter seamless loop beds; runtime equal-power RPM blending, pitch interpolation, load filtering and stereo mixing. Reproduce with `python3 scripts/prepare-audio.py` (ffmpeg and network access required only for preparation).
+- The original software repository's GPL is not used as a blanket licence for these assets. The separate asset-specific CC BY/CC0 credit records above are the basis for inclusion. No author endorsement is implied. Other unclear legacy VDrift sounds and restricted samples were not imported.

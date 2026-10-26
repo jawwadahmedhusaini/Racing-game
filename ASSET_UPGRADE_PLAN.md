@@ -1,5 +1,9 @@
 # Free asset upgrade — intake findings, 25 October 2026
 
+## 26 October update
+
+A different source is now usable: Stunt Rally's versioned asset repositories. Version 2.5 adds Neubi's CC0 BMW M3 community model with CryHam's adaptation, plus asset-specifically credited CC BY sound banks. See `public/licenses/bmw-m3.json`, `public/licenses/audio.json` and [SOUND_AND_CONTACT.md](SOUND_AND_CONTACT.md). All prior cars and circuits remain. Sketchfab, Poly Haven, Freesound and OpenGameArt remain blocked here; the earlier McLaren/Porsche/Ferrari/Mercedes/Aston Martin candidates are not claimed as imported. The older intake findings below remain an accurate record of their original review.
+
 ## Decision
 
 Keep all four existing garage choices, both circuits and saved progression. Add a new vehicle and environment only after they pass an actual asset review. A downloaded track scene is not automatically a race: importing it also requires a driveable surface, course definition, checkpoints, grid, barriers, AI and recovery validation.

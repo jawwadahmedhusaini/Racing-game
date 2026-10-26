@@ -1,65 +1,56 @@
-"""Generate the current patch validation report without relabeling historical benchmarks."""
+"""Generate the 2.5 release evidence after all current gates pass."""
 from pathlib import Path
 import json
 from datetime import datetime, timezone
-root = Path(__file__).resolve().parent.parent
-version = json.loads((root/'package.json').read_text())['version']
-def read(name):
-    return json.loads((root/f'artifacts/{name}.json').read_text())
-u = read('unit-results')
-browser = read('browser-results')
-b = browser['stats']
-assert u['success'] and u['numPassedTests'] == 105 and u['numFailedTests'] == u['numPendingTests'] == 0
-assert b['expected'] == 14 and b['unexpected'] == b['skipped'] == b['flaky'] == 0 and not browser.get('errors')
+root=Path(__file__).resolve().parent.parent
+version=json.loads((root/'package.json').read_text())['version']
+def read(name):return json.loads((root/f'artifacts/{name}.json').read_text())
+u=read('unit-results');browser=read('browser-results');b=browser['stats'];audio=read('audio-render')
+assert u['success'] and u['numPassedTests']>=127 and u['numFailedTests']==u['numPendingTests']==0
+assert b['expected']==17 and b['unexpected']==b['skipped']==b['flaky']==0 and not browser.get('errors')
+assert audio['passed'] and len(audio['results'])==7
+peak=max(r['peak'] for r in audio['results']);assert peak<.99
 for name in ['production-smoke','hosting-smoke']:
-    r = read(name)
-    assert r['version'] == version and r['passed'] and not r['errors'] and not r['failedRequests'], name
-assert read('dependency-audit')['metadata']['vulnerabilities']['total'] == 0
-for folder in ['dist','dist-pages']:
-    assert json.loads((root/folder/'version.json').read_text())['version'] == version
-baseline = read('performance')
-evidence = {
-    'version': version, 'date': datetime.now(timezone.utc).isoformat(),
-    'unitPassed': u['numPassedTests'], 'browserPassed': b['expected'],
-    'browserStarted': b['startTime'], 'browserDurationMs': b['duration'],
-    'reproducedBeforeFix': {'physicsAndStandingsTests': 6, 'keyboardWorkflow': 1},
-    'mixedInputStressCases': 8, 'secondsPerStressCase': 90,
-    'productionPassed': True, 'hostingBasePassed': True,
-    'historicalPerformanceVersion': baseline['version'], 'hardwarePerformanceVerified': False,
-    'passed': True,
-}
-(root/'artifacts/audit-review.json').write_text(json.dumps(evidence, indent=2)+'\n')
+ r=read(name);assert r['version']==version and r['passed'] and not r['errors'] and not r['failedRequests'],name
+assert read('dependency-audit')['metadata']['vulnerabilities']['total']==0
+for folder in ['dist','dist-pages']:assert json.loads((root/folder/'version.json').read_text())['version']==version
+bmw=json.loads((root/'public/licenses/bmw-m3.json').read_text());sounds=json.loads((root/'public/licenses/audio.json').read_text())
+evidence={'version':version,'date':datetime.now(timezone.utc).isoformat(),'unitPassed':u['numPassedTests'],'browserPassed':b['expected'],'browserStarted':b['startTime'],'browserDurationMs':b['duration'],'audioScenarios':len(audio['results']),'maximumAudioPeak':peak,'importedCar':'BMW M3 community model','carDetailTriangles':[a['triangles'] for a in bmw['assets']],'soundAssetBytes':sum(a['bytes'] for a in sounds['assets']),'sampleOrigin':'Engine Simulator renders by CryHam; metal recordings by Halleck, edited by CryHam. Not manufacturer engine recordings.','mixedInputStressCases':10,'secondsPerStressCase':90,'productionPassed':True,'hostingBasePassed':True,'hardwarePerformanceVerified':False,'humanListeningVerified':False,'passed':True}
+(root/'artifacts/sound-contact-review.json').write_text(json.dumps(evidence,indent=2)+'\n')
 (root/'TEST_REPORT.md').write_text(f'''# APEX RUSH {version} — validation
 
-## Current release checks
+## Current release gates
 
-- **{u['numPassedTests']} unit checks passed**, no failures or skipped tests.
-- **{b['expected']} Chromium browser workflows passed**, no failures, skips, retries or flaky outcomes; {b['duration']/60000:.1f} minutes. Run started {b['startTime']} (UTC).
-- TypeScript, root production build and `/Racing-game/` production build passed.
-- Packaged Python launcher smoke and Pages-base smoke passed on {version}, with zero unexpected page/console errors or HTTP failures; development test controls absent.
-- Dependency audit: zero reported vulnerabilities.
-- The separate Python asset-intake suite passed all seven checks; it does not validate driving physics.
+- **{u['numPassedTests']} unit tests passed**, no failures or skipped tests.
+- **{b['expected']} Chromium browser workflows passed**, no failures, skips, retries or flaky outcomes; {b['duration']/60000:.1f} minutes. Started {b['startTime']} (UTC).
+- TypeScript and both root/Pages production builds passed before the full browser run; runtime files were frozen and fingerprinted throughout final validation.
+- Packaged Python launcher and `/Racing-game/` production smoke checks passed on {version}; no unexpected page/console errors or failed HTTP responses; development test controls absent.
+- Seven separate Python asset-intake tests passed. Dependency audit reports zero vulnerabilities.
 
-## Defects reproduced and repaired
+## Sound waveform checks
 
-Six new regression cases failed before the fixes: nitro release/exhaustion speed discontinuities, head-on contact, reversing contact, same-step finish ranking and elimination survival order. They now pass. Eight additional stress cases cover every car on both tracks with deterministic mixed braking/reverse, steering, drift, boost and recovery for 90 simulated seconds per case. State stays finite, cars stay within road bounds, and altitude/nitro remain valid.
+The real Web Audio graph rendered seven eight-second OfflineAudioContext scenarios: V8 acceleration/shift/overrun, V12, engine-muted tire/brake/impact effects, master mute, pause, stereo rivals and a maximum-strength mix with repeated impacts/landings plus two opponents. The loudest measured sample was **{peak:.3f}**, below the digital clipping threshold of 1.0. Muted output and settled paused driving output were zero; right-side rivals increased right-channel energy. Voice limits held at 15 steady-state engine sample layers and 12 transient nodes. A separate browser case aborts all sample requests and verifies the fallback engine/context stays usable.
 
-A real browser test failed to open Settings with Space before the input fix. It now verifies native button activation, accessible dialog names, Tab access to credit links, focus restoration, Space/Enter holds on touch pedals and release on blur. All earlier browser workflows also ran against the corrected physics/input files. After the suite, a deprecated shadow enum was replaced by PCFShadowMap, the exact fallback already used by Three.js. Both builds and the packaged/Pages smokes were rerun after this one-line renderer cleanup; the packaged Ultra check rejects the old deprecation warning.
+Unit checks cover all four banks' adjacent-layer crossfades, finite pitch ratios, free revving/release, tire/brake input, airborne/rest silence and every distributed WAV hash/PCM header/loop seam. This is signal/behaviour validation, not subjective listening or proof of flagship sound. `artifacts/engine-demo.wav` is an actual render from the new graph.
 
-Existing coverage includes manual camera-relative steering; reverse; drift, boost, ramp surfaces and landing rewards; six AI rivals finishing both circuits on all three difficulties; save parsing/conflicts; purchases and upgrades; single reward crediting; repeated starts/resource counts; loading cancellation and duplicate starts; focus loss; multitouch; blocked storage; audio failure; asset failure/retry; actual graphics-context loss; and Solstice selection, paint, quality changes and persisted settings.
+## Driving/contact coverage
 
-## Production and visual checks
+New tests exercise glancing versus perpendicular wall hits, steering away, lateral momentum transfer without energy gain, already-separating bodies, high closing speed over a long supplied frame, silent stationary overlaps, airborne braking, single landing events, airborne nitro thrust, recovery and invalidating the clean bonus after an in-flight impact. Two older tests now create actual angled wall impacts instead of teleporting a parallel-facing car outside the wall and expecting arbitrary speed loss.
 
-The packaged build uses real W/Shift/S keys to verify acceleration, nitro, pause/resume and reverse. It purchases Solstice, renders Ultra and checks four layouts (1280×800, 1600×900, 844×390, 390×844). The Pages-base build loads both vehicle families, both previews, HDR, surfaces, vegetation and licence files, then starts and drives the city race. Screenshots are included in the source ZIP.
+All previous simulation regressions still pass: manual steering, boost release/exhaustion, head-on/reverse contact, finish interpolation, elimination survival order, ramp surfaces/reverse support, drifting, six AI finishers on both tracks/all difficulties and save/reward handling. Ten deterministic 90-second mixed-input runs cover all five cars on both circuits with braking, reverse, steering, drift, nitro and recovery.
 
-The full browser suite checks coastal terrain/scenery clearance and city scenery clearance. Geometry, textures and track layouts are unchanged. The only renderer change selects the supported shadow enum directly, preserving Three.js's prior fallback behaviour. The older `startup-review.json`, `visual-review.json`, `solstice-browser.json` and `performance.json` retain their 2.4 timestamps/results; they are historical evidence, not newly measured 2.4.1 benchmarks. No new hardware FPS or graphics-quality improvement is claimed.
+## BMW and browser flows
 
-## Scope and limits
+Both BMW GLBs match their provenance hashes and have geometry within collision bounds, separate front/rear wheel pivots, fixed caliper attachments and triangle budgets. Geometry-only Node tests omit texture decoding; actual textured appearance, selection, purchase, garage audition, race audio, mobile layout and persisted selection are exercised in Chromium. Existing garage/career/rewards, touch/keyboard, pause/restart/resource reuse, second-tab protection, blocked storage/audio, asset failure/retry, actual context loss and load cancellation also pass.
 
-Chromium on Linux uses ANGLE/SwiftShader software WebGL 2. Real desktop/mobile GPU performance, Android/iOS thermals, Safari/Firefox, subjective handling/audio and Windows/macOS launcher wrappers remain unverified. The published 2.4 software FPS results are below playable targets and do not predict hardware FPS.
+Production checks use real W/Shift/S keys, render Ultra, exercise four layouts and load the additional BMW and sound files under the correct hosting base. Screenshot evidence is included in the source ZIP.
 
-The physics remain a track-relative arcade model, not a swept rigid-body simulation. A complete game audit cannot prove the absence of defects. See [DEEP_AUDIT.md](DEEP_AUDIT.md) for findings and remaining weaknesses. Existing garage progress is retained, and prior race records remain stored separately from v4 handling records.
+## Limits and historical evidence
 
-Raw current results: `unit-results.json`, `browser-results.json`, `production-smoke.json`, `hosting-smoke.json`, `dependency-audit.json`, `audit-review.json` under `artifacts/`. Release archive CRC/hash and post-publication download checks are performed separately.
+Chromium on Linux uses ANGLE/SwiftShader software WebGL2. Real desktop/mobile GPU frame pacing, thermal behaviour, Safari/Firefox, listening quality and Windows/macOS launcher wrappers remain unverified. No new FPS/performance claim is made. `performance.json`, `startup-review.json`, `visual-review.json`, `solstice-browser.json` and `audit-review.json` retain their earlier release dates and are historical evidence.
+
+The model is community art, engine banks are simulated-engine renders, and contact remains a planar arcade approximation. See [SOUND_AND_CONTACT.md](SOUND_AND_CONTACT.md). Existing saves and earlier times are retained; new handling records use v5. Archive CRC/SHA checks and public download verification are separate final delivery gates.
+
+Current raw results: `unit-results.json`, `browser-results.json`, `audio-render.json`, `production-smoke.json`, `hosting-smoke.json`, `dependency-audit.json`, `sound-contact-review.json` in `artifacts/`.
 ''')
-print('Generated audit release report:', version, u['numPassedTests'], 'unit /', b['expected'], 'browser')
+print('Validated',version,u['numPassedTests'],'unit /',b['expected'],'browser; max audio peak',peak)

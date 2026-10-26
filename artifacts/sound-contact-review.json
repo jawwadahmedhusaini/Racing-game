@@ -1,0 +1,24 @@
+{
+  "version": "2.5.0",
+  "date": "2026-10-26T09:44:05.192894+00:00",
+  "unitPassed": 129,
+  "browserPassed": 17,
+  "browserStarted": "2026-10-26T09:28:10.064Z",
+  "browserDurationMs": 808085.852,
+  "audioScenarios": 7,
+  "maximumAudioPeak": 0.9157342314720154,
+  "importedCar": "BMW M3 community model",
+  "carDetailTriangles": [
+    31947,
+    20010
+  ],
+  "soundAssetBytes": 1690892,
+  "sampleOrigin": "Engine Simulator renders by CryHam; metal recordings by Halleck, edited by CryHam. Not manufacturer engine recordings.",
+  "mixedInputStressCases": 10,
+  "secondsPerStressCase": 90,
+  "productionPassed": true,
+  "hostingBasePassed": true,
+  "hardwarePerformanceVerified": false,
+  "humanListeningVerified": false,
+  "passed": true
+}

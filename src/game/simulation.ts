@@ -1,6 +1,6 @@
 import {CARS,type CarSpec,type RaceMode,type Difficulty} from './content';
 import {Track,angleDelta} from './track';
-import {contactOffset,footprint,resolveContactSpeed} from './contact';
+import {contactOffset,footprint,resolveContactSpeed,velocity} from './contact';
 import {rampHeight,RAMP} from './ramp';
 import {planOpponent} from './opponents';
 import {shiftGear} from './engine-voice';
@@ -8,8 +8,8 @@ import {shiftGear} from './engine-voice';
 export interface Controls {throttle:number; brake:number; steer:number; drift:boolean; nitro:boolean;}
 export const NO_INPUT:Controls={throttle:0,brake:0,steer:0,drift:false,nitro:false};
 export interface Driver {
-  id:number; name:string; spec:CarSpec; distance:number; lateral:number; speed:number; heading:number; yawVelocity:number;
-  nitro:number; boost:number; drift:number; driftTotal:number; airborne:number; verticalSpeed:number; rampLift:number; jumpRewardPending:boolean;
+  id:number; name:string; spec:CarSpec; distance:number; lateral:number; speed:number; heading:number; yawVelocity:number; sideSpeed:number; brakeInput:number; impact:number; impactSerial:number; impactCooldown:number; scrape:number; landingSerial:number;
+  nitro:number; boost:number; drift:number; driftTotal:number; airborne:number; verticalSpeed:number; rampLift:number; jumpRewardPending:boolean; jumpClean:boolean;
   finishTime:number|null; eliminated:boolean; eliminationPosition:number|null; collision:number; steer:number; lap:number;
   targetLane:number; lastRamp:number; boostCooldown:number; boostPrevious:boolean; jumpTotal:number; reverseHold:number; slipAngle:number; acceleration:number; landingImpact:number; throttle:number; gear:number;
 }
@@ -21,7 +21,7 @@ export class RaceSimulation {
   constructor(options:RaceOptions) {
     this.track=options.track;this.mode=options.mode;this.difficulty=options.difficulty;this.upgrade=options.upgrade;this.laps=options.laps??(options.mode==='time'?1:2);
     const names=['YOU','M. KOVA','J. SANTOS','R. WOLFF','A. RIVERA','K. MORI','L. COSTA'];
-    for(let i=0;i<(this.mode==='time'?1:7);i++)this.drivers.push({id:i,name:names[i],spec:i===0?options.car:CARS[(i-1)%CARS.length],distance:-Math.floor(i/2)*7,lateral:(i%2===0?-1:1)*3,speed:0,heading:0,yawVelocity:0,nitro:65,boost:0,drift:0,driftTotal:0,airborne:0,verticalSpeed:0,rampLift:0,jumpRewardPending:false,finishTime:null,eliminated:false,eliminationPosition:null,collision:0,steer:0,lap:1,targetLane:(i%2===0?-1:1)*3,lastRamp:-1,boostCooldown:0,boostPrevious:false,jumpTotal:0,reverseHold:0,slipAngle:0,acceleration:0,landingImpact:0,throttle:0,gear:1});
+    for(let i=0;i<(this.mode==='time'?1:7);i++)this.drivers.push({id:i,name:names[i],spec:i===0?options.car:CARS[(i-1)%CARS.length],distance:-Math.floor(i/2)*7,lateral:(i%2===0?-1:1)*3,speed:0,heading:0,yawVelocity:0,sideSpeed:0,brakeInput:0,impact:0,impactSerial:0,impactCooldown:0,scrape:0,landingSerial:0,nitro:65,boost:0,drift:0,driftTotal:0,airborne:0,verticalSpeed:0,rampLift:0,jumpRewardPending:false,jumpClean:false,finishTime:null,eliminated:false,eliminationPosition:null,collision:0,steer:0,lap:1,targetLane:(i%2===0?-1:1)*3,lastRamp:-1,boostCooldown:0,boostPrevious:false,jumpTotal:0,reverseHold:0,slipAngle:0,acceleration:0,landingImpact:0,throttle:0,gear:1});
     this.updateRank();
   }
   get player(){return this.drivers[0];}
@@ -50,6 +50,12 @@ export class RaceSimulation {
     return {throttle:targetSpeed<.5?0:d.speed<targetSpeed?1:.15,brake:d.speed>targetSpeed+1?.75:0,steer:this.steeringFor(d,d.targetLane),drift:false,nitro:d.nitro>35&&bend<.002&&d.speed>40&&(Math.sin(this.elapsed*.2+d.id)>0)};
   }
   step(dt:number,input:Controls) {
+    if(!Number.isFinite(dt)||dt<=0)return;
+    // Bound displacement per contact solve even when a caller supplies a long frame.
+    const duration=Math.min(dt,.2),steps=Math.ceil(duration*120);
+    for(let i=0;i<steps;i++)this.substep(duration/steps,input);
+  }
+  private substep(dt:number,input:Controls) {
     if(this.status==='finished')return;
     if(this.status==='countdown'){this.countdown-=dt;if(this.countdown<=0){this.status='racing';this.event('GO · OWN THE HORIZON');}return;}
     this.elapsed+=dt;this.eventTimer=Math.max(0,this.eventTimer-dt);
@@ -62,20 +68,23 @@ export class RaceSimulation {
       }
     }
     // Broadphase for seven cars: physical separation and speed exchange on close contact.
+    for(let pass=0;pass<3;pass++){
     for(let i=0;i<this.drivers.length;i++)for(let j=i+1;j<this.drivers.length;j++) {
       const a=this.drivers[i],b=this.drivers[j];if(a.eliminated||b.eliminated||a.finishTime!==null||b.finishTime!==null||Math.abs(a.airborne+a.rampLift-b.airborne-b.rampLift)>1)continue;
       const aYaw=this.track.sample(a.distance).yaw,bYaw=this.track.sample(b.distance).yaw,roadTurn=angleDelta(aYaw,bYaw);
       const contact=contactOffset(a,b,this.track.length,roadTurn);
       if(contact){
-        resolveContactSpeed(a,b,contact,roadTurn);
+        const closing=resolveContactSpeed(a,b,contact,roadTurn);
+        this.registerImpact(a,closing);this.registerImpact(b,closing);
         a.lateral+=contact.x;b.lateral-=contact.x;a.distance+=contact.z;b.distance-=contact.z;
         a.heading=angleDelta(0,a.heading-angleDelta(aYaw,this.track.sample(a.distance).yaw));
         b.heading=angleDelta(0,b.heading-angleDelta(bYaw,this.track.sample(b.distance).yaw));
-        a.collision=b.collision=.4;
+        if(closing>1)a.collision=b.collision=.25;
       }
     }
     // Rival contact can push a car across the wall after its own integration.
     for(const d of this.drivers)if(!d.eliminated&&d.finishTime===null)this.constrainToRoad(d,0);
+    }
     if(this.mode==='elimination'&&this.elapsed>=this.nextElimination) {
       const active=this.ordered.filter(d=>!d.eliminated&&d.finishTime===null);
       if(active.length>1){const last=active[active.length-1];last.eliminationPosition=this.drivers.filter(d=>!d.eliminated).length;last.eliminated=true;last.speed=0;last.boost=0;this.event(last.id===0?'ELIMINATED':`${last.name} ELIMINATED`);}
@@ -89,7 +98,8 @@ export class RaceSimulation {
   }
   integrate(d:Driver,dt:number,c:Controls) {
     const previousDistance=d.distance,previousLateral=d.lateral,previousLift=d.rampLift,previousSpeed=d.speed;
-    d.landingImpact=Math.max(0,d.landingImpact-dt*3);
+    d.landingImpact=Math.max(0,d.landingImpact-dt*3);d.impact=Math.max(0,d.impact-dt*2);d.impactCooldown=Math.max(0,d.impactCooldown-dt);d.scrape=Math.max(0,d.scrape-dt*5);d.brakeInput=clamp(c.brake,0,1);
+    const inAir=d.airborne>0||d.verticalSpeed>0;
     const sample=this.track.sample(d.distance),up=d.id===0?this.upgrade:0;
     const max=d.spec.topSpeed/3.6*(1+up*.024);
     const nitroRating=clamp(d.spec.nitro/90,.8,1.15);
@@ -114,7 +124,12 @@ export class RaceSimulation {
     // Opponents use the same brakes but cannot request reverse.
     const throttle=c.brake?0:c.throttle;d.throttle=throttle;
     if(c.brake&&d.id===0&&d.speed<=.05)d.reverseHold+=dt;else d.reverseHold=0;
-    if(d.speed<0){
+    if(inAir){
+      // Braking/traction cannot change horizontal momentum while the tires are airborne.
+      const thrust=(d.boost===2?16:d.boost?10:0)*nitroRating;
+      const ceiling=max+(d.boost===2?30:19)*nitroRating;
+      d.speed=Math.min(d.speed*Math.exp(-dt*.018)+dt*thrust,Math.max(d.speed,ceiling));
+    }else if(d.speed<0){
       if(throttle>0)d.speed=Math.min(0,d.speed+dt*39*throttle);
       else if(c.brake&&d.id===0)d.speed=Math.max(-10,d.speed-dt*8*c.brake);
       else d.speed=Math.min(0,d.speed+dt*(c.brake*39+5.2));
@@ -127,12 +142,13 @@ export class RaceSimulation {
     }
     // Integrate the car's own world heading. Curved road coordinates never steer it.
     // Positive control means physical right, which is negative world-Y yaw.
-    const desiredYaw=-steering*this.turnCapacity(d)*(drifting?1.17:1);
+    const desiredYaw=-steering*this.turnCapacity(d)*(inAir?.16:drifting?1.17:1);
     d.yawVelocity+=(desiredYaw-d.yawVelocity)*Math.min(1,dt*(d.airborne>.3?1.2:drifting?3.8:7.5));
     d.heading+=d.yawVelocity*dt;
     const slip=d.speed>0?d.slipAngle:0;
-    d.lateral-=Math.sin(d.heading+slip)*d.speed*dt;
-    const advance=d.speed*Math.cos(d.heading+slip)/Math.max(.5,1+sample.curvature*d.lateral)*dt;
+    d.sideSpeed*=Math.exp(-dt*(inAir?.1:6*grip));
+    d.lateral+=(-Math.sin(d.heading+slip)*d.speed+Math.cos(d.heading+slip)*d.sideSpeed)*dt;
+    const advance=(d.speed*Math.cos(d.heading+slip)+Math.sin(d.heading+slip)*d.sideSpeed)/Math.max(.5,1+sample.curvature*d.lateral)*dt;
     d.distance+=advance;
     const roadTurn=angleDelta(sample.yaw,this.track.sample(d.distance).yaw);
     d.heading=angleDelta(0,d.heading-roadTurn);
@@ -143,7 +159,7 @@ export class RaceSimulation {
     const shape=footprint(d);let highestRamp=floor;
     for(const x of [-shape.width,shape.width])for(const z of [-shape.length,shape.length])highestRamp=Math.max(highestRamp,rampHeight(this.track,d.distance+x*Math.sin(d.heading)+z*Math.cos(d.heading),d.lateral+x*Math.cos(d.heading)-z*Math.sin(d.heading)));
     if(highestRamp>previousLift+d.airborne+.35+Math.abs(d.speed)*dt*RAMP.rise/RAMP.length){
-      d.distance=previousDistance;d.lateral=previousLateral;d.heading=angleDelta(0,d.heading+roadTurn);d.speed*=.35;d.boost=0;d.collision=.4;floor=rampHeight(this.track,d.distance,d.lateral);
+      d.distance=previousDistance;d.lateral=previousLateral;d.heading=angleDelta(0,d.heading+roadTurn);this.registerImpact(d,Math.abs(d.speed));d.speed*=.12;d.sideSpeed*=.3;d.boost=0;d.collision=.4;floor=rampHeight(this.track,d.distance,d.lateral);
     }
     const lap=Math.floor(Math.max(0,d.distance)/this.track.length);
     if(d.airborne===0&&d.verticalSpeed===0){
@@ -151,15 +167,17 @@ export class RaceSimulation {
         d.airborne=previousLift;d.rampLift=0;
         const lip=this.track.length*RAMP.fraction+RAMP.length,progress=((d.distance%this.track.length)+this.track.length)%this.track.length;
         const launch=d.speed>25&&previousLift>1.05&&progress>=lip&&progress<lip+5&&d.lateral>=RAMP.left&&d.lateral<=RAMP.right;
-        d.verticalSpeed=launch?8+d.speed*.04:0;
-        if(launch&&d.lastRamp!==lap){d.lastRamp=lap;d.jumpTotal++;d.jumpRewardPending=true;if(d.id===0)this.event('AIR TIME');}
+        d.verticalSpeed=launch?8+d.speed*.04+sample.tangent.y*d.speed:0;
+        if(launch&&d.lastRamp!==lap){d.lastRamp=lap;d.jumpTotal++;d.jumpRewardPending=true;d.jumpClean=true;if(d.id===0)this.event('AIR TIME');}
       }else d.rampLift=floor;
     }
     if(d.airborne>0||d.verticalSpeed>0){
+      if(inAir)d.airborne-=this.track.sample(d.distance).position.y-sample.position.y;
       d.verticalSpeed-=dt*15;d.airborne+=d.verticalSpeed*dt;
       if(d.airborne<=floor){
-        d.landingImpact=clamp(-d.verticalSpeed/18,0,1);d.airborne=0;d.verticalSpeed=0;d.rampLift=floor;
-        if(d.jumpRewardPending){d.nitro=Math.min(100,d.nitro+12);if(d.id===0)this.event('CLEAN LANDING · +12 NITRO');d.jumpRewardPending=false;}
+        d.landingImpact=clamp(-d.verticalSpeed/18,0,1);d.landingSerial++;
+        d.speed*=1-d.landingImpact*.035;d.sideSpeed*=.45;d.airborne=0;d.verticalSpeed=0;d.rampLift=floor;
+        if(d.jumpRewardPending){if(d.jumpClean&&Math.abs(d.heading)<.8&&d.impact<.3){d.nitro=Math.min(100,d.nitro+12);if(d.id===0)this.event('CLEAN LANDING · +12 NITRO');}else if(d.id===0)this.event('ROUGH LANDING · LINE UP YOUR APPROACH');d.jumpRewardPending=false;d.jumpClean=false;}
       }
     }
     if(lap+1>d.lap&&lap<this.laps&&d.id===0)this.event(lap+1===this.laps?'FINAL LAP':`LAP ${lap+1}`);
@@ -172,15 +190,30 @@ export class RaceSimulation {
     const {width:halfWidth,length:halfLength}=footprint(d);
     return this.track.width/2-(Math.abs(Math.cos(d.heading))*halfWidth+Math.abs(Math.sin(d.heading))*halfLength)-.06;
   }
+  registerImpact(d:Driver,closing:number){
+    if(closing<1)return;
+    if(d.airborne>0&&closing>3)d.jumpClean=false;
+    d.impact=Math.max(d.impact,clamp(closing/38,0,1));
+    if(d.impactCooldown===0){d.impactSerial++;d.impactCooldown=.14;}
+  }
   constrainToRoad(d:Driver,dt:number){
     const bound=this.roadClearance(d);
     if(Math.abs(d.lateral)>bound){
+      const side=Math.sign(d.lateral),v=velocity(d),closing=Math.max(0,v.x*side);
       d.lateral=clamp(d.lateral,-bound,bound);
-      if(d.collision<=0){d.speed*=.48;d.collision=.7;if(d.id===0)this.event('BARRIER CONTACT · STEER AWAY OR RECOVER');}
-      d.speed=Math.sign(d.speed)*Math.max(0,Math.abs(d.speed)-dt*38);
+      if(closing>0){
+        // Remove inward velocity, retain tangential motion: scrapes no longer halve speed.
+        this.registerImpact(d,closing);
+        const friction=Math.max(.92,1-closing*.002),z=v.z*friction;
+        const h=d.heading+(d.speed>0?d.slipAngle:0);d.speed=Math.cos(h)*z;d.sideSpeed=Math.sin(h)*z;
+        d.yawVelocity*=.5;
+        if(closing>8){d.boost=0;if(d.collision===0&&d.id===0)this.event('BARRIER CONTACT · STEER AWAY OR RECOVER');}
+      }
+      d.speed*=Math.exp(-dt*.6);d.sideSpeed*=Math.exp(-dt*.6);
+      d.scrape=Math.min(1,Math.abs(v.z)/55);d.collision=Math.max(d.collision,.12);
     }
   }
-  recover(){if(this.status==='finished')return;this.player.lateral=0;this.player.heading=0;this.player.yawVelocity=0;this.player.speed=clamp(this.player.speed,0,25);this.player.reverseHold=0;this.player.slipAngle=0;this.player.drift=0;this.player.acceleration=0;this.player.landingImpact=0;this.player.airborne=0;this.player.verticalSpeed=0;this.player.rampLift=0;this.player.jumpRewardPending=false;this.event('BACK ON TRACK');}
+  recover(){if(this.status==='finished')return;this.player.lateral=0;this.player.heading=0;this.player.yawVelocity=0;this.player.sideSpeed=0;this.player.impact=0;this.player.scrape=0;this.player.collision=0;this.player.speed=clamp(this.player.speed,0,25);this.player.reverseHold=0;this.player.slipAngle=0;this.player.drift=0;this.player.acceleration=0;this.player.landingImpact=0;this.player.airborne=0;this.player.verticalSpeed=0;this.player.rampLift=0;this.player.jumpRewardPending=false;this.player.jumpClean=false;this.event('BACK ON TRACK');}
 }
 export function clamp(value:number,min:number,max:number){return Math.max(min,Math.min(max,value));}
 export function formatTime(seconds:number){const mins=Math.floor(seconds/60),secs=Math.floor(seconds%60),ms=Math.floor(seconds%1*100);return `${mins}:${String(secs).padStart(2,'0')}.${String(ms).padStart(2,'0')}`;}

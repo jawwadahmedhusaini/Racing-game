@@ -1,14 +1,22 @@
 # APEX RUSH — release notes and known limits
 
+## 2.5 sound/contact fixes
+
+- Two simple engine oscillators replaced by four credited sample banks, with RPM blending, throttle/overrun, shifting, tire/brake sounds, metal impacts and spatial rivals. Mixer output is tested for clipping and mute/pause tails.
+- Light scrapes no longer receive the same speed penalty as perpendicular hits. Planar impulses include lateral recoil and drift travel direction; bounded substeps prevent the tested high-speed pass-through.
+- Braking no longer stops horizontal momentum in flight; touchdown generates a single event and rough landings do not earn the clean bonus.
+- BMW source axes, wheel locations, light placement and mobile audition layout were corrected during asset validation. The imported model remains community-quality art.
+- Saves retain existing cars/records and add BMW selection plus separate v5 times.
+
 ## Resolved during validation
 
 | Issue | Resolution / evidence |
+| --- | --- |
 | Releasing or exhausting boost instantly removed excess speed | Preserve momentum and let engine drag/coasting reduce speed. Regression checks both release and exhaustion. |
 | Head-on and reversing cars retained inappropriate closing speed | Project a normal contact impulse onto signed travel directions; preserve world yaw after separation. |
 | Same-step finish ties preferred driver array order | Interpolate finish crossing time within the fixed step and sort by finish time. |
 | Eliminated cars were ranked by distance rather than survival order | Store the position at elimination and use it in standings. |
 | Space could not activate menu buttons; credit links were trapped outside keyboard navigation | Preserve native activation, support hold controls with Space/Enter, include links in focus trapping, label dialogs and restore their opener focus. |
-| --- | --- |
 | Opponents queued indefinitely behind a stopped car | Evaluate clear lateral escape paths and avoid creeping into a zero target speed. Six-rival full-race regressions cover both circuits and all difficulty levels. |
 | A rival hit the raised ramp side and stalled | Plan a clear line before the ramp; preserve physical ramp collision. Full-race idle-player regression catches permanent stalls. |
 | Immediate lane return cut back toward the overtaken vehicle | Hold the committed passing lane until the other car is behind, including across the lap seam. |
@@ -71,9 +79,9 @@
 - Hardware performance is unmeasured. SwiftShader in this cloud machine runs much slower than a usable gaming frame rate. Use hardware acceleration and start at Low/Medium on slower devices; validate actual target devices before any FPS guarantee.
 - Extremely slow rendering deliberately slows simulation rather than integrating large unstable physics steps.
 - Chrome/Chromium desktop and emulated touch have been exercised. Real Android/iOS, Safari, Firefox, gamepads and assistive-technology gameplay need separate testing.
-- Four garage choices use two underlying designs: three Car Concept variants and original Solstice GT. There are two tracks and four career events. A professional 8–12-car collection remains outstanding.
+- Five garage choices use three underlying designs: three Car Concept variants, original Solstice GT and the imported BMW M3 community model. There are two tracks and four career events. A professional 8–12-car collection remains outstanding.
 - Steering controls world heading manually. Road boundaries still constrain the arcade simulation. There is no off-road free roaming, rigid-body vehicle damage, barrel-roll stunt system or multiplayer.
-- Audio is synthesized. Automated tests verify the application path without exceptions, not subjective audio quality on speakers/headphones.
+- Engine Simulator sample banks and recorded metal effects are combined with synthesized tire/wind/boost detail. Automated tests verify rendered waveforms, mute/pause, stereo response and node bounds; subjective quality on speakers/headphones remains unverified.
 - Saves are local to the browser and origin. Clearing data removes progress; private browsing or blocked storage may prevent persistence. The game reports failed save writes.
 - Graphics-context loss pauses and asks for a reload. Automatic renderer reconstruction is not implemented.
 - Static hosting supports a configured subdirectory base; `npm run build:pages` targets `/Racing-game/`. GitHub Pages activation still requires the repository owner's settings change.

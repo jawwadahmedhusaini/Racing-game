@@ -28,7 +28,7 @@ export function planOpponent(driver:Driver,drivers:Driver[],track:Track){
     }));
     safe.sort((a,b)=>(Math.abs(a-driver.targetLane)*1.2+Math.abs(a-ideal)*.3)-(Math.abs(b-driver.targetLane)*1.2+Math.abs(b-ideal)*.3));
     lane=safe[0]??driver.lateral;
-    if(gap<17||!safe.length)speedLimit=Math.max(0,lead.speed)+Math.max(0,gap-6)*1.25+(safe.length?4:0);
+    if(gap<17||!safe.length)speedLimit=Math.max(0,lead.speed)+Math.max(0,gap-6)*1.25+(safe.length?1.5:0);
   }
   return {lane:clamp(lane,-5,5),speedLimit,bend};
 }

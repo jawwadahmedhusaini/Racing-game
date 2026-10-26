@@ -9,6 +9,7 @@ export const CARS: CarSpec[] = [
   { id: 'spectre', name: 'SPECTRE S', maker: 'NOVARA', class: 'S', tagline: 'A long nose. A low horizon.', color: '#b8dce0', topSpeed: 356, acceleration: 93, handling: 83, nitro: 94, price: 6000, shape: 'flow' },
   { id: 'stratos', name: 'STRATOS R', maker: 'KAIROS', class: 'S', tagline: 'Wide stance. Built for the apex.', color: '#e7f069', topSpeed: 338, acceleration: 96, handling: 98, nitro: 88, price: 10000, shape: 'track' },
   { id: 'solstice', name: 'SOLSTICE GT', maker: 'VELORA', class: 'A', tagline: 'Long bonnet. Open horizon.', color: '#287c86', topSpeed: 328, acceleration: 90, handling: 94, nitro: 87, price: 2500, shape: 'grandtourer' },
+  { id: 'bmw-m3', name: 'M3 GTR', maker: 'BMW', class: 'A', tagline: 'A community-built touring racer. V8 character.', color: '#a8bdce', topSpeed: 312, acceleration: 87, handling: 96, nitro: 85, price: 2200, shape: 'grandtourer' },
 ];
 
 export const PAINTS = ['#ff552b', '#b8dce0', '#e7f069', '#f2f1eb', '#7672e8', '#263645'];

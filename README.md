@@ -4,17 +4,24 @@ A complete, independent single-player browser arcade racer: pick a car, choose a
 
 ## Play online or download
 
-[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.4.1](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
+[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.5.0](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
 
 [Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH-SOURCE.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
 
-The next free-asset upgrade is tracked in [ASSET_UPGRADE_PLAN.md](ASSET_UPGRADE_PLAN.md), including verified candidate findings, blocked downloads and the offline GLB inspection command. The asset upgrade remains pending candidate files; 2.4.1 improves the existing game independently.
+The next free-asset upgrade is tracked in [ASSET_UPGRADE_PLAN.md](ASSET_UPGRADE_PLAN.md), including verified candidate findings, blocked downloads and the offline GLB inspection command. Version 2.5 imports a CC0 BMW M3 community model and credited CC BY engine/impact samples from Stunt Rally. The other shortlisted manufacturer models still need usable source archives and licensing evidence.
 
 The online link requires the repository's GitHub Pages deployment to be enabled; see [HOSTING.md](HOSTING.md). If your browser still shows the previous build, refresh the page. Version 2.4 adds the independently authored **Solstice GT** (2,500 credits), six AI opponents, traffic-aware passing, controlled drift recovery, acceleration/landing camera response, a reduced-motion option, circuit braking references and event dressing. Engine firing profiles now vary by car and gears use hysteresis. Credits, cars, paints and upgrades carry forward; new race records are separate from prior handling versions.
 
 Version **2.4.1** fixes sudden slowdown after boost, head-on/reverse contact response, close-finish timing, elimination standings and keyboard navigation. Older records remain saved; corrected handling uses separate v4 records. See [DEEP_AUDIT.md](DEEP_AUDIT.md) for reproduced defects, validation and remaining limits.
 
 ![APEX RUSH 2.4 garage](artifacts/garage-final.jpg)
+
+## New in 2.5 — sound and contact
+
+- Four sampled engine characters (V8, V12, inline-six and touring V8), five RPM layers per bank, load-sensitive filtering, shifts, overrun, tire/brake feedback, metal impacts, barrier scrape and landing sounds. Two nearby rivals use stereo placement and bounded Doppler. **Hear the engine** in the garage auditions the viewed car.
+- **BMW M3 GTR community model** by Neubi, adapted by CryHam and APEX RUSH: 2,200 credits, independent body/interior and wheel geometry, functional lights, paint and race LOD. No manufacturer endorsement, exact specifications or authentic BMW recording is claimed.
+- 120 Hz contact substeps, lateral collision recoil, angle-sensitive barrier response, tire grip recovery, reduced air steering and preserved horizontal jump momentum. Airborne braking cannot stop the car. Wall strikes invalidate clean-landing rewards.
+- Existing cars, circuits and progression remain; revised handling uses v5 records. [Sound and collision release notes](SOUND_AND_CONTACT.md) explain the implementation and remaining limits.
 
 ## Play and develop
 
@@ -42,7 +49,7 @@ The complete static game is in `dist/`. Serve the contents of that directory wit
 
 ## Included
 
-- Reflective 3D garage with an original long-bonnet grand tourer and three tuned concept-car variants, six paint finishes, unlocks and three upgrade levels.
+- Reflective 3D garage with an imported BMW M3 community model, an original long-bonnet grand tourer and three tuned concept-car variants, six paint finishes, unlocks and three upgrade levels.
 - A professionally authored, licensed car chassis with a modeled cockpit, treaded tires, animated wheels, lights and original aero packages.
 - Costa Aurelia: a coastal circuit with elevation, bridges, palms, ridged terrain and textured hills, 3D vegetation, ocean shading and a captured coastal reflection environment.
 - Neon Harbor: a waterfront city circuit with three facade families, stepped towers, recessed lit rooms, streetlights, headlights and damp asphalt.
@@ -53,7 +60,7 @@ The complete static game is in `dist/`. Serve the contents of that directory wit
 - Fixed-step arcade dynamics with manual heading-based steering, braking, reverse, drift slip and gradual grip recovery, nitro, shockwave, contact, jumps and recovery.
 - Live rivals with speed planning, lane choice, overtaking, boost and collision responses.
 - Countdown, lap progress, minimap, position, speed, timer, results, rewards and replay.
-- Synthesized engine, tire, wind, boost, collision, countdown and background music.
+- Locally bundled sampled engine/metal-impact banks, synthesized tire/wind/boost detail, countdown and background music.
 - Keyboard and touch input, pause/resume, three chase-camera distances, a reduced-motion setting, quality presets and audio controls.
 - Validated browser-local progress, settings, best times and purchases.
 
@@ -92,7 +99,7 @@ After building, run `python3 scripts/package-release.py` to produce the browser 
 
 ## Scope
 
-This release provides the complete single-player play loop. Reflection probes are captured once per scene; they do not update with moving cars or provide ray tracing. Vanta, Spectre and Stratos derive from a licensed concept chassis. Solstice is separately authored original geometry with a long bonnet, rearward cabin, its own lights and wheel assemblies; its detailed and race meshes contain 65,844 and 24,436 triangles. The garage has four choices across two underlying vehicle designs, not an 8–12-car premium collection. Spectre has a longer front body and rearward cabin; Stratos has wider fenders and a lower cabin. The authored body and glass normals follow these surface changes, while wheel assemblies remain rigid. Aero, performance and progression also differ. No manufacturer vehicles or badges are represented. The physics use a track-relative coordinate system with a manually controlled world heading. Forward input does not auto-steer; only rivals use a course-following controller. This is an arcade model with barriers, not a full rigid-body simulator. Multiplayer, branded car collections, photorealistic crash deformation, barrel-roll stunts, a large licensed soundtrack and a major-studio-sized career are not implemented.
+This release provides the complete single-player play loop. Reflection probes are captured once per scene; they do not update with moving cars or provide ray tracing. Vanta, Spectre and Stratos derive from a licensed concept chassis. Solstice is separately authored original geometry with a long bonnet, rearward cabin, its own lights and wheel assemblies; its detailed and race meshes contain 65,844 and 24,436 triangles. The garage has five choices across three underlying vehicle designs, including the newly imported BMW M3 community model. Spectre has a longer front body and rearward cabin; Stratos has wider fenders and a lower cabin. The authored body and glass normals follow these surface changes, while wheel assemblies remain rigid. Aero, performance and progression also differ. The BMW is an unofficial community recreation; the other four cars are fictional designs. The physics use a track-relative coordinate system with a manually controlled world heading. Forward input does not auto-steer; only rivals use a course-following controller. This is an arcade model with barriers, not a full rigid-body simulator. Multiplayer, branded car collections, photorealistic crash deformation, barrel-roll stunts, a large licensed soundtrack and a major-studio-sized career are not implemented.
 
 ## Tuning for your device
 
