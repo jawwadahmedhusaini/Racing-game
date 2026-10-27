@@ -1,5 +1,12 @@
 # APEX RUSH — release notes and known limits
 
+## 2.5.2 collision fixes
+
+- Reproduced unchanged body heading during wall contact, fuel spent boosting against a wall, and residual lateral motion after finishing (22 baseline failures).
+- Added planar angular contact response, full-normal wall friction, momentum-preserving impact rotation and near-flush contact stabilization.
+- Corrected HUD/camera lateral speed, recovery/finish spin cleanup, boost gating and speed-dependent AI traffic braking.
+- Kept the prior ramp suite. Current verification is in TEST_REPORT.md and COLLISION_FIXES.md.
+
 ## 2.5.1 ramp regression fixes
 
 - Reproduced and fixed permanent ramp-edge deadlock: center-only support disagreed with full-footprint collision.

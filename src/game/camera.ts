@@ -1,3 +1,4 @@
+import {groundSpeed} from './contact';
 import {MathUtils,PerspectiveCamera,Vector3} from 'three';
 import type {Track} from './track';
 import type {Driver} from './simulation';
@@ -10,7 +11,7 @@ export class RaceCamera {
   update(camera:PerspectiveCamera,track:Track,driver:Driver,position:Vector3,dt:number,time:number,mode:number,moving:boolean,reducedMotion=false){
     dt=MathUtils.clamp(dt,0,.1);
     const blend=(rate:number)=>1-Math.exp(-rate*dt),s=track.sample(driver.distance);
-    const yaw=s.yaw+driver.heading,speed=Math.abs(driver.speed),reverse=driver.speed<-.1;
+    const yaw=s.yaw+driver.heading,speed=groundSpeed(driver),reverse=driver.speed<-.1;
     const heading=new Vector3(Math.sin(yaw),s.tangent.y,Math.cos(yaw)).normalize();
     const reset=!this.initialized||position.distanceToSquared(this.lastPosition)>2500;
     if(reset)this.forward.copy(heading);else if(moving)this.forward.lerp(heading,blend(reverse?10:Math.abs(driver.drift)>.1?4.5:8)).normalize();

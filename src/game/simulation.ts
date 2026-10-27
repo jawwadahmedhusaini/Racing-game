@@ -1,6 +1,6 @@
 import {CARS,type CarSpec,type RaceMode,type Difficulty} from './content';
 import {Track,angleDelta} from './track';
-import {contactOffset,footprint,resolveContactSpeed,resolveStaticContactSpeed,velocity} from './contact';
+import {contactOffset,footprint,resolveContactSpeed,resolveStaticContactSpeed,velocity,setVelocity,groundSpeed} from './contact';
 import {rampSupport,rampContact,RAMP} from './ramp';
 import {planOpponent} from './opponents';
 import {shiftGear} from './engine-voice';
@@ -8,7 +8,7 @@ import {shiftGear} from './engine-voice';
 export interface Controls {throttle:number; brake:number; steer:number; drift:boolean; nitro:boolean;}
 export const NO_INPUT:Controls={throttle:0,brake:0,steer:0,drift:false,nitro:false};
 export interface Driver {
-  id:number; name:string; spec:CarSpec; distance:number; lateral:number; speed:number; heading:number; yawVelocity:number; sideSpeed:number; brakeInput:number; impact:number; impactSerial:number; impactCooldown:number; scrape:number; landingSerial:number;
+  id:number; name:string; spec:CarSpec; distance:number; lateral:number; speed:number; heading:number; yawVelocity:number; impactYaw:number; sideSpeed:number; brakeInput:number; impact:number; impactSerial:number; impactCooldown:number; scrape:number; landingSerial:number;
   nitro:number; boost:number; drift:number; driftTotal:number; airborne:number; verticalSpeed:number; rampLift:number; jumpRewardPending:boolean; jumpClean:boolean;
   finishTime:number|null; eliminated:boolean; eliminationPosition:number|null; collision:number; steer:number; lap:number;
   targetLane:number; lastRamp:number; boostCooldown:number; boostPrevious:boolean; jumpTotal:number; reverseHold:number; slipAngle:number; acceleration:number; landingImpact:number; throttle:number; gear:number;
@@ -21,7 +21,7 @@ export class RaceSimulation {
   constructor(options:RaceOptions) {
     this.track=options.track;this.mode=options.mode;this.difficulty=options.difficulty;this.upgrade=options.upgrade;this.laps=options.laps??(options.mode==='time'?1:2);
     const names=['YOU','M. KOVA','J. SANTOS','R. WOLFF','A. RIVERA','K. MORI','L. COSTA'];
-    for(let i=0;i<(this.mode==='time'?1:7);i++)this.drivers.push({id:i,name:names[i],spec:i===0?options.car:CARS[(i-1)%CARS.length],distance:-Math.floor(i/2)*7,lateral:(i%2===0?-1:1)*3,speed:0,heading:0,yawVelocity:0,sideSpeed:0,brakeInput:0,impact:0,impactSerial:0,impactCooldown:0,scrape:0,landingSerial:0,nitro:65,boost:0,drift:0,driftTotal:0,airborne:0,verticalSpeed:0,rampLift:0,jumpRewardPending:false,jumpClean:false,finishTime:null,eliminated:false,eliminationPosition:null,collision:0,steer:0,lap:1,targetLane:(i%2===0?-1:1)*3,lastRamp:-1,boostCooldown:0,boostPrevious:false,jumpTotal:0,reverseHold:0,slipAngle:0,acceleration:0,landingImpact:0,throttle:0,gear:1});
+    for(let i=0;i<(this.mode==='time'?1:7);i++)this.drivers.push({id:i,name:names[i],spec:i===0?options.car:CARS[(i-1)%CARS.length],distance:-Math.floor(i/2)*7,lateral:(i%2===0?-1:1)*3,speed:0,heading:0,yawVelocity:0,impactYaw:0,sideSpeed:0,brakeInput:0,impact:0,impactSerial:0,impactCooldown:0,scrape:0,landingSerial:0,nitro:65,boost:0,drift:0,driftTotal:0,airborne:0,verticalSpeed:0,rampLift:0,jumpRewardPending:false,jumpClean:false,finishTime:null,eliminated:false,eliminationPosition:null,collision:0,steer:0,lap:1,targetLane:(i%2===0?-1:1)*3,lastRamp:-1,boostCooldown:0,boostPrevious:false,jumpTotal:0,reverseHold:0,slipAngle:0,acceleration:0,landingImpact:0,throttle:0,gear:1});
     this.updateRank();
   }
   get player(){return this.drivers[0];}
@@ -64,7 +64,7 @@ export class RaceSimulation {
       const before=d.distance,controls=d.id===0?input:this.aiInput(d);this.integrate(d,dt,controls);
       if(d.distance>=this.track.length*this.laps){
         const fraction=clamp((this.track.length*this.laps-before)/Math.max(1e-9,d.distance-before),0,1);
-        d.finishTime=this.elapsed-dt+dt*fraction;d.speed=0;d.boost=0;
+        d.finishTime=this.elapsed-dt+dt*fraction;d.speed=d.sideSpeed=d.impactYaw=d.yawVelocity=0;d.boost=0;
       }
     }
     // Broadphase for seven cars: physical separation and speed exchange on close contact.
@@ -87,10 +87,10 @@ export class RaceSimulation {
     }
     if(this.mode==='elimination'&&this.elapsed>=this.nextElimination) {
       const active=this.ordered.filter(d=>!d.eliminated&&d.finishTime===null);
-      if(active.length>1){const last=active[active.length-1];last.eliminationPosition=this.drivers.filter(d=>!d.eliminated).length;last.eliminated=true;last.speed=0;last.boost=0;this.event(last.id===0?'ELIMINATED':`${last.name} ELIMINATED`);}
+      if(active.length>1){const last=active[active.length-1];last.eliminationPosition=this.drivers.filter(d=>!d.eliminated).length;last.eliminated=true;last.speed=last.sideSpeed=last.impactYaw=last.yawVelocity=0;last.boost=0;this.event(last.id===0?'ELIMINATED':`${last.name} ELIMINATED`);}
       this.eliminatedAt=this.elapsed;this.nextElimination+=22;
     }
-    this.updateRank();this.bestSpeed=Math.max(this.bestSpeed,this.player.speed*3.6);
+    this.updateRank();this.bestSpeed=Math.max(this.bestSpeed,groundSpeed(this.player)*3.6);
     if(this.player.finishTime!==null||this.player.eliminated||(this.mode==='elimination'&&this.drivers.filter(d=>!d.eliminated).length===1)) {
       this.resultPosition=this.player.eliminated?this.player.eliminationPosition!:this.rank;
       this.player.finishTime??=this.elapsed;this.status='finished';this.finishedAt=this.elapsed;
@@ -105,7 +105,8 @@ export class RaceSimulation {
     const nitroRating=clamp(d.spec.nitro/90,.8,1.15);
     const accel=(15+d.spec.acceleration*.09)*(1+up*.06);
     d.boostCooldown=Math.max(0,d.boostCooldown-dt);
-    if(c.nitro&&!c.brake&&d.speed>5) {
+    const pressingWall=Math.abs(d.lateral)>=this.roadClearance(d)-.04&&-Math.sin(d.heading+d.slipAngle)*Math.sign(d.lateral)>.15;
+    if(c.nitro&&!c.brake&&d.speed>5&&!pressingWall) {
       if(d.nitro>0){
         if(!d.boostPrevious||d.boost===0){d.boost=d.nitro>=95?2:1;if(d.id===0)this.event(d.boost===2?'SHOCKWAVE':'NITRO');}
         d.nitro=Math.max(0,d.nitro-dt*(d.boost===2?23:17)/nitroRating);
@@ -145,7 +146,9 @@ export class RaceSimulation {
     const desiredYaw=-steering*this.turnCapacity(d)*(inAir?.16:drifting?1.17:1);
     d.yawVelocity+=(desiredYaw-d.yawVelocity)*Math.min(1,dt*(d.airborne>.3?1.2:drifting?3.8:7.5));
     d.heading+=d.yawVelocity*dt;
-    const slip=d.speed>0?d.slipAngle:0;
+    // A collision turns the body, not its existing world-space momentum.
+    if(Math.abs(d.impactYaw)>1e-9){const motion=velocity(d);d.heading+=d.impactYaw*dt;setVelocity(d,motion);d.impactYaw*=Math.exp(-dt*(inAir?.8:3.5));}else d.impactYaw=0;
+    const slip=d.slipAngle;
     d.sideSpeed*=Math.exp(-dt*(inAir?.1:6*grip));
     d.lateral+=(-Math.sin(d.heading+slip)*d.speed+Math.cos(d.heading+slip)*d.sideSpeed)*dt;
     const advance=(d.speed*Math.cos(d.heading+slip)+Math.sin(d.heading+slip)*d.sideSpeed)/Math.max(.5,1+sample.curvature*d.lateral)*dt;
@@ -203,21 +206,18 @@ export class RaceSimulation {
   constrainToRoad(d:Driver,dt:number){
     const bound=this.roadClearance(d);
     if(Math.abs(d.lateral)>bound){
-      const side=Math.sign(d.lateral),v=velocity(d),closing=Math.max(0,v.x*side);
+      const side=Math.sign(d.lateral),v=velocity(d);
       d.lateral=clamp(d.lateral,-bound,bound);
-      if(closing>0){
-        // Remove inward velocity, retain tangential motion: scrapes no longer halve speed.
-        this.registerImpact(d,closing);
-        const friction=Math.max(.92,1-closing*.002),z=v.z*friction;
-        const h=d.heading+(d.speed>0?d.slipAngle:0);d.speed=Math.cos(h)*z;d.sideSpeed=Math.sin(h)*z;
-        d.yawVelocity*=.5;
-        if(closing>8){d.boost=0;if(d.collision===0&&d.id===0)this.event('BARRIER CONTACT · STEER AWAY OR RECOVER');}
+      const contactClosing=resolveStaticContactSpeed(d,{x:-side,z:0},.6);
+      if(contactClosing>0){
+        this.registerImpact(d,contactClosing);
+        if(contactClosing>8){d.boost=0;if(d.collision===0&&d.id===0)this.event('BARRIER CONTACT · STEER AWAY OR REVERSE');}
       }
       d.speed*=Math.exp(-dt*.6);d.sideSpeed*=Math.exp(-dt*.6);
       d.scrape=Math.min(1,Math.abs(v.z)/55);d.collision=Math.max(d.collision,.12);
     }
   }
-  recover(){if(this.status==='finished')return;this.player.lateral=0;this.player.heading=0;this.player.yawVelocity=0;this.player.sideSpeed=0;this.player.impact=0;this.player.scrape=0;this.player.collision=0;this.player.speed=clamp(this.player.speed,0,25);this.player.reverseHold=0;this.player.slipAngle=0;this.player.drift=0;this.player.acceleration=0;this.player.landingImpact=0;this.player.airborne=0;this.player.verticalSpeed=0;this.player.rampLift=0;this.player.jumpRewardPending=false;this.player.jumpClean=false;this.event('BACK ON TRACK');}
+  recover(){if(this.status==='finished')return;this.player.lateral=0;this.player.heading=0;this.player.yawVelocity=0;this.player.impactYaw=0;this.player.sideSpeed=0;this.player.impact=0;this.player.scrape=0;this.player.collision=0;this.player.speed=clamp(this.player.speed,0,25);this.player.reverseHold=0;this.player.slipAngle=0;this.player.drift=0;this.player.acceleration=0;this.player.landingImpact=0;this.player.airborne=0;this.player.verticalSpeed=0;this.player.rampLift=0;this.player.jumpRewardPending=false;this.player.jumpClean=false;this.event('BACK ON TRACK');}
 }
 export function clamp(value:number,min:number,max:number){return Math.max(min,Math.min(max,value));}
 export function formatTime(seconds:number){const mins=Math.floor(seconds/60),secs=Math.floor(seconds%60),ms=Math.floor(seconds%1*100);return `${mins}:${String(secs).padStart(2,'0')}.${String(ms).padStart(2,'0')}`;}

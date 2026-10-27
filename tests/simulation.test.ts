@@ -30,7 +30,13 @@ describe('racing dynamics',()=>{
     expect(Math.abs(angleDelta(before,after.yaw+sim.player.heading))).toBeLessThan(.0001);
     expect(Math.abs(sim.player.lateral)).toBeGreaterThan(.2);
   });
-  it('throttle alone cannot auto-follow a lap through barriers',()=>{const sim=make('time');run(sim,90,{throttle:1});expect(sim.status).toBe('racing');expect(sim.player.distance).toBeLessThan(coast.length*.5);});
+  it('wall deflection cannot replace steering: throttle-only grinding loses to a driven racing line',()=>{
+    const sim=make('time');run(sim,90,{throttle:1});expect(sim.status).toBe('racing');
+    // Corner impulses now rotate the body, so some progress after repeated hits
+    // is legitimate. Compare race outcome instead of requiring the old frozen nose.
+    const driven=make('time');for(let i=0;i<90*60&&driven.status!=='finished';i++)driven.step(1/60,driven.aiInput(driven.player));
+    expect(driven.status).toBe('finished');expect(driven.player.finishTime!).toBeLessThan(sim.elapsed*.65);
+  });
   it('rewards real drifting with nitro and records slip time',()=>{const sim=make('time');run(sim,7,{throttle:1},true);sim.player.nitro=30;run(sim,.4,{throttle:1,drift:true,steer:1});expect(sim.player.driftTotal).toBeGreaterThan(.35);expect(sim.player.nitro).toBeGreaterThan(35);expect(sim.player.drift).toBeGreaterThan(.5);});
   it('uses a full meter for shockwave and consumes it',()=>{const sim=make('time');run(sim,8,{throttle:1},true);sim.player.nitro=100;run(sim,.5,{throttle:1,nitro:true},true);expect(sim.player.boost).toBe(2);expect(sim.player.nitro).toBeLessThan(90);run(sim,.2,{throttle:1},true);expect(sim.player.boost).toBe(0);});
   it('activates held nitro after launching, without wasting fuel before speed is sufficient',()=>{

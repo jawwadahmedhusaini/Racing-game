@@ -1,4 +1,4 @@
-APEX RUSH 2.5.1 — browser racing game
+APEX RUSH 2.5.2 — browser racing game
 
 1. Unzip the complete download.
 2. Install Python 3 if it is not already on your computer.
@@ -60,3 +60,6 @@ ENGINE in the garage. Existing saves remain; handling records now use v5.
 
 2.5.1: fixes ramp-edge trapping, raised-face sliding/reverse escape, traffic pushes,
        direction-sensitive takeoff, landing response and chassis slope orientation.
+
+2.5.2: directional body response to collisions, wall friction, sideways-speed HUD,
+       reverse/steering escape, improved rival braking and separate v6 records.

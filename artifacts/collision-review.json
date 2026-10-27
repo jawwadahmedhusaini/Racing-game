@@ -1,0 +1,23 @@
+{
+  "version": "2.5.2",
+  "date": "2026-10-26T22:44:30.027787+00:00",
+  "baselineVersion": "2.5.1",
+  "baselineFailedReproductions": 22,
+  "newUnitCases": 34,
+  "retainedRampCases": 41,
+  "unitPassed": 204,
+  "browserPassed": 21,
+  "browserStarted": "2026-10-26T22:26:02.178Z",
+  "browserDurationMs": 963108.994,
+  "touchWallTracks": [
+    "coast",
+    "city"
+  ],
+  "mixedInputStressCases": 10,
+  "secondsPerStressCase": 90,
+  "maximumAudioPeak": 0.9157342314720154,
+  "productionPassed": true,
+  "hostingBasePassed": true,
+  "hardwarePerformanceVerified": false,
+  "passed": true
+}

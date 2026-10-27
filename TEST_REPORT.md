@@ -1,41 +1,35 @@
-# APEX RUSH 2.5.1 — validation
+# APEX RUSH 2.5.2 — validation
 
 ## Current release gates
 
-- **170 unit tests passed**, no failures or skipped tests.
-- **19 distinct Chromium browser workflows verified**: the full run passed 18 of 19 (14.3 minutes); the remaining BMW workflow passed a targeted rerun after correcting its transient-rev observation. No runtime files changed between runs. Initial run started 2026-10-26T15:11:10.206Z (UTC). Both raw reports are retained.
-- TypeScript and root/Pages production builds passed; final runtime files were frozen and fingerprinted during release validation.
-- Packaged Python launcher and `/Racing-game/` production checks passed on 2.5.1; no unexpected page/console errors or failed HTTP responses. Development controls are absent from production.
-- Dependency audit reports zero vulnerabilities. No dependencies or external assets changed in this patch.
+- **204 unit tests passed**, no failures or skipped tests.
+- **21 Chromium browser workflows passed**, no failures, skips, retries or flaky outcomes; 16.1 minutes. Started 2026-10-26T22:26:02.178Z (UTC).
+- TypeScript and root/Pages production builds passed. Final runtime files were frozen and fingerprinted for release validation.
+- Packaged launcher and `/Racing-game/` production checks passed on 2.5.2, including real keyboard acceleration, nitro, reverse, pause, Ultra rendering, four layouts and asset paths. Development controls are absent from production.
+- Dependency audit reports zero vulnerabilities. No dependencies or external assets changed.
 
-## Reproduced ramp defect
+## Reproduced defects and added coverage
 
-Before the fix, all ten full approaches (five cars on both tracks) stalled when the car's center was just left of the ramp. Forward and reverse attempts from an already wedged position also failed. These **12 failed baseline reproductions** are retained in `artifacts/ramp-before.txt`.
+The baseline had **22 failures**: corner impacts for five cars on both walls of both tracks did not generate chassis rotation, nitro spent fuel against a wall, and finishing left residual lateral motion. The original output is retained in `artifacts/wall-before.txt`.
 
-The earlier lip-only launch test and forced-speed slow test did not exercise this condition. New regressions drive the whole approach with normal throttle and steering inputs. The fix combines footprint-based support with normal separation and removal of inward velocity, preserving motion along or away from a raised ramp face.
+**34 new unit cases** cover those defects plus combined linear/angular energy, symmetric head-on stops, steering/reverse escape, off-center vehicle impacts, momentum-preserving body rotation, near-zero rounding, ground-speed reporting, recovery, rival stopping distance/projected width and 30/60/120 Hz consistency. Total collision energy is checked across 90 combinations of wall side, angle, speed and existing spin. The previous **41 ramp regressions** still pass.
 
-## New coverage
+Two new browser workflows use a mobile landscape layout and real multi-touch events to reproduce both wall sides, steer away, reverse after a head-on stop, and confirm the speedometer reads 36 km/h for a 10 m/s lateral slide with zero forward speed. They use development-only scenario positioning/time advancement for repeatability; steering comes from touch controls. They do not constitute physical-phone testing.
 
-**41 ramp regression cases** cover all cars and both tracks for edge approaches, stopping/restarting on the slope and outside-lane boost. They also cover glancing/perpendicular side hits without energy gain, forward/reverse escape, reversing down the slope, landing on top once, overhead clearance, traffic pushes, consistent 30/60/120 Hz callers and chassis tilt matching the surface at different headings.
+The old throttle-only test required less than half a lap because the former wall solver froze the chassis heading. With real contact-induced turning, that distance limit was not a valid physical requirement. Its replacement requires an unfinished throttle-only race at 90 seconds, while a normally steered racing line finishes much sooner. The separate test that forward input preserves world heading away from obstacles remains unchanged.
 
-Two new browser workflows reproduce the pictured approach on Costa Aurelia and Neon Harbor, capture climbing and airborne views, verify one landing and exercise side/rear escape. They use keyboard throttle/brake, with development-only positioning and steering/time advancement for repeatability. They do not claim a complete human driving session or use production progression cheats.
+## Retained regression coverage
 
-## Browser test correction
+Manual steering, reverse, boost/drift, six AI finishers on both tracks/all difficulties, finish/elimination order, career rewards, purchases and save migration all pass. Ten 90-second mixed-input runs cover every car on both tracks. V6 record migration retains earlier times and garage progress.
 
-The initial BMW test waited for sample readiness and then polled the current RPM of a 2.5-second audition. Under software rendering, the audition could already have ended before that observation. The revised test waits for decoded samples first, then records the peak RPM inside the page while clicking the real rev button. The original >1,500 RPM assertion and the remaining purchase/race/persistence checks are retained. Only this affected workflow was rerun; the earlier passing workflows remain valid against the identical runtime fingerprint.
+Browser coverage includes the ramp approaches/escape tests, touch/keyboard controls, pause/restart/resource reuse, loading cancellation, second-tab protection, storage/audio failure, missing assets, WebGL context loss and BMW selection/audio persistence.
 
-## Existing regressions
+Seven OfflineAudioContext waveform scenarios remain below clipping (maximum sample **0.916**), with mute/pause silence, stereo rivals, bounded voices and failed-download fallback.
 
-All prior checks still pass: manual steering, reverse, boost, drift, collisions, six AI finishers on both tracks/all difficulties, career rewards, elimination/finish order, purchases and persistent saves. Ten 90-second deterministic mixed-input runs cover all five cars on both circuits.
+## Limits and evidence
 
-Browser coverage retains touch/keyboard controls, pause/restart/resource reuse, loading cancellation, second-tab protection, blocked storage/audio, missing assets and real WebGL context loss. BMW selection and garage/race audio still pass.
+The contact solver has planar yaw inertia and bounded/damped spin. It remains a track-relative arcade approximation, without rollover, crash deformation, independent-wheel suspension or unconstrained off-road dynamics. Chromium uses Linux software WebGL; physical phone/desktop GPU performance, thermals, Safari/Firefox and subjective handling remain unverified. No universal bug-free or flagship-quality claim is made.
 
-Seven real OfflineAudioContext scenarios remain below clipping (maximum sample **0.916**), with mute/pause silence, stereo rivals, bounded voices and failed-download fallback. Production checks use real W/Shift/S keys, render Ultra, exercise four layouts and check hosted asset paths.
+Current evidence includes `unit-results.json`, `browser-results.json`, `collision-review.json`, `wall-coast-browser.json`, `wall-city-browser.json`, wall/ramp screenshots, `audio-render.json`, `production-smoke.json`, `hosting-smoke.json` and `dependency-audit.json` in `artifacts/`. Source archives include these files. Archive CRC/SHA checks and public-download verification are final delivery gates.
 
-## Scope and evidence
-
-This remains track-relative arcade physics with forgiving partial ramp support, constrained outer track boundaries and no independent-wheel suspension/full rigid-body solver. Chromium uses Linux software WebGL. Physical desktop/mobile GPU performance, thermals, Safari/Firefox and subjective sound/handling remain unverified. No new FPS or flagship-quality claim is made.
-
-Current evidence: `unit-results.json`, `browser-results.json`, `browser-rerun.json`, `ramp-review.json`, `ramp-coast-browser.json`, `ramp-city-browser.json`, ramp screenshots, `audio-render.json`, `production-smoke.json`, `hosting-smoke.json`, and `dependency-audit.json` under `artifacts/`. The source archive includes these files. Archive CRC/SHA and public-download checks are final delivery gates.
-
-`sound-contact-review.json` and older audit/performance/visual reports retain their previous release versions and dates. Existing progress and v5 records remain. See [RAMP_FIXES.md](RAMP_FIXES.md).
+The previous `ramp-review.json`, `browser-rerun.json`, `sound-contact-review.json` and older audit/performance/visual reports retain their original release dates/versions. See [COLLISION_FIXES.md](COLLISION_FIXES.md).

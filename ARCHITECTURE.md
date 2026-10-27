@@ -90,3 +90,7 @@ Airborne nitro applies separate arcade thrust while tire throttle/braking remain
 ## 2.5.1 ramp contact
 
 Ramp support and contact share a rotated footprint overlap test in `ramp.ts`. The climbable low face is excluded from the solid region using base height, step clearance and per-substep travel. Static-face response removes inward velocity and returns an outward separation rather than restoring an entire previous pose. Constraints run after car-contact separation as well as movement. Rendered surface tilt uses heading-relative pitch and roll. See RAMP_FIXES.md for the reproduced center/support mismatch and remaining arcade approximations.
+
+## 2.5.2 planar collision rotation
+
+`contact.ts` calculates support/contact points and rectangular yaw inertia for unit-mass bodies. Inelastic impulses exchange linear momentum and bounded `impactYaw`; static faces also apply Coulomb-style tangential friction using the entire normal impulse. Near-flush supports blend toward the face midpoint. The simulation applies/damps impact yaw separately from steering and reprojects existing velocity when impact rotation changes the chassis heading. The HUD/camera use horizontal ground speed. Rival lookahead scales with stopping distance and projected footprint width. This remains track-relative planar arcade dynamics, not a full 3D rigid-body solver.

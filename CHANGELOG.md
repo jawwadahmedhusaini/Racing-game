@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.5.2 — wall and vehicle contact (2026-10-27)
+
+- Added contact-point yaw impulses, damped impact spin, near-flush contact stability and wall friction based on the full normal impulse.
+- Fixed zero speed displayed during lateral sliding and cleared residual motion at race completion/recovery.
+- Blocked boost into contacting walls and expanded rivals' traffic lookahead/braking envelope at racing speeds.
+- Preserved prior saves and records; new handling uses v6 times. Added wall/traffic regressions and mobile touch workflows. See COLLISION_FIXES.md and TEST_REPORT.md.
+
 ## 2.5.1 — ramp edge and escape fixes (2026-10-26)
 
 - Fixed cars getting permanently stuck when straddling a ramp edge. Partial-width approaches now climb and launch.
