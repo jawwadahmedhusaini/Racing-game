@@ -47,7 +47,9 @@ try {
   report.pause = true;
   expect(report.assetPaths.some(path => path.endsWith('/concept-car.glb'))).toBe(true);
   expect(report.assetPaths.some(path => path.endsWith('/concept-car-lod.glb'))).toBe(true);
-  for(const model of ['solstice-gt.glb','solstice-gt-lod.glb','bmw-m3.glb','bmw-m3-lod.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(true);
+  for(const model of ['solstice-gt-lod.glb','bmw-m3-lod.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(true);
+  for(const model of ['solstice-gt.glb','bmw-m3.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(false);
+  report.demandLoadedGrid=true;
   const solstice=await page.request.get(new URL('licenses/solstice.json',url).href);expect(solstice.status()).toBe(200);expect((await solstice.json()).license).toBe('CC0-1.0');
   expect(report.assetPaths.some(path => path.endsWith('/venice_sunset_1k.hdr'))).toBe(true);
   expect(report.assetPaths.some(path => path.endsWith('/vegetation.json'))).toBe(true);

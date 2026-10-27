@@ -4,7 +4,7 @@ A complete, independent single-player browser arcade racer: pick a car, choose a
 
 ## Play online or download
 
-[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.5.2](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
+[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.6.0](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
 
 [Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH-SOURCE.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
 
@@ -15,6 +15,10 @@ The online link requires the repository's GitHub Pages deployment to be enabled;
 Version **2.4.1** fixes sudden slowdown after boost, head-on/reverse contact response, close-finish timing, elimination standings and keyboard navigation. Older records remain saved; corrected handling uses separate v4 records. See [DEEP_AUDIT.md](DEEP_AUDIT.md) for reproduced defects, validation and remaining limits.
 
 ![APEX RUSH 2.4 garage](artifacts/garage-final.jpg)
+
+## New in 2.6 — Neon Harbor and vehicle loading
+
+Neon Harbor has a new 2.71 km route, exposed waterfront, port cranes and cargo, illuminated street frontage and an elevated return. Vehicle models load on demand with shared requests, retry and an eviction cache that protects live instances. Existing cars and saves remain; new times use v7 records. See [upgrade scope and remaining targets](NEON_HARBOR_UPGRADE.md).
 
 ## Fixed in 2.5.2 — collision response
 

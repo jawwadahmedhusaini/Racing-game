@@ -25,7 +25,7 @@ export function addCircuitDetail(scene:THREE.Scene,track:Track,space:RoadSpace,h
     for(const before of [100,50]){
       const s=track.sample(d-before),p=s.position.clone().addScaledVector(s.right,12);
       if(!space.place('braking-board',p.x,p.z,.65))continue;
-      const mat=new THREE.MeshStandardMaterial({map:signTexture(String(before),track.id==='coast'?'#f0cf96':'#a5dce8','BRAKE'),roughness:.7,emissive:'#ffffff',emissiveIntensity:track.id==='city'?.3:0});
+      const mat=new THREE.MeshStandardMaterial({map:signTexture(String(before),track.id==='coast'?'#f0cf96':'#a5dce8','BRAKE'),roughness:.7,emissive:'#ffffff',emissiveIntensity:track.id==='city'?.3:0});mat.emissiveMap=mat.map;
       block(p,s.yaw,0,1.3,0,.065,2.6,.065,steel);block(p,s.yaw,0,2.4,0,1.15,.8,.06,mat);
     }
   }

@@ -1,0 +1,19 @@
+{
+  "version": "2.6.0",
+  "date": "2026-10-27T14:21:00.690966+00:00",
+  "unitPassed": 210,
+  "browserPassed": 23,
+  "browserStarted": "2026-10-27T13:26:39.798Z",
+  "browserDurationMs": 1336890.53,
+  "initialVehicleBytes": 6462376,
+  "previousVehicleBytes": 15578284,
+  "vehicleTransferReduction": 0.5851676603148331,
+  "cityRoadSamples": 4520,
+  "citySceneryPlacements": 277,
+  "minimumSceneryClearance": 2.3503584800565567,
+  "maximumAudioPeak": 0.9157342910766602,
+  "productionPassed": true,
+  "hostingBasePassed": true,
+  "hardwarePerformanceVerified": false,
+  "passed": true
+}

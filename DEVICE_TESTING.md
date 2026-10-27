@@ -10,7 +10,7 @@ Cloud verification uses Chromium and software WebGL. The following runs require 
 | Older Android phone | Current Chrome | Low | Pending |
 | iPhone/iPad | Current Safari | Low, then Medium | Pending |
 
-1. Open the hosted build and confirm **2.4** in Settings. Enable **Performance Display**. Record the device, OS/browser versions, viewport/orientation, chosen quality and whether adaptive resolution is enabled.
+1. Open the hosted build and confirm **2.6.0** in Settings. Enable **Performance Display**. Record the device, OS/browser versions, viewport/orientation, chosen quality and whether adaptive resolution is enabled.
 2. On each circuit, time Start Race to the visible preparation card and then to the countdown, once cold and again on restart. Cancel loading once and retry. Hold accelerate during loading and confirm the held key works when the countdown ends.
 3. Race both circuits for five minutes, including a full grid, boost, drifting, the ramp at walking speed and at launch speed, reverse, a camera switch and repeated restarts. Record FPS, displayed render resolution and any stutters after the opening shaders have warmed. Repeat after ten minutes to expose heat-related slowdown.
 4. Disable adaptive resolution for a controlled comparison; use identical quality and orientation. If image resolution drops without meaningful frame-rate improvement, lower the quality preset to reduce scene/effect cost.
@@ -20,3 +20,5 @@ Cloud verification uses Chromium and software WebGL. The following runs require 
 Record sustained FPS as a range, resolution changes, thermal state, visible artifacts and reproduction steps. The current in-game readout is a rolling wall-clock estimate, not a GPU profiler. It does not justify a universal 30/60 FPS claim. Dynamic resolution affects pixel work; CPU-bound geometry, driver overhead and browser memory limits require device-specific profiling.
 
 For 2.4, include a purchased Solstice GT, all camera modes and Reduced Camera Motion. Check the fourth garage card at narrow widths, rotate the long car in portrait, compare gear/audio shifts, and run a seven-car race around the raised ramp. Record real hardware data before signing off any 30/60 FPS target.
+
+For 2.6, test a cold garage with Vanta and with a saved BMW/Solstice selection. Throttle the connection and switch car cards rapidly; a failed optional car should leave the current car usable and allow retry. Cancel race preparation during model download. On Neon Harbor, drive the complete new route and check the port straight, downtown bends and elevated return on Low and High. Compare cold versus repeated starts and record the actual device/GPU; the reported GLB-byte reduction is not an FPS or startup-time measurement.

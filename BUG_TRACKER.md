@@ -1,5 +1,13 @@
 # APEX RUSH — release notes and known limits
 
+## 2.6 loading and city upgrade
+
+- Confirmed and replaced eager loading of all six GLBs with demand loading and a reference-counted cache.
+- Protected the current garage car during failed/delayed requests and cancelled race preparation.
+- Replaced the similar city layout and opened water previously hidden under a full-size ground plane.
+- Fixed washed-out billboard emission and expanded the rival braking margin after a new-route regression.
+- The new environment is original modular geometry. More professional vehicle/environment assets and real-device performance remain outstanding; see NEON_HARBOR_UPGRADE.md.
+
 ## 2.5.2 collision fixes
 
 - Reproduced unchanged body heading during wall contact, fuel spent boosting against a wall, and residual lateral motion after finishing (22 baseline failures).

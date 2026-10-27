@@ -12,9 +12,9 @@ export class Track {
     const points=id==='coast'?[
       [0,8,0],[0,10,180],[-110,19,330],[-280,24,290],[-365,16,110],[-280,10,-65],[-190,15,-255],[20,20,-320],[210,13,-180],[235,9,-25],[120,8,-40],
     ]:[
-      [0,5,0],[0,5,200],[-100,10,310],[-270,11,280],[-350,7,120],[-310,6,-105],[-170,7,-285],[60,11,-285],[230,8,-150],[235,5,-25],[120,5,-40],
+      [180,6,-260],[180,6,40],[180,7,310],[90,8,400],[-60,10,360],[-180,10,300],[-330,10,340],[-410,12,220],[-320,19,130],[-200,23,80],[-210,20,-30],[-380,13,-100],[-400,8,-260],[-260,6,-370],[-60,5,-360],[90,6,-345],
     ];
-    this.curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(p[0],p[1],p[2])),true,'catmullrom',.65);
+    this.curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(p[0],p[1],p[2])),true,'catmullrom',id==='coast'?.65:.5);
     this.curve.arcLengthDivisions=3600;this.curve.updateArcLengths();this.length=this.curve.getLength();
     for(let i=0;i<this.count;i++) {
       const t=(i/this.count+90/this.length)%1,position=this.curve.getPointAt(t),tangent=this.curve.getTangentAt(t).normalize();

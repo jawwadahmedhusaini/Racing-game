@@ -20,7 +20,7 @@ export type Difficulty = 'rookie' | 'pro' | 'expert';
 
 export const TRACKS = [
   { id: 'coast' as TrackId, name: 'COSTA AURELIA', subtitle: 'THE COASTAL RUN', region: 'ITALIAN RIVIERA', weather: 'GOLDEN HOUR', description: 'Cliffside sweepers. Ocean air. One more corner.', laps: 2 },
-  { id: 'city' as TrackId, name: 'NEON HARBOR', subtitle: 'AFTER HOURS', region: 'PACIFIC METROPOLIS', weather: 'MIDNIGHT', description: 'Light up the waterfront. Own the night.', laps: 2 },
+  { id: 'city' as TrackId, name: 'NEON HARBOR', subtitle: 'DOCKS TO SKYLINE', region: 'PACIFIC METROPOLIS', weather: 'MIDNIGHT', description: 'Portside straights. Downtown switchbacks. The high road home.', laps: 2 },
 ];
 
 export const EVENTS = [

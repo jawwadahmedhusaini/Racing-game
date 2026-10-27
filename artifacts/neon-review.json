@@ -1,0 +1,1151 @@
+{
+  "version": "2.6.0",
+  "date": "2026-10-27T13:23:27.450Z",
+  "quality": "high",
+  "hardwarePerformanceVerified": false,
+  "posedDevelopmentCaptures": true,
+  "errors": [],
+  "scenes": [
+    {
+      "distance": 0,
+      "vehicleCache": [
+        {
+          "key": "concept-car.glb",
+          "ready": true,
+          "users": 2
+        },
+        {
+          "key": "concept-car-lod.glb",
+          "ready": true,
+          "users": 4
+        },
+        {
+          "key": "solstice-gt-lod.glb",
+          "ready": true,
+          "users": 1
+        },
+        {
+          "key": "bmw-m3-lod.glb",
+          "ready": true,
+          "users": 1
+        }
+      ],
+      "vehicleLoading": false,
+      "viewedCar": "VANTA GT",
+      "audio": {
+        "ready": true,
+        "samples": "ready",
+        "decoded": 24,
+        "transients": 0,
+        "engineLayers": 15,
+        "rpm": 950.113963223528,
+        "context": "running"
+      },
+      "preparing": false,
+      "loadMetrics": {
+        "totalMs": 17265.5,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 4.199999999254942
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.600000001490116
+          },
+          {
+            "label": "Laying the road and barriers…",
+            "elapsedSinceYieldMs": 1.1000000014901161
+          },
+          {
+            "label": "Installing circuit lighting…",
+            "elapsedSinceYieldMs": 220.30000000074506
+          },
+          {
+            "label": "Building the surroundings…",
+            "elapsedSinceYieldMs": 20
+          },
+          {
+            "label": "Finishing the starting grid…",
+            "elapsedSinceYieldMs": 134.80000000074506
+          },
+          {
+            "label": "Optimizing the circuit…",
+            "elapsedSinceYieldMs": 13.199999999254942
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 36.599999997764826
+          },
+          {
+            "label": "Lighting the circuit · 1 / 6",
+            "elapsedSinceYieldMs": 2
+          },
+          {
+            "label": "Lighting the circuit · 2 / 6",
+            "elapsedSinceYieldMs": 1455.300000000745
+          },
+          {
+            "label": "Lighting the circuit · 3 / 6",
+            "elapsedSinceYieldMs": 1001.9000000022352
+          },
+          {
+            "label": "Lighting the circuit · 4 / 6",
+            "elapsedSinceYieldMs": 2.899999998509884
+          },
+          {
+            "label": "Lighting the circuit · 5 / 6",
+            "elapsedSinceYieldMs": 1.6000000014901161
+          },
+          {
+            "label": "Lighting the circuit · 6 / 6",
+            "elapsedSinceYieldMs": 14.5
+          },
+          {
+            "label": "Finishing the reflections…",
+            "elapsedSinceYieldMs": 5.099999997764826
+          },
+          {
+            "label": "Loading the race grid…",
+            "elapsedSinceYieldMs": 768.6999999992549
+          },
+          {
+            "label": "Preparing car 1 of 7…",
+            "elapsedSinceYieldMs": 123.09999999776483
+          },
+          {
+            "label": "Preparing car 2 of 7…",
+            "elapsedSinceYieldMs": 3.599999997764826
+          },
+          {
+            "label": "Preparing car 3 of 7…",
+            "elapsedSinceYieldMs": 557.6999999992549
+          },
+          {
+            "label": "Preparing car 4 of 7…",
+            "elapsedSinceYieldMs": 44.69999999925494
+          },
+          {
+            "label": "Preparing car 5 of 7…",
+            "elapsedSinceYieldMs": 42.600000001490116
+          },
+          {
+            "label": "Preparing car 6 of 7…",
+            "elapsedSinceYieldMs": 21
+          },
+          {
+            "label": "Preparing car 7 of 7…",
+            "elapsedSinceYieldMs": 18.299999997019768
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 3.899999998509884
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 113.19999999925494
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 5539
+          }
+        ]
+      },
+      "sceneryCount": 277,
+      "screen": "racing",
+      "status": "racing",
+      "paused": true,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "steer": 0,
+        "drift": false,
+        "nitro": false
+      },
+      "player": {
+        "id": 0,
+        "name": "YOU",
+        "spec": "vanta",
+        "distance": 0,
+        "lateral": 0,
+        "speed": 0,
+        "heading": 0,
+        "yawVelocity": 0,
+        "impactYaw": 0,
+        "sideSpeed": 0,
+        "brakeInput": 0,
+        "impact": 0,
+        "impactSerial": 0,
+        "impactCooldown": 0,
+        "scrape": 0,
+        "landingSerial": 0,
+        "nitro": 65.83000000000042,
+        "boost": 0,
+        "drift": 0,
+        "driftTotal": 0,
+        "airborne": 0,
+        "verticalSpeed": 0,
+        "rampLift": 0,
+        "jumpRewardPending": false,
+        "jumpClean": false,
+        "finishTime": null,
+        "eliminated": false,
+        "eliminationPosition": null,
+        "collision": 0,
+        "steer": 0,
+        "lap": 1,
+        "targetLane": -3,
+        "lastRamp": -1,
+        "boostCooldown": 0,
+        "boostPrevious": false,
+        "jumpTotal": 0,
+        "reverseHold": 0,
+        "slipAngle": 0,
+        "acceleration": 0,
+        "landingImpact": 0,
+        "throttle": 0,
+        "gear": 1
+      },
+      "elapsed": 0.6916666666666667,
+      "rank": 2,
+      "credits": 2500,
+      "selected": "vanta",
+      "quality": "high",
+      "reducedMotion": false,
+      "opponents": 6,
+      "cameraMode": 0,
+      "adaptiveScale": 1,
+      "pixelRatio": 1,
+      "textures": 125,
+      "skidMarks": 0,
+      "carBounds": [
+        2.337911009788513,
+        1.0340470969676971,
+        4.357380628585815
+      ],
+      "invalidCarShadows": 0,
+      "fps": 0,
+      "drawCalls": 1112,
+      "triangles": 715908,
+      "geometries": 931
+    },
+    {
+      "distance": 270,
+      "vehicleCache": [
+        {
+          "key": "concept-car.glb",
+          "ready": true,
+          "users": 2
+        },
+        {
+          "key": "concept-car-lod.glb",
+          "ready": true,
+          "users": 4
+        },
+        {
+          "key": "solstice-gt-lod.glb",
+          "ready": true,
+          "users": 1
+        },
+        {
+          "key": "bmw-m3-lod.glb",
+          "ready": true,
+          "users": 1
+        }
+      ],
+      "vehicleLoading": false,
+      "viewedCar": "VANTA GT",
+      "audio": {
+        "ready": true,
+        "samples": "ready",
+        "decoded": 24,
+        "transients": 0,
+        "engineLayers": 15,
+        "rpm": 950.0000655233512,
+        "context": "running"
+      },
+      "preparing": false,
+      "loadMetrics": {
+        "totalMs": 17265.5,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 4.199999999254942
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.600000001490116
+          },
+          {
+            "label": "Laying the road and barriers…",
+            "elapsedSinceYieldMs": 1.1000000014901161
+          },
+          {
+            "label": "Installing circuit lighting…",
+            "elapsedSinceYieldMs": 220.30000000074506
+          },
+          {
+            "label": "Building the surroundings…",
+            "elapsedSinceYieldMs": 20
+          },
+          {
+            "label": "Finishing the starting grid…",
+            "elapsedSinceYieldMs": 134.80000000074506
+          },
+          {
+            "label": "Optimizing the circuit…",
+            "elapsedSinceYieldMs": 13.199999999254942
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 36.599999997764826
+          },
+          {
+            "label": "Lighting the circuit · 1 / 6",
+            "elapsedSinceYieldMs": 2
+          },
+          {
+            "label": "Lighting the circuit · 2 / 6",
+            "elapsedSinceYieldMs": 1455.300000000745
+          },
+          {
+            "label": "Lighting the circuit · 3 / 6",
+            "elapsedSinceYieldMs": 1001.9000000022352
+          },
+          {
+            "label": "Lighting the circuit · 4 / 6",
+            "elapsedSinceYieldMs": 2.899999998509884
+          },
+          {
+            "label": "Lighting the circuit · 5 / 6",
+            "elapsedSinceYieldMs": 1.6000000014901161
+          },
+          {
+            "label": "Lighting the circuit · 6 / 6",
+            "elapsedSinceYieldMs": 14.5
+          },
+          {
+            "label": "Finishing the reflections…",
+            "elapsedSinceYieldMs": 5.099999997764826
+          },
+          {
+            "label": "Loading the race grid…",
+            "elapsedSinceYieldMs": 768.6999999992549
+          },
+          {
+            "label": "Preparing car 1 of 7…",
+            "elapsedSinceYieldMs": 123.09999999776483
+          },
+          {
+            "label": "Preparing car 2 of 7…",
+            "elapsedSinceYieldMs": 3.599999997764826
+          },
+          {
+            "label": "Preparing car 3 of 7…",
+            "elapsedSinceYieldMs": 557.6999999992549
+          },
+          {
+            "label": "Preparing car 4 of 7…",
+            "elapsedSinceYieldMs": 44.69999999925494
+          },
+          {
+            "label": "Preparing car 5 of 7…",
+            "elapsedSinceYieldMs": 42.600000001490116
+          },
+          {
+            "label": "Preparing car 6 of 7…",
+            "elapsedSinceYieldMs": 21
+          },
+          {
+            "label": "Preparing car 7 of 7…",
+            "elapsedSinceYieldMs": 18.299999997019768
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 3.899999998509884
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 113.19999999925494
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 5539
+          }
+        ]
+      },
+      "sceneryCount": 277,
+      "screen": "racing",
+      "status": "racing",
+      "paused": true,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "steer": 0,
+        "drift": false,
+        "nitro": false
+      },
+      "player": {
+        "id": 0,
+        "name": "YOU",
+        "spec": "vanta",
+        "distance": 270,
+        "lateral": 0,
+        "speed": 0,
+        "heading": 0,
+        "yawVelocity": 0,
+        "impactYaw": 0,
+        "sideSpeed": 0,
+        "brakeInput": 0,
+        "impact": 0,
+        "impactSerial": 0,
+        "impactCooldown": 0,
+        "scrape": 0,
+        "landingSerial": 0,
+        "nitro": 65.83000000000042,
+        "boost": 0,
+        "drift": 0,
+        "driftTotal": 0,
+        "airborne": 0,
+        "verticalSpeed": 0,
+        "rampLift": 0,
+        "jumpRewardPending": false,
+        "jumpClean": false,
+        "finishTime": null,
+        "eliminated": false,
+        "eliminationPosition": null,
+        "collision": 0,
+        "steer": 0,
+        "lap": 1,
+        "targetLane": -3,
+        "lastRamp": -1,
+        "boostCooldown": 0,
+        "boostPrevious": false,
+        "jumpTotal": 0,
+        "reverseHold": 0,
+        "slipAngle": 0,
+        "acceleration": 0,
+        "landingImpact": 0,
+        "throttle": 0,
+        "gear": 1
+      },
+      "elapsed": 0.6916666666666667,
+      "rank": 2,
+      "credits": 2500,
+      "selected": "vanta",
+      "quality": "high",
+      "reducedMotion": false,
+      "opponents": 6,
+      "cameraMode": 0,
+      "adaptiveScale": 1,
+      "pixelRatio": 1,
+      "textures": 125,
+      "skidMarks": 0,
+      "carBounds": [
+        2.337911009788513,
+        1.0340470969676971,
+        4.357380628585815
+      ],
+      "invalidCarShadows": 0,
+      "fps": 0,
+      "drawCalls": 596,
+      "triangles": 507487,
+      "geometries": 934
+    },
+    {
+      "distance": 1270,
+      "vehicleCache": [
+        {
+          "key": "concept-car.glb",
+          "ready": true,
+          "users": 2
+        },
+        {
+          "key": "concept-car-lod.glb",
+          "ready": true,
+          "users": 4
+        },
+        {
+          "key": "solstice-gt-lod.glb",
+          "ready": true,
+          "users": 1
+        },
+        {
+          "key": "bmw-m3-lod.glb",
+          "ready": true,
+          "users": 1
+        }
+      ],
+      "vehicleLoading": false,
+      "viewedCar": "VANTA GT",
+      "audio": {
+        "ready": true,
+        "samples": "ready",
+        "decoded": 24,
+        "transients": 0,
+        "engineLayers": 15,
+        "rpm": 950.0000010077425,
+        "context": "running"
+      },
+      "preparing": false,
+      "loadMetrics": {
+        "totalMs": 17265.5,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 4.199999999254942
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.600000001490116
+          },
+          {
+            "label": "Laying the road and barriers…",
+            "elapsedSinceYieldMs": 1.1000000014901161
+          },
+          {
+            "label": "Installing circuit lighting…",
+            "elapsedSinceYieldMs": 220.30000000074506
+          },
+          {
+            "label": "Building the surroundings…",
+            "elapsedSinceYieldMs": 20
+          },
+          {
+            "label": "Finishing the starting grid…",
+            "elapsedSinceYieldMs": 134.80000000074506
+          },
+          {
+            "label": "Optimizing the circuit…",
+            "elapsedSinceYieldMs": 13.199999999254942
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 36.599999997764826
+          },
+          {
+            "label": "Lighting the circuit · 1 / 6",
+            "elapsedSinceYieldMs": 2
+          },
+          {
+            "label": "Lighting the circuit · 2 / 6",
+            "elapsedSinceYieldMs": 1455.300000000745
+          },
+          {
+            "label": "Lighting the circuit · 3 / 6",
+            "elapsedSinceYieldMs": 1001.9000000022352
+          },
+          {
+            "label": "Lighting the circuit · 4 / 6",
+            "elapsedSinceYieldMs": 2.899999998509884
+          },
+          {
+            "label": "Lighting the circuit · 5 / 6",
+            "elapsedSinceYieldMs": 1.6000000014901161
+          },
+          {
+            "label": "Lighting the circuit · 6 / 6",
+            "elapsedSinceYieldMs": 14.5
+          },
+          {
+            "label": "Finishing the reflections…",
+            "elapsedSinceYieldMs": 5.099999997764826
+          },
+          {
+            "label": "Loading the race grid…",
+            "elapsedSinceYieldMs": 768.6999999992549
+          },
+          {
+            "label": "Preparing car 1 of 7…",
+            "elapsedSinceYieldMs": 123.09999999776483
+          },
+          {
+            "label": "Preparing car 2 of 7…",
+            "elapsedSinceYieldMs": 3.599999997764826
+          },
+          {
+            "label": "Preparing car 3 of 7…",
+            "elapsedSinceYieldMs": 557.6999999992549
+          },
+          {
+            "label": "Preparing car 4 of 7…",
+            "elapsedSinceYieldMs": 44.69999999925494
+          },
+          {
+            "label": "Preparing car 5 of 7…",
+            "elapsedSinceYieldMs": 42.600000001490116
+          },
+          {
+            "label": "Preparing car 6 of 7…",
+            "elapsedSinceYieldMs": 21
+          },
+          {
+            "label": "Preparing car 7 of 7…",
+            "elapsedSinceYieldMs": 18.299999997019768
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 3.899999998509884
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 113.19999999925494
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 5539
+          }
+        ]
+      },
+      "sceneryCount": 277,
+      "screen": "racing",
+      "status": "racing",
+      "paused": true,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "steer": 0,
+        "drift": false,
+        "nitro": false
+      },
+      "player": {
+        "id": 0,
+        "name": "YOU",
+        "spec": "vanta",
+        "distance": 1270,
+        "lateral": 0,
+        "speed": 0,
+        "heading": 0,
+        "yawVelocity": 0,
+        "impactYaw": 0,
+        "sideSpeed": 0,
+        "brakeInput": 0,
+        "impact": 0,
+        "impactSerial": 0,
+        "impactCooldown": 0,
+        "scrape": 0,
+        "landingSerial": 0,
+        "nitro": 65.83000000000042,
+        "boost": 0,
+        "drift": 0,
+        "driftTotal": 0,
+        "airborne": 0,
+        "verticalSpeed": 0,
+        "rampLift": 0,
+        "jumpRewardPending": false,
+        "jumpClean": false,
+        "finishTime": null,
+        "eliminated": false,
+        "eliminationPosition": null,
+        "collision": 0,
+        "steer": 0,
+        "lap": 1,
+        "targetLane": -3,
+        "lastRamp": -1,
+        "boostCooldown": 0,
+        "boostPrevious": false,
+        "jumpTotal": 0,
+        "reverseHold": 0,
+        "slipAngle": 0,
+        "acceleration": 0,
+        "landingImpact": 0,
+        "throttle": 0,
+        "gear": 1
+      },
+      "elapsed": 0.6916666666666667,
+      "rank": 2,
+      "credits": 2500,
+      "selected": "vanta",
+      "quality": "high",
+      "reducedMotion": false,
+      "opponents": 6,
+      "cameraMode": 0,
+      "adaptiveScale": 1,
+      "pixelRatio": 1,
+      "textures": 131,
+      "skidMarks": 0,
+      "carBounds": [
+        2.337911009788513,
+        1.0340470969676971,
+        4.357380628585815
+      ],
+      "invalidCarShadows": 0,
+      "fps": 0,
+      "drawCalls": 1359,
+      "triangles": 754927,
+      "geometries": 1020
+    },
+    {
+      "distance": 1780,
+      "vehicleCache": [
+        {
+          "key": "concept-car.glb",
+          "ready": true,
+          "users": 2
+        },
+        {
+          "key": "concept-car-lod.glb",
+          "ready": true,
+          "users": 4
+        },
+        {
+          "key": "solstice-gt-lod.glb",
+          "ready": true,
+          "users": 1
+        },
+        {
+          "key": "bmw-m3-lod.glb",
+          "ready": true,
+          "users": 1
+        }
+      ],
+      "vehicleLoading": false,
+      "viewedCar": "VANTA GT",
+      "audio": {
+        "ready": true,
+        "samples": "ready",
+        "decoded": 24,
+        "transients": 0,
+        "engineLayers": 15,
+        "rpm": 950.0000000100844,
+        "context": "running"
+      },
+      "preparing": false,
+      "loadMetrics": {
+        "totalMs": 17265.5,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 4.199999999254942
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.600000001490116
+          },
+          {
+            "label": "Laying the road and barriers…",
+            "elapsedSinceYieldMs": 1.1000000014901161
+          },
+          {
+            "label": "Installing circuit lighting…",
+            "elapsedSinceYieldMs": 220.30000000074506
+          },
+          {
+            "label": "Building the surroundings…",
+            "elapsedSinceYieldMs": 20
+          },
+          {
+            "label": "Finishing the starting grid…",
+            "elapsedSinceYieldMs": 134.80000000074506
+          },
+          {
+            "label": "Optimizing the circuit…",
+            "elapsedSinceYieldMs": 13.199999999254942
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 36.599999997764826
+          },
+          {
+            "label": "Lighting the circuit · 1 / 6",
+            "elapsedSinceYieldMs": 2
+          },
+          {
+            "label": "Lighting the circuit · 2 / 6",
+            "elapsedSinceYieldMs": 1455.300000000745
+          },
+          {
+            "label": "Lighting the circuit · 3 / 6",
+            "elapsedSinceYieldMs": 1001.9000000022352
+          },
+          {
+            "label": "Lighting the circuit · 4 / 6",
+            "elapsedSinceYieldMs": 2.899999998509884
+          },
+          {
+            "label": "Lighting the circuit · 5 / 6",
+            "elapsedSinceYieldMs": 1.6000000014901161
+          },
+          {
+            "label": "Lighting the circuit · 6 / 6",
+            "elapsedSinceYieldMs": 14.5
+          },
+          {
+            "label": "Finishing the reflections…",
+            "elapsedSinceYieldMs": 5.099999997764826
+          },
+          {
+            "label": "Loading the race grid…",
+            "elapsedSinceYieldMs": 768.6999999992549
+          },
+          {
+            "label": "Preparing car 1 of 7…",
+            "elapsedSinceYieldMs": 123.09999999776483
+          },
+          {
+            "label": "Preparing car 2 of 7…",
+            "elapsedSinceYieldMs": 3.599999997764826
+          },
+          {
+            "label": "Preparing car 3 of 7…",
+            "elapsedSinceYieldMs": 557.6999999992549
+          },
+          {
+            "label": "Preparing car 4 of 7…",
+            "elapsedSinceYieldMs": 44.69999999925494
+          },
+          {
+            "label": "Preparing car 5 of 7…",
+            "elapsedSinceYieldMs": 42.600000001490116
+          },
+          {
+            "label": "Preparing car 6 of 7…",
+            "elapsedSinceYieldMs": 21
+          },
+          {
+            "label": "Preparing car 7 of 7…",
+            "elapsedSinceYieldMs": 18.299999997019768
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 3.899999998509884
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 113.19999999925494
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 5539
+          }
+        ]
+      },
+      "sceneryCount": 277,
+      "screen": "racing",
+      "status": "racing",
+      "paused": true,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "steer": 0,
+        "drift": false,
+        "nitro": false
+      },
+      "player": {
+        "id": 0,
+        "name": "YOU",
+        "spec": "vanta",
+        "distance": 1780,
+        "lateral": 0,
+        "speed": 0,
+        "heading": 0,
+        "yawVelocity": 0,
+        "impactYaw": 0,
+        "sideSpeed": 0,
+        "brakeInput": 0,
+        "impact": 0,
+        "impactSerial": 0,
+        "impactCooldown": 0,
+        "scrape": 0,
+        "landingSerial": 0,
+        "nitro": 65.83000000000042,
+        "boost": 0,
+        "drift": 0,
+        "driftTotal": 0,
+        "airborne": 0,
+        "verticalSpeed": 0,
+        "rampLift": 0,
+        "jumpRewardPending": false,
+        "jumpClean": false,
+        "finishTime": null,
+        "eliminated": false,
+        "eliminationPosition": null,
+        "collision": 0,
+        "steer": 0,
+        "lap": 1,
+        "targetLane": -3,
+        "lastRamp": -1,
+        "boostCooldown": 0,
+        "boostPrevious": false,
+        "jumpTotal": 0,
+        "reverseHold": 0,
+        "slipAngle": 0,
+        "acceleration": 0,
+        "landingImpact": 0,
+        "throttle": 0,
+        "gear": 1
+      },
+      "elapsed": 0.6916666666666667,
+      "rank": 2,
+      "credits": 2500,
+      "selected": "vanta",
+      "quality": "high",
+      "reducedMotion": false,
+      "opponents": 6,
+      "cameraMode": 0,
+      "adaptiveScale": 1,
+      "pixelRatio": 1,
+      "textures": 131,
+      "skidMarks": 0,
+      "carBounds": [
+        2.337911009788513,
+        1.0340470969676971,
+        4.357380628585815
+      ],
+      "invalidCarShadows": 0,
+      "fps": 0,
+      "drawCalls": 604,
+      "triangles": 478981,
+      "geometries": 1020
+    },
+    {
+      "distance": 2320,
+      "vehicleCache": [
+        {
+          "key": "concept-car.glb",
+          "ready": true,
+          "users": 2
+        },
+        {
+          "key": "concept-car-lod.glb",
+          "ready": true,
+          "users": 4
+        },
+        {
+          "key": "solstice-gt-lod.glb",
+          "ready": true,
+          "users": 1
+        },
+        {
+          "key": "bmw-m3-lod.glb",
+          "ready": true,
+          "users": 1
+        }
+      ],
+      "vehicleLoading": false,
+      "viewedCar": "VANTA GT",
+      "audio": {
+        "ready": true,
+        "samples": "ready",
+        "decoded": 24,
+        "transients": 0,
+        "engineLayers": 15,
+        "rpm": 950.0000000002123,
+        "context": "running"
+      },
+      "preparing": false,
+      "loadMetrics": {
+        "totalMs": 17265.5,
+        "cancelled": false,
+        "stages": [
+          {
+            "label": "Preparing the circuit…",
+            "elapsedSinceYieldMs": 4.199999999254942
+          },
+          {
+            "label": "Sculpting the landscape…",
+            "elapsedSinceYieldMs": 9.600000001490116
+          },
+          {
+            "label": "Laying the road and barriers…",
+            "elapsedSinceYieldMs": 1.1000000014901161
+          },
+          {
+            "label": "Installing circuit lighting…",
+            "elapsedSinceYieldMs": 220.30000000074506
+          },
+          {
+            "label": "Building the surroundings…",
+            "elapsedSinceYieldMs": 20
+          },
+          {
+            "label": "Finishing the starting grid…",
+            "elapsedSinceYieldMs": 134.80000000074506
+          },
+          {
+            "label": "Optimizing the circuit…",
+            "elapsedSinceYieldMs": 13.199999999254942
+          },
+          {
+            "label": "Setting the light…",
+            "elapsedSinceYieldMs": 36.599999997764826
+          },
+          {
+            "label": "Lighting the circuit · 1 / 6",
+            "elapsedSinceYieldMs": 2
+          },
+          {
+            "label": "Lighting the circuit · 2 / 6",
+            "elapsedSinceYieldMs": 1455.300000000745
+          },
+          {
+            "label": "Lighting the circuit · 3 / 6",
+            "elapsedSinceYieldMs": 1001.9000000022352
+          },
+          {
+            "label": "Lighting the circuit · 4 / 6",
+            "elapsedSinceYieldMs": 2.899999998509884
+          },
+          {
+            "label": "Lighting the circuit · 5 / 6",
+            "elapsedSinceYieldMs": 1.6000000014901161
+          },
+          {
+            "label": "Lighting the circuit · 6 / 6",
+            "elapsedSinceYieldMs": 14.5
+          },
+          {
+            "label": "Finishing the reflections…",
+            "elapsedSinceYieldMs": 5.099999997764826
+          },
+          {
+            "label": "Loading the race grid…",
+            "elapsedSinceYieldMs": 768.6999999992549
+          },
+          {
+            "label": "Preparing car 1 of 7…",
+            "elapsedSinceYieldMs": 123.09999999776483
+          },
+          {
+            "label": "Preparing car 2 of 7…",
+            "elapsedSinceYieldMs": 3.599999997764826
+          },
+          {
+            "label": "Preparing car 3 of 7…",
+            "elapsedSinceYieldMs": 557.6999999992549
+          },
+          {
+            "label": "Preparing car 4 of 7…",
+            "elapsedSinceYieldMs": 44.69999999925494
+          },
+          {
+            "label": "Preparing car 5 of 7…",
+            "elapsedSinceYieldMs": 42.600000001490116
+          },
+          {
+            "label": "Preparing car 6 of 7…",
+            "elapsedSinceYieldMs": 21
+          },
+          {
+            "label": "Preparing car 7 of 7…",
+            "elapsedSinceYieldMs": 18.299999997019768
+          },
+          {
+            "label": "Warming up the graphics…",
+            "elapsedSinceYieldMs": 3.899999998509884
+          },
+          {
+            "label": "Ready at the starting line…",
+            "elapsedSinceYieldMs": 113.19999999925494
+          },
+          {
+            "label": "Ready to race",
+            "elapsedSinceYieldMs": 5539
+          }
+        ]
+      },
+      "sceneryCount": 277,
+      "screen": "racing",
+      "status": "racing",
+      "paused": true,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "steer": 0,
+        "drift": false,
+        "nitro": false
+      },
+      "player": {
+        "id": 0,
+        "name": "YOU",
+        "spec": "vanta",
+        "distance": 2320,
+        "lateral": 0,
+        "speed": 0,
+        "heading": 0,
+        "yawVelocity": 0,
+        "impactYaw": 0,
+        "sideSpeed": 0,
+        "brakeInput": 0,
+        "impact": 0,
+        "impactSerial": 0,
+        "impactCooldown": 0,
+        "scrape": 0,
+        "landingSerial": 0,
+        "nitro": 65.83000000000042,
+        "boost": 0,
+        "drift": 0,
+        "driftTotal": 0,
+        "airborne": 0,
+        "verticalSpeed": 0,
+        "rampLift": 0,
+        "jumpRewardPending": false,
+        "jumpClean": false,
+        "finishTime": null,
+        "eliminated": false,
+        "eliminationPosition": null,
+        "collision": 0,
+        "steer": 0,
+        "lap": 1,
+        "targetLane": -3,
+        "lastRamp": -1,
+        "boostCooldown": 0,
+        "boostPrevious": false,
+        "jumpTotal": 0,
+        "reverseHold": 0,
+        "slipAngle": 0,
+        "acceleration": 0,
+        "landingImpact": 0,
+        "throttle": 0,
+        "gear": 1
+      },
+      "elapsed": 0.6916666666666667,
+      "rank": 2,
+      "credits": 2500,
+      "selected": "vanta",
+      "quality": "high",
+      "reducedMotion": false,
+      "opponents": 6,
+      "cameraMode": 0,
+      "adaptiveScale": 1,
+      "pixelRatio": 1,
+      "textures": 131,
+      "skidMarks": 0,
+      "carBounds": [
+        2.337911009788513,
+        1.0340470969676971,
+        4.357380628585815
+      ],
+      "invalidCarShadows": 0,
+      "fps": 0,
+      "drawCalls": 897,
+      "triangles": 685084,
+      "geometries": 1020
+    }
+  ],
+  "audit": {
+    "track": "city",
+    "samples": 4520,
+    "kinds": {
+      "braking-board": 10,
+      "event-banner": 8,
+      "harbor-crane": 3,
+      "cargo-stack": 41,
+      "harbor-frontage": 55,
+      "harbor-tower": 2,
+      "skyway-pier": 8,
+      "building": 140,
+      "billboard": 8,
+      "station": 2
+    },
+    "placements": 277,
+    "minTerrainClearance": 7.000028798545409,
+    "minSceneryClearance": 2.3503584800565567,
+    "violations": []
+  },
+  "passed": true
+}

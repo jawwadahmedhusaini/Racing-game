@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-27T13:46:14.777Z",
+  "requests": [
+    "concept-car.glb",
+    "solstice-gt.glb",
+    "solstice-gt.glb",
+    "solstice-gt.glb"
+  ],
+  "initialBytes": 6462376,
+  "previousVehicleBytes": 15578284,
+  "reduction": 0.5851676603148331,
+  "failedOptionalRetry": true,
+  "lateSelectionIgnored": true,
+  "savedSelectionReload": true,
+  "errors": [],
+  "passed": true
+}

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.6.0 — Neon Harbor and demand-loaded cars (2026-10-27)
+
+- Redesigned the city into a 2.71 km port, downtown and elevated-road circuit; preserved Coast.
+- Exposed harbor water and added original port structures, illuminated frontage, landmark towers and portal frames, batched in spatial cells.
+- Added deduplicated on-demand vehicle loading, retryable optional failures, stale-selection protection and reference-counted cache eviction.
+- Improved wet-road roughness and sign emission; corrected rival braking on the longer circuit.
+- Preserved garage progress and old records; new times use v7. See NEON_HARBOR_UPGRADE.md and TEST_REPORT.md.
+
 ## 2.5.2 — wall and vehicle contact (2026-10-27)
 
 - Added contact-point yaw impulses, damped impact spin, near-flush contact stability and wall friction based on the full normal impulse.

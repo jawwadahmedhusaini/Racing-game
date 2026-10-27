@@ -25,7 +25,7 @@ The renderer interpolates camera motion separately from the fixed-step simulatio
 
 ## Assets and lifetime
 
-Car Concept uses 106,391-triangle detailed / 30,534-triangle race GLBs. Original Solstice uses 65,844 / 24,436 triangles. BMW M3 uses independent detailed/race meshes; the six source GLBs are parsed once; each prepared template batches static geometry by material, preserving separate wheel pivots. Textures from the asset are shared. Ten immutable prepared templates (five catalog cars × two detail levels) retain geometry and texture maps for the page lifetime; each instance clones its materials. Instance materials and race effects are disposed on restart/exit. Rear-surface fitting samples are cached by detail level. Each world is built once and cached. The garage is kept separate from race scenes. Live processes are not assumed to survive cloud environment publication.
+Car Concept uses 106,391-triangle detailed / 30,534-triangle race GLBs. Original Solstice uses 65,844 / 24,436 triangles. BMW M3 uses independent detailed/race meshes; source GLBs load on demand; each prepared template batches static geometry by material, preserving separate wheel pivots. Textures from the asset are shared. Prepared templates share geometry/maps within a cached family/detail owner; live instances hold reference-counted leases and clone materials. Idle owners are evicted beyond two retained entries after selection or race transitions. Instance materials and race effects are disposed on restart/exit. Rear-surface fitting samples are cached by detail level. Each world is built once and cached. The garage is kept separate from race scenes. Live processes are not assumed to survive cloud environment publication.
 
 ## Persistence
 
@@ -94,3 +94,7 @@ Ramp support and contact share a rotated footprint overlap test in `ramp.ts`. Th
 ## 2.5.2 planar collision rotation
 
 `contact.ts` calculates support/contact points and rectangular yaw inertia for unit-mass bodies. Inelastic impulses exchange linear momentum and bounded `impactYaw`; static faces also apply Coulomb-style tangential friction using the entire normal impulse. Near-flush supports blend toward the face midpoint. The simulation applies/damps impact yaw separately from steering and reprojects existing velocity when impact rotation changes the chassis heading. The HUD/camera use horizontal ground speed. Rival lookahead scales with stopping distance and projected footprint width. This remains track-relative planar arcade dynamics, not a full 3D rigid-body solver.
+
+## 2.6 loading and world ownership
+
+Vehicle families/detail levels are loaded through `AssetCache`. Raw GLTF and prepared variants share one owner; cloned cars hold leases until disposed. Explicit transition-time trimming evicts at most-idle owners after a new batch is acquired, protecting live textures and geometry. Selection generation tokens reject stale UI results; race cancellation uses the existing abortable wait. `harbor.ts` supplies original static district geometry, merged by material and cell, with road footprints reserved before background buildings are placed.
