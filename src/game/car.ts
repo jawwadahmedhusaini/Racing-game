@@ -5,29 +5,37 @@ import type {CarSpec} from './content';
 import {publicUrl} from './urls';
 import {random} from './materials';
 import {wingGeometry} from './aero';
+import {AssetCache} from './asset-cache';
 import {reshapeGeometry,reshapePoint} from './vehicle-shape';
 export interface CarModel {group:THREE.Group;body:THREE.Group;wheels:THREE.Group[];dimensions:THREE.Vector3;paint:THREE.MeshPhysicalMaterial;brake:THREE.MeshStandardMaterial;headlamps:THREE.MeshStandardMaterial;flames:THREE.Mesh[];update:(speed:number,steer:number,drift:number,boost:number,braking:boolean,time:number,acceleration?:number,landing?:number)=>void;dispose:()=>void;}
-let garageTemplate:THREE.Group|undefined,raceTemplate:THREE.Group|undefined,solsticeTemplate:THREE.Group|undefined,solsticeRaceTemplate:THREE.Group|undefined,bmwTemplate:THREE.Group|undefined,bmwRaceTemplate:THREE.Group|undefined;
-export async function loadVehicleAsset(){const loader=new GLTFLoader();const models=await Promise.all(['concept-car.glb','concept-car-lod.glb','solstice-gt.glb','solstice-gt-lod.glb','bmw-m3.glb','bmw-m3-lod.glb'].map(file=>loader.loadAsync(publicUrl(`assets/${file}`))));[garageTemplate,raceTemplate,solsticeTemplate,solsticeRaceTemplate,bmwTemplate,bmwRaceTemplate]=models.map(model=>model.scene);models.forEach(model=>model.scene.updateMatrixWorld(true));}
+interface VehicleAsset {template:THREE.Group;prepared:Map<string,CarModel>;}
+export function vehicleAssetKey(spec:CarSpec,racing=false){return `${spec.id==='bmw-m3'?'bmw-m3':spec.shape==='grandtourer'?'solstice-gt':'concept-car'}${racing?'-lod':''}.glb`;}
+function disposeAsset(asset:VehicleAsset){
+  const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>(),textures=new Set<THREE.Texture>();
+  for(const group of [asset.template,...[...asset.prepared.values()].map(c=>c.group)])group.traverse(o=>{if(o instanceof THREE.Mesh){geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material])materials.add(m);}});
+  for(const m of materials)for(const value of Object.values(m))if(value instanceof THREE.Texture)textures.add(value);
+  geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());asset.prepared.clear();
+}
+const assets=new AssetCache<VehicleAsset>(async file=>{const model=await new GLTFLoader().loadAsync(publicUrl(`assets/${file}`));model.scene.updateMatrixWorld(true);return {template:model.scene,prepared:new Map()};},disposeAsset);
+export async function loadVehicleAsset(spec:CarSpec,racing=false){await assets.load(vehicleAssetKey(spec,racing));}
+export function trimVehicleCache(keep:string[]=[]){assets.trim(2,keep);}
+export function vehicleCacheStats(){return assets.stats();}
 
-// Immutable prepared meshes are bounded to five designs × two detail levels.
-// Instances own their materials; geometry and texture maps stay alive for reuse.
-const prepared=new Map<string,CarModel>();
 const rearSurfaces=new Map<string,number>();
 export function createCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
-  const key=`${spec.id}:${racing}`;let source=prepared.get(key);
-  if(!source){source=buildCar(spec,spec.color,racing);prepared.set(key,source);}
+  const lease=assets.acquire(vehicleAssetKey(spec,racing)),asset=lease.value;let source=asset.prepared.get(spec.id);
+  try{if(!source){source=buildCar(spec,asset.template,spec.color,racing);asset.prepared.set(spec.id,source);}}catch(error){lease.release();throw error;}
   const group=source.group.clone(true),materials=new Map<THREE.Material,THREE.Material>();
   group.traverse(o=>{if(o instanceof THREE.Mesh){const clone=(m:THREE.Material)=>{let own=materials.get(m);if(!own){own=m.clone();materials.set(m,own);}return own;};o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);}});
   const paint=materials.get(source.paint) as THREE.MeshPhysicalMaterial;paint.color.set(color);
   for(const [original,own] of materials)if(original.name.startsWith('Interior 3'))(own as THREE.MeshStandardMaterial).color.set(color).multiplyScalar(.55);
-  return animateCar(group,group.getObjectByName('vehicle-body') as THREE.Group,source.wheels.map(w=>group.getObjectByName(w.name) as THREE.Group),source.dimensions.clone(),paint,materials.get(source.brake) as THREE.MeshStandardMaterial,materials.get(source.headlamps) as THREE.MeshStandardMaterial,group.getObjectsByProperty('name','boost-flame') as THREE.Mesh[],()=>materials.forEach(m=>m.dispose()));
+  return animateCar(group,group.getObjectByName('vehicle-body') as THREE.Group,source.wheels.map(w=>group.getObjectByName(w.name) as THREE.Group),source.dimensions.clone(),paint,materials.get(source.brake) as THREE.MeshStandardMaterial,materials.get(source.headlamps) as THREE.MeshStandardMaterial,group.getObjectsByProperty('name','boost-flame') as THREE.Mesh[],()=>{materials.forEach(m=>m.dispose());lease.release();});
 }
 
 // Car Concept by Eric Chadwick / DGG (CC BY 4.0), adapted for this game.
 // Model preparation and license details are in scripts/prepare-car.py and ASSET_LICENSES.md.
-function buildCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
-  const original=spec.shape==='grandtourer',template=spec.id==='bmw-m3'?(racing?bmwRaceTemplate:bmwTemplate):original?(racing?solsticeRaceTemplate:solsticeTemplate):(racing?raceTemplate:garageTemplate);if(!template)throw new Error('Vehicle assets must load before creating cars.');
+function buildCar(spec:CarSpec,template:THREE.Group,color=spec.color,racing=false):CarModel {
+  const original=spec.shape==='grandtourer';
   const group=new THREE.Group(),body=new THREE.Group();group.name=spec.name;body.name='vehicle-body';group.add(body);
   const materials=new Map<THREE.Material,THREE.Material>();
   let paint!:THREE.MeshPhysicalMaterial,brake!:THREE.MeshStandardMaterial,headlamps!:THREE.MeshStandardMaterial;

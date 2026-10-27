@@ -1,35 +1,35 @@
-# APEX RUSH 2.5.2 — validation
+# APEX RUSH 2.6.0 — validation
 
 ## Current release gates
 
-- **204 unit tests passed**, no failures or skipped tests.
-- **21 Chromium browser workflows passed**, no failures, skips, retries or flaky outcomes; 16.1 minutes. Started 2026-10-26T22:26:02.178Z (UTC).
-- TypeScript and root/Pages production builds passed. Final runtime files were frozen and fingerprinted for release validation.
-- Packaged launcher and `/Racing-game/` production checks passed on 2.5.2, including real keyboard acceleration, nitro, reverse, pause, Ultra rendering, four layouts and asset paths. Development controls are absent from production.
-- Dependency audit reports zero vulnerabilities. No dependencies or external assets changed.
+- **210 unit tests passed**, no failures or skips.
+- **23 Chromium browser workflows passed**, no failures, skips, retries or flaky outcomes; 22.3 minutes. Started 2026-10-27T13:26:39.798Z (UTC).
+- TypeScript and root/Pages production builds passed. Final source, public assets and runtime configuration were frozen and fingerprinted before the complete browser run.
+- Packaged launcher and `/Racing-game/` production smoke checks passed on 2.6.0, including actual keyboard acceleration, nitro, reverse, pause, four layouts, Ultra rendering and asset paths. Development controls are absent from production.
+- No dependencies or external asset sources changed. The retained dependency audit reports zero vulnerabilities.
 
-## Reproduced defects and added coverage
+## Loading and cache
 
-The baseline had **22 failures**: corner impacts for five cars on both walls of both tracks did not generate chassis rotation, nitro spent fuel against a wall, and finishing left residual lateral motion. The original output is retained in `artifacts/wall-before.txt`.
+The default cold garage requested only `concept-car.glb`: **6,462,376 bytes** instead of the former six files' **15,578,284 bytes** (58.5% fewer vehicle bytes). This is model transfer volume, not total startup bytes, startup time or FPS. Surface/vegetation preload remains.
 
-**34 new unit cases** cover those defects plus combined linear/angular energy, symmetric head-on stops, steering/reverse escape, off-center vehicle impacts, momentum-preserving body rotation, near-zero rounding, ground-speed reporting, recovery, rival stopping distance/projected width and 30/60/120 Hz consistency. Total collision energy is checked across 90 combinations of wall side, angle, speed and existing spin. The previous **41 ramp regressions** still pass.
+Browser checks deliberately fail an optional car download, retry it, hold a response while selecting another car, purchase/reload Solstice, cancel grid preparation during a held BMW LOD download, restart, and switch racing quality. The fresh seven-car grid requested exactly four unique GLBs: the selected detailed model and three LOD families. Unselected detailed BMW/Solstice models were not fetched. Cache tests cover request sharing, retry, idempotent release, in-flight protection, live leases and LRU disposal. Returning from a race leaves at most two idle owners alongside the active garage model.
 
-Two new browser workflows use a mobile landscape layout and real multi-touch events to reproduce both wall sides, steer away, reverse after a head-on stop, and confirm the speedometer reads 36 km/h for a 10 m/s lateral slide with zero forward speed. They use development-only scenario positioning/time advancement for repeatability; steering comes from touch controls. They do not constitute physical-phone testing.
+## New city route and art
 
-The old throttle-only test required less than half a lap because the former wall solver froze the chassis heading. With real contact-induced turning, that distance limit was not a valid physical requirement. Its replacement requires an unfinished throttle-only race at 90 seconds, while a normally steered racing line finishes much sooner. The separate test that forward input preserves world heading away from obstacles remains unchanged.
+Neon Harbor is a 2.71 km route with portside straights, alternating bends and an elevated return. Both tracks pass non-adjacent corridor separation, grid straightness, finite curvature and closed-seam checks. Existing AI completion tests still finish all six opponents on both tracks and all difficulties; the new route exposed and led to a more conservative traffic-braking margin.
+
+Five posed High-preset screenshots at 1280 × 800 were captured and inspected. The whole-city clearance audit sampled **4,520** road points and checked **277** registered scenery footprints with **zero violations**. Minimum registered scenery clearance beyond the road edge was **2.35 m**. The new port and frontage are original modular geometry. No additional third-party car or professional track pack is claimed.
 
 ## Retained regression coverage
 
-Manual steering, reverse, boost/drift, six AI finishers on both tracks/all difficulties, finish/elimination order, career rewards, purchases and save migration all pass. Ten 90-second mixed-input runs cover every car on both tracks. V6 record migration retains earlier times and garage progress.
+The 34 wall and 41 ramp cases pass, including rotated impacts, steering/reverse escape, lateral-speed display, partial ramp approaches, jumps and landing. Ten 90-second mixed-input runs cover every car on both tracks. Browser checks retain career rewards, purchases, BMW audio/selection, mobile controls, pause/restart/resource reuse, loading cancellation, second-tab protection, storage/audio failure, missing assets and WebGL context loss. Existing records and garage progress survive v7 record migration.
 
-Browser coverage includes the ramp approaches/escape tests, touch/keyboard controls, pause/restart/resource reuse, loading cancellation, second-tab protection, storage/audio failure, missing assets, WebGL context loss and BMW selection/audio persistence.
-
-Seven OfflineAudioContext waveform scenarios remain below clipping (maximum sample **0.916**), with mute/pause silence, stereo rivals, bounded voices and failed-download fallback.
+Seven audio waveform scenarios remain below clipping (maximum sample **0.916**), with mute/pause silence, stereo rivals and failed-download fallback.
 
 ## Limits and evidence
 
-The contact solver has planar yaw inertia and bounded/damped spin. It remains a track-relative arcade approximation, without rollover, crash deformation, independent-wheel suspension or unconstrained off-road dynamics. Chromium uses Linux software WebGL; physical phone/desktop GPU performance, thermals, Safari/Firefox and subjective handling remain unverified. No universal bug-free or flagship-quality claim is made.
+Chromium ran with Linux software WebGL. This is not a physical-GPU benchmark. Physical phones, thermals, hardware frame pacing, Safari/Firefox and subjective handling remain unverified. Reflections use static probes; GPU texture compression, full suspension/rollover dynamics, a larger professionally authored garage and extended career remain separate work. No Asphalt-parity or universal FPS claim is made.
 
-Current evidence includes `unit-results.json`, `browser-results.json`, `collision-review.json`, `wall-coast-browser.json`, `wall-city-browser.json`, wall/ramp screenshots, `audio-render.json`, `production-smoke.json`, `hosting-smoke.json` and `dependency-audit.json` in `artifacts/`. Source archives include these files. Archive CRC/SHA checks and public-download verification are final delivery gates.
+Current evidence: `unit-results.json`, `browser-results.json`, `streaming-garage.json`, `streaming-race.json`, `neon-review.json`, `neon-streaming-review.json`, `neon-*.png`, wall/ramp browser JSON/screenshots, `audio-render.json`, `production-smoke.json` and `hosting-smoke.json` in `artifacts/`. Source archives include these records. CRC/SHA and public-download checks remain the final delivery gates.
 
-The previous `ramp-review.json`, `browser-rerun.json`, `sound-contact-review.json` and older audit/performance/visual reports retain their original release dates/versions. See [COLLISION_FIXES.md](COLLISION_FIXES.md).
+The older collision/ramp/sound/performance reports retain their original release dates. See [NEON_HARBOR_UPGRADE.md](NEON_HARBOR_UPGRADE.md) for scope and [DEVICE_TESTING.md](DEVICE_TESTING.md) for hardware validation.

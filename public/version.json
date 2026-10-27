@@ -1,11 +1,11 @@
 {
-  "version": "2.5.2",
+  "version": "2.6.0",
   "date": "2026-10-27",
   "changes": [
-    "Planar contact-point yaw response for walls, ramps and cars",
-    "Wall friction, momentum-preserving impact spin and boost gating",
-    "Ground-speed HUD/camera, finish and recovery motion cleanup",
-    "Speed-dependent AI traffic braking and rotated-vehicle clearance",
-    "Existing saves and older records retained; new handling records use v6"
+    "Demand-loaded vehicles with shared requests, retry and reference-counted LRU cache",
+    "Redesigned 2.71 km Neon Harbor route with docks, switchbacks and elevated return",
+    "Open harbor water, port structures, illuminated storefronts and original landmark towers",
+    "Readable illuminated signs, patchy wet asphalt and colored road lighting",
+    "Earlier rival braking; existing saves and records retained, new records use v7"
   ]
 }

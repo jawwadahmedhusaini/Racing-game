@@ -47,9 +47,9 @@ export function asphaltMaterial(length: number, width: number, wet: boolean) {
       shader.fragmentShader='varying vec3 vRoadWorld;\n'+shader.fragmentShader;
       shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
         float wetness=.5+.23*sin(vRoadWorld.x*.065+sin(vRoadWorld.z*.047)*1.8)+.2*sin(vRoadWorld.z*.083+vRoadWorld.x*.029);
-        roughnessFactor*=mix(.60,.96,smoothstep(.25,.75,wetness));`);
+        roughnessFactor*=mix(.24,.82,smoothstep(.25,.75,wetness));`);
     };
-    material.customProgramCacheKey=()=> 'apex-wet-road-v3';
+    material.customProgramCacheKey=()=> 'apex-wet-road-v4';
   }
   return material;
 }

@@ -9,12 +9,12 @@ if(cityOnly){report.cityRecheck=new Date().toISOString();report.errors=[];}
 page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
 await page.addInitScript(()=>localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{adaptiveResolution:false,quality:'high',music:0,engine:0,effects:0}})));
 await page.goto('http://127.0.0.1:5173');await page.waitForSelector('.loading',{state:'detached',timeout:60000});if(!cityOnly){await page.screenshot({path:'artifacts/garage-final.png'});await page.screenshot({path:'artifacts/garage-final.jpg',quality:90});}
-for(const [name,file] of cityOnly?[]:[['SPECTRE S','spectre-final'],['STRATOS R','stratos-final'],['SOLSTICE GT','solstice-final']]){await page.getByRole('button',{name:`View ${name}`}).click();await page.screenshot({path:`artifacts/${file}.png`});report.vehicles.push({name,bounds:(await page.evaluate(()=>window.__apex.state())).carBounds});}
+for(const [name,file] of cityOnly?[]:[['SPECTRE S','spectre-final'],['STRATOS R','stratos-final'],['SOLSTICE GT','solstice-final']]){await page.getByRole('button',{name:`View ${name}`}).click();await page.waitForFunction(name=>window.__apex.state().viewedCar===name,name,{timeout:60000});await page.screenshot({path:`artifacts/${file}.png`});report.vehicles.push({name,bounds:(await page.evaluate(()=>window.__apex.state())).carBounds});}
 if(!cityOnly){
  await page.mouse.move(600,400);await page.mouse.down();await page.mouse.move(1120,400,{steps:12});await page.mouse.up();await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));await page.screenshot({path:'artifacts/solstice-rear.png'});
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'artifacts/solstice-mobile.png'});await page.setViewportSize({width:1280,height:800});
 }
-await page.getByRole('button',{name:'View VANTA GT'}).click();
+await page.getByRole('button',{name:'View VANTA GT'}).click();await page.waitForFunction(()=>window.__apex.state().viewedCar==='VANTA GT',null,{timeout:60000});
 for(const track of cityOnly?['city']:['coast','city']){
  await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator(`[data-action="track"][data-value="${track}"]`).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await page.waitForSelector('#countdown',{timeout:90000});await page.evaluate(track=>window.__apex.advance(track==='city'?5.5:7,{throttle:1},true),track);
  if(track==='coast'){

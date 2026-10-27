@@ -102,7 +102,7 @@ test('rapid car browsing and repeated restarts release resources; graphics setti
   test.setTimeout(300_000); // Four complete restarts and thirteen mesh rebuilds under software WebGL.
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
   const bounds:number[][]=[];
-  for(const name of ['VANTA GT','SPECTRE S','STRATOS R']){await page.getByRole('button',{name:`View ${name}`}).click();bounds.push((await state(page)).carBounds);}
+  for(const name of ['VANTA GT','SPECTRE S','STRATOS R']){await page.getByRole('button',{name:`View ${name}`}).click();await expect.poll(async()=>(await state(page)).viewedCar).toBe(name);bounds.push((await state(page)).carBounds);}
   expect(bounds[0][0]).toBeLessThan(2.38);expect(bounds[2][0]).toBeLessThan(2.48);expect(bounds[1][2]).toBeGreaterThan(bounds[0][2]*1.06);expect(bounds[2][1]).toBeLessThan(bounds[0][1]);
   await page.getByRole('button',{name:'View VANTA GT'}).click();
   await page.evaluate(()=>{for(let i=0;i<12;i++)(document.querySelector(`[data-action="car"][data-value="${i%3}"]`) as HTMLElement).click();(document.querySelector('[data-action="car"][data-value="0"]') as HTMLElement).click();});

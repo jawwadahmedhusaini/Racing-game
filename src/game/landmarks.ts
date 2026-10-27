@@ -46,7 +46,7 @@ export function addLandmarks(scene:THREE.Scene,track:Track,height:(x:number,z:nu
       block(base,0,5.3,0,9,.18,25,glass,yaw);block(base,0,5.5,0,9.3,.18,25.2,metal,yaw);
       for(const x of [-3.5,3.5])block(base,x,5.15,0,.08,.07,24,amber,yaw);
       for(const z of [-6,0,6]){block(base,-2,.8,z,1.1,.16,3.6,white,yaw);for(const dz of [-1.2,1.2])block(base,-2,.4,z+dz,.6,.8,.16,metal,yaw);block(base,-2.5,1.25,z,.12,.8,3.6,white,yaw);}
-      const sign=new THREE.MeshStandardMaterial({map:signTexture('HARBOR / TRANSIT','#8cd6db','NIGHT LINE · PLATFORM 02'),emissive:'#ffffff',emissiveIntensity:.5,roughness:.6});
+      const sign=new THREE.MeshStandardMaterial({map:signTexture('HARBOR / TRANSIT','#8cd6db','NIGHT LINE · PLATFORM 02'),emissive:'#ffffff',emissiveIntensity:.5,roughness:.6});sign.emissiveMap=sign.map;
       block(base,0,4.2,-10,7,1,.15,sign,yaw);
     }
   }

@@ -13,7 +13,7 @@ export function planOpponent(driver:Driver,drivers:Driver[],track:Track){
   const avoidRamp=rampApproach>-65&&rampApproach<RAMP.length+15;
   const ideal=avoidRamp?-2:clamp(-look.curvature*220,-2.8,2.8)+(driver.id%3-1)*.4;
   const obstacles=drivers.filter(o=>o.id!==driver.id&&!o.eliminated&&o.finishTime===null&&Math.abs(o.airborne+o.rampLift-driver.airborne-driver.rampLift)<1.5);
-  const horizon=Math.max(34,driver.speed*.5+driver.speed*driver.speed/64+9);
+  const horizon=Math.max(34,driver.speed*.5+driver.speed*driver.speed/48+9);
   const lateralRadius=(d:Driver)=>{const f=footprint(d);return Math.abs(Math.cos(d.heading))*f.width+Math.abs(Math.sin(d.heading))*f.length;};
   let lead:Driver|undefined,gap=Infinity;
   for(const other of obstacles){const d=raceGap(other.distance,driver.distance,track.length);if(d>0&&d<horizon&&Math.abs(other.lateral-driver.lateral)<lateralRadius(driver)+lateralRadius(other)+.4&&d<gap){lead=other;gap=d;}}
@@ -34,7 +34,7 @@ export function planOpponent(driver:Driver,drivers:Driver[],track:Track){
     if(gap<17||!safe.length)speedLimit=Math.max(0,lead.speed)+Math.max(0,gap-6)*1.25+(safe.length?1.5:0);
     // A fixed 34 m lookahead is shorter than braking distance at racing speed.
     // Brake for the current occupied corridor even while planning a pass.
-    speedLimit=Math.min(speedLimit,Math.max(0,lead.speed)+Math.sqrt(64*Math.max(0,gap-7))+(safe.length?1.5:0));
+    speedLimit=Math.min(speedLimit,Math.max(0,lead.speed)+Math.sqrt(48*Math.max(0,gap-7))+(safe.length?1.5:0));
   }
   return {lane:clamp(lane,-5,5),speedLimit,bend};
 }

@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-27T13:47:09.550Z",
+  "requests": [
+    "concept-car.glb",
+    "concept-car-lod.glb",
+    "solstice-gt-lod.glb",
+    "bmw-m3-lod.glb"
+  ],
+  "cache": [
+    {
+      "key": "concept-car.glb",
+      "ready": true,
+      "users": 1
+    },
+    {
+      "key": "concept-car-lod.glb",
+      "ready": true,
+      "users": 0
+    },
+    {
+      "key": "bmw-m3-lod.glb",
+      "ready": true,
+      "users": 0
+    }
+  ],
+  "cancelledPendingDownload": true,
+  "detailSwitch": true,
+  "errors": [],
+  "passed": true
+}
