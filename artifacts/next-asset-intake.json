@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-27",
+  "sourceCommit": "251bc67d5ff52ce535525e144a4a1304e3b2b5ef",
+  "models": [
+    {
+      "sourceFile": "next-cars/cars/Y7/veneno.blend",
+      "sha256": "5cd9c16c24be5f6715d94e289d7c2b73a458b759c8761f6d4e7a6bf9def275fd",
+      "meshObjects": 3,
+      "baseTriangles": 69192,
+      "materials": [
+        "Y7_body",
+        "Y7_glass",
+        "Y7_interior"
+      ],
+      "imageReferences": 3
+    },
+    {
+      "sourceFile": "next-cars/cars/Y7/wheel.blend",
+      "sha256": "5e990f26e33b274748784e84469fe8ded786cf5ef00d5791633b402ce520517b",
+      "meshObjects": 4,
+      "baseTriangles": 32180,
+      "materials": [
+        "Material_005",
+        "Y7_brake",
+        "Y7_wheel"
+      ],
+      "imageReferences": 5
+    },
+    {
+      "sourceFile": "next-cars/cars/LF/LF.blend",
+      "sha256": "aea32a17aaae35d75fb7b690bee9e63410e19c88af5d80e1738d5bc9907cb538",
+      "meshObjects": 5,
+      "baseTriangles": 78560,
+      "materials": [
+        "LF_body",
+        "LF_glass",
+        "LF_interior",
+        "LF_wheel"
+      ],
+      "imageReferences": 0
+    },
+    {
+      "sourceFile": "next-city/12Buildings.blend",
+      "sha256": "df96af8430c86cb056434b3c9b1f137d3263cf1ae0ed1dd2fde341be93637d02",
+      "meshObjects": 12,
+      "baseTriangles": 115278,
+      "materials": [
+        "Building"
+      ],
+      "imageReferences": 3
+    }
+  ],
+  "integrated": false,
+  "visualQualityApproved": false,
+  "notes": [
+    "Counts are source mesh triangles before modifiers, object duplication, rig conversion or LOD generation.",
+    "Y7 body and wheel sources are separate; final four-wheel cost is not their simple sum.",
+    "Building geometry credits raytrace under CC BY; texture credits Calinou under CC BY-SA 3.0.",
+    "Keep source credits and confirm complete license terms before redistribution; unrelated packed lighting images are not approved for use."
+  ]
+}

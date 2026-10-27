@@ -1,5 +1,19 @@
 # Free asset upgrade — intake findings, 25 October 2026
 
+## 27 October: new source files acquired
+
+A new intake obtained actual Blender sources from the pinned Stunt Rally blendfiles repository, using GitHub HTML listings and raw downloads despite blocked APIs. This supersedes the earlier general statement that all intended source archives are unavailable.
+
+| Candidate | Inspected source geometry | Credits and status |
+| --- | --- | --- |
+| Y7 / Veneno | 69,192 body-scene triangles; separate wheel scene 32,180 | hasapeta, CC BY according to source about.txt; rig, texture provenance, full terms, visual review and LODs pending |
+| LF sports car | 78,560 source-scene triangles | MasterLife, CC BY according to source about.txt; visual review, full terms, wheel duplication/rig and LODs pending |
+| 12 Buildings | 12 mesh objects, 115,278 source-scene triangles | raytrace geometry credited CC BY; Calinou textures credited CC BY-SA 3.0; inspect individual materials/dependencies and terms separately |
+
+The files are in ignored `asset-inbox/next-cars` and `asset-inbox/next-city`, outside public assets and release archives. Blender inspection used disabled automatic script execution. Counts exclude evaluated modifiers and final instance duplication; they are not final GLB budgets or quality ratings. `artifacts/next-asset-intake.json` records hashes and measured source counts. No new car or imported building is shipped by this intake.
+
+The next production milestone is an artist-asset test scene: prepare one vehicle and selected building modules, review them in the existing lighting, then measure draw calls and memory before adding the second car. Keep the current game and saves available. Real-device FPS still requires actual hardware; cloud software WebGL cannot supply that evidence.
+
 ## 26 October update
 
 A different source is now usable: Stunt Rally's versioned asset repositories. Version 2.5 adds Neubi's CC0 BMW M3 community model with CryHam's adaptation, plus asset-specifically credited CC BY sound banks. See `public/licenses/bmw-m3.json`, `public/licenses/audio.json` and [SOUND_AND_CONTACT.md](SOUND_AND_CONTACT.md). All prior cars and circuits remain. Sketchfab, Poly Haven, Freesound and OpenGameArt remain blocked here; the earlier McLaren/Porsche/Ferrari/Mercedes/Aston Martin candidates are not claimed as imported. The older intake findings below remain an accurate record of their original review.
