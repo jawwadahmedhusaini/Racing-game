@@ -1,0 +1,134 @@
+
+ RUN  v5.0.5 /workspace/Racing-game
+
+ × tests/wall-response.test.ts > vanta on coast: left corner impact turns the body away from the wall 5ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > vanta on coast: right corner impact turns the body away from the wall 1ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > spectre on coast: left corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > spectre on coast: right corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > stratos on coast: left corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > stratos on coast: right corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > solstice on coast: left corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > solstice on coast: right corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > bmw-m3 on coast: left corner impact turns the body away from the wall 1ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > bmw-m3 on coast: right corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > vanta on city: left corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > vanta on city: right corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > spectre on city: left corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > spectre on city: right corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > stratos on city: left corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > stratos on city: right corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > solstice on city: left corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > solstice on city: right corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > bmw-m3 on city: left corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > bmw-m3 on city: right corner impact turns the body away from the wall 0ms
+   → expected 0 to be greater than 0.2
+ × tests/wall-response.test.ts > holding nitro while pointing into a wall does not spend fuel on wall riding 3ms
+   → expected 1 to be +0 // Object.is equality
+ × tests/wall-response.test.ts > finishing the race clears lateral movement and residual collision spin 2ms
+   → expected { x: 7.605608730589138, …(1) } to deeply equal { x: +0, z: +0 }
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 22 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/wall-response.test.ts > vanta on coast: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > vanta on coast: right corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > spectre on coast: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > spectre on coast: right corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > stratos on coast: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > stratos on coast: right corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > solstice on coast: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > solstice on coast: right corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > bmw-m3 on coast: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > bmw-m3 on coast: right corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > vanta on city: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > vanta on city: right corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > spectre on city: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > spectre on city: right corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > stratos on city: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > stratos on city: right corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > solstice on city: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > solstice on city: right corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > bmw-m3 on city: left corner impact turns the body away from the wall
+ FAIL  tests/wall-response.test.ts > bmw-m3 on city: right corner impact turns the body away from the wall
+AssertionError: expected 0 to be greater than 0.2
+ ❯ tests/wall-response.test.ts:12:41
+     10|  const s=race(track,car),d=s.player;d.heading=-side*.55;d.speed=40;d.l…
+     11|  const worldYaw=track.sample(d.distance).yaw+d.heading;s.constrainToRo…
+     12|  expect(((d as any).impactYaw??0)*side).toBeGreaterThan(.2);
+       |                                         ^
+     13|  for(let i=0;i<60;i++)s.step(1/60,{...NO_INPUT,throttle:1});
+     14|  const turn=angleDelta(worldYaw,track.sample(d.distance).yaw+d.heading…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/22]⎯
+
+ FAIL  tests/wall-response.test.ts > holding nitro while pointing into a wall does not spend fuel on wall riding
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/wall-response.test.ts:21:18
+     19|  const s=race(),d=s.player;d.heading=-.65;d.speed=12;d.lateral=s.roadC…
+     20|  s.step(1/120,{...NO_INPUT,throttle:1,nitro:true});
+     21|  expect(d.boost).toBe(0);expect(d.nitro).toBeGreaterThanOrEqual(70);
+       |                  ^
+     22| });
+     23| it('finishing the race clears lateral movement and residual collision …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/22]⎯
+
+ FAIL  tests/wall-response.test.ts > finishing the race clears lateral movement and residual collision spin
+AssertionError: expected { x: 7.605608730589138, …(1) } to deeply equal { x: +0, z: +0 }
+
+- Expected
++ Received
+
+  {
+-   "x": 0,
+-   "z": 0,
++   "x": 7.605608730589138,
++   "z": 0.0015266773934399164,
+  }
+
+ ❯ tests/wall-response.test.ts:25:78
+     23| it('finishing the race clears lateral movement and residual collision …
+     24|  const s=race(),d=s.player;d.distance=s.track.length-.05;d.lateral=0;d…
+     25|  s.step(1/60,NO_INPUT);expect(s.status).toBe('finished');expect(veloci…
+       |                                                                              ^
+     26| });
+     27|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/22]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  22 failed (22)
+   Start at  22:05:37
+   Duration  321ms (import 50%, transform 33%, tests 14%, worker 3%)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

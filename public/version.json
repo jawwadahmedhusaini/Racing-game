@@ -1,11 +1,11 @@
 {
-  "version": "2.5.1",
-  "date": "2026-10-26",
+  "version": "2.5.2",
+  "date": "2026-10-27",
   "changes": [
-    "Fixed ramp-edge trapping with footprint-based support",
-    "Raised-face contacts permit sliding and forward/reverse escape",
-    "Ramp constraints after traffic pushes; direction-sensitive lip crossing",
-    "Road-relative landing response and heading-correct chassis tilt",
-    "Existing cars, sound assets, progress and v5 records retained"
+    "Planar contact-point yaw response for walls, ramps and cars",
+    "Wall friction, momentum-preserving impact spin and boost gating",
+    "Ground-speed HUD/camera, finish and recovery motion cleanup",
+    "Speed-dependent AI traffic braking and rotated-vehicle clearance",
+    "Existing saves and older records retained; new handling records use v6"
   ]
 }

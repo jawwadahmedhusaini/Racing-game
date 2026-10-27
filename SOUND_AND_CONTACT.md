@@ -1,5 +1,7 @@
 # APEX RUSH 2.5 — sound, contact and BMW import
 
+Historical 2.5 notes: version 2.5.2 adds planar yaw inertia/contact response; see COLLISION_FIXES.md for the current collision model.
+
 ## Delivered
 
 The previous two-oscillator engine has been replaced by four credited, locally bundled engine sample banks, each with five RPM layers. RPM follows gear ratios and clutch response; unloaded wheels rev freely. Throttle/load changes filter tone and gain, shifting dips power, lifting off produces a short overrun burst. Tires react to braking, slip and speed and stay silent in flight. Impacts use metal recordings scaled to closing velocity; scrapes and landings have separate response. Two nearby competitors use stereo direction, distance attenuation and bounded Doppler. Mix buses and a compressor preserve headroom. The garage has a short **Hear the engine** audition, including on mobile.
