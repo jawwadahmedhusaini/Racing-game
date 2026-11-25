@@ -37,7 +37,10 @@ export class AudioSystem {
   master?:GainNode;engineBus?:GainNode;effectsBus?:GainNode;musicGain?:GainNode;limiter?:DynamicsCompressorNode;
   private playerVoice?:SampleVoice;private rivals:SampleVoice[]=[];private buffers=new Map<string,AudioBuffer>();
   private fallback?:OscillatorNode;private fallbackGain?:GainNode;private wind?:GainNode;private tires?:GainNode;private tireFilter?:BiquadFilterNode;private squeal?:OscillatorNode;private squealGain?:GainNode;private boost?:GainNode;private scrape?:GainNode;
-  private loops:AudioScheduledSourceNode[]=[];private transients=new Set<AudioScheduledSourceNode>();private lastDriver:Driver|null=null;private lastImpact=0;private lastLanding=0;private lastThrottle=0;private lastPop=-10;private lastBeat=0;private note=0;
+  private loops:AudioScheduledSourceNode[]=[];private transients=new Set<AudioScheduledSourceNode>();private lastDriver:Driver|null=null;private lastImpact=0;private lastLanding=0;private lastThrottle=0;private lastPop=-10;private score?:AudioBufferSourceNode;
+  private scoreRequest?:Promise<void>;
+  private scoreWanted=false;
+  private scoreRetryAfter=0;
   previewUntil=0;previewId='vanta';
   constructor(settings:SaveData['settings']){this.settings=settings;}
   start(){if(this.starting)return this.starting;this.starting=this.initialize().finally(()=>this.starting=undefined);return this.starting;}
@@ -80,7 +83,7 @@ export class AudioSystem {
   update(driver:Driver|null,playing:boolean,rivals:Driver[]=[],trackLength=1,camera=0,freeRev:number|null=null){
     const ctx=this.context;if(!ctx||!this.ready)return;
     const t=ctx.currentTime,dt=this.lastUpdate?clamp(t-this.lastUpdate,0,.1):1/60;this.lastUpdate=t;
-    target(this.master!.gain,this.muted?0:.72,t,.015);target(this.engineBus!.gain,this.settings.engine,t);target(this.effectsBus!.gain,this.settings.effects,t);target(this.musicGain!.gain,this.settings.music*.10,t,.15);
+    target(this.master!.gain,this.muted?0:.72,t,.015);target(this.engineBus!.gain,this.settings.engine,t);target(this.effectsBus!.gain,this.settings.effects,t);target(this.musicGain!.gain,this.settings.music*.40,t,.15);
     const preview=!driver&&this.previewUntil>t&&!this.muted,active=playing||preview;
     const throttle=freeRev??(preview?Math.sin(clamp((this.previewUntil-t)/2.5)*Math.PI)*.9:driver?.speed&&driver.speed<0?driver.brakeInput:driver?.throttle??0);
     const engine=this.voice.update(preview?this.previewId:driver?.spec.id??'vanta',Math.abs(driver?.speed??0),active?throttle:0,dt,driver?.gear,freeRev!==null||preview||(driver?.airborne??0)>.05);
@@ -104,7 +107,25 @@ export class AudioSystem {
     if(active&&engine.changed)this.burst('noise',.055,.10,this.engineBus!,engine.downshift?160:100);
     if(active&&this.lastThrottle>.6&&throttle<.15&&engine.rpm>3600&&t-this.lastPop>.35){this.lastPop=t;this.burst('noise',.085,.14,this.engineBus!,260);}
     this.lastThrottle=throttle;
-    if(t-this.lastBeat>.375&&!this.muted&&this.settings.music>0){this.lastBeat=t;const notes=[55,55,82.41,55,65.41,65.41,98,65.41];this.oscTone(notes[this.note++%notes.length]*(playing?1:2),.30,.16,this.musicGain!);}
+    this.scoreWanted=playing&&!this.muted&&this.settings.music>0;
+    if(this.scoreWanted&&!this.score&&!this.scoreRequest&&t>=this.scoreRetryAfter){
+      this.scoreRequest=this.playScore(ctx).finally(()=>{this.scoreRequest=undefined;});
+    }else if(!this.scoreWanted&&this.score){this.score.stop();this.score.disconnect();this.score=undefined;}
+  }
+  private async playScore(ctx:AudioContext){
+    try{
+      let buffer=this.buffers.get('score');
+      if(!buffer){
+        const response=await fetch(publicUrl('assets/audio/slipstream-signal.ogg'),{signal:AbortSignal.timeout(20000)});
+        if(!response.ok)throw new Error('Score unavailable');
+        buffer=await ctx.decodeAudioData(await response.arrayBuffer());
+        if(ctx!==this.context)return;
+        this.buffers.set('score',buffer);
+      }
+      if(!this.scoreWanted||this.muted||ctx!==this.context)return;
+      const source=ctx.createBufferSource();source.buffer=buffer;source.loop=true;
+      source.connect(this.musicGain!);source.start();this.score=source;
+    }catch{this.scoreRetryAfter=ctx.currentTime+60;}
   }
   private track(source:AudioScheduledSourceNode,nodes:AudioNode[]){this.transients.add(source);source.onended=()=>{this.transients.delete(source);source.disconnect();nodes.forEach(n=>n.disconnect());};}
   private burst(name:string,duration:number,gain:number,bus:AudioNode,frequency=18000){
@@ -120,5 +141,5 @@ export class AudioSystem {
   }
   tone(freq=700,duration=.1,gain=.1){if(!this.ready||this.muted||this.settings.effects<=0||!this.effectsBus)return;this.oscTone(freq,duration,gain,this.effectsBus);}
   diagnostics(){return {ready:this.ready,samples:this.sampleStatus,decoded:this.buffers.size,transients:this.transients.size,engineLayers:(this.playerVoice?.layers.length??0)+this.rivals.reduce((n,v)=>n+v.layers.length,0),rpm:this.voice.rpm,context:this.context?.state};}
-  async dispose(){this.ready=false;this.cancelPreview();this.playerVoice?.dispose();this.rivals.forEach(v=>v.dispose());this.loops.forEach(s=>{try{s.stop();s.disconnect();}catch{}});this.transients.forEach(s=>{try{s.stop();s.disconnect();}catch{}});const ctx=this.context;this.context=undefined;this.buffers.clear();await ctx?.close();}
+  async dispose(){this.ready=false;this.scoreWanted=false;this.score?.stop();this.score?.disconnect();this.score=undefined;this.cancelPreview();this.playerVoice?.dispose();this.rivals.forEach(v=>v.dispose());this.loops.forEach(s=>{try{s.stop();s.disconnect();}catch{}});this.transients.forEach(s=>{try{s.stop();s.disconnect();}catch{}});const ctx=this.context;this.context=undefined;this.buffers.clear();await ctx?.close();}
 }

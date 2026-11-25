@@ -7,7 +7,7 @@ try{
   const page=await browser.newPage({viewport:{width:1280,height:800}});
   page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
   await page.addInitScript(()=>localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{quality:'high',adaptiveResolution:false,music:0,engine:0,effects:0}})));
-  await page.goto(process.env.GAME_URL??'http://127.0.0.1:5173');await page.locator('.loading').waitFor({state:'detached',timeout:90000});
+  await page.goto(process.env.GAME_URL??'http://127.0.0.1:5173/drive.html');await page.locator('.loading').waitFor({state:'detached',timeout:90000});
   await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();
   await page.waitForFunction(()=>window.__apex.state().screen==='racing',null,{timeout:180000});await page.evaluate(()=>window.__apex.advance(4));
   await page.getByRole('button',{name:'Pause race'}).click();await page.evaluate(()=>document.querySelector('#modal').style.visibility='hidden');

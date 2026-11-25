@@ -1,5 +1,5 @@
 import type {Driver} from './simulation';
-export function footprint(driver:Driver){if(driver.spec.id==='bmw-m3')return {width:1.1,length:2.48};if(driver.spec.shape==='grandtourer')return {width:1.24,length:2.48};return {width:driver.spec.shape==='track'?1.24:driver.spec.shape==='flow'?1.14:1.19,length:driver.spec.shape==='flow'?2.6:2.3};}
+export function footprint(driver:Driver){if(driver.spec.collision)return {width:driver.spec.collision.halfWidth,length:driver.spec.collision.halfLength};if(driver.spec.id==='bmw-m3')return {width:1.1,length:2.48};if(driver.spec.shape==='grandtourer')return {width:1.24,length:2.48};return {width:driver.spec.shape==='track'?1.24:driver.spec.shape==='flow'?1.14:1.19,length:driver.spec.shape==='flow'?2.6:2.3};}
 export function groundSpeed(d:Pick<Driver,'speed'|'sideSpeed'>){return Math.hypot(d.speed,d.sideSpeed);}
 export function velocity(d:Driver,turn=0){const h=d.heading+d.slipAngle+turn;return {x:-Math.sin(h)*d.speed+Math.cos(h)*d.sideSpeed,z:Math.cos(h)*d.speed+Math.sin(h)*d.sideSpeed};}
 export function setVelocity(d:Driver,v:{x:number;z:number},turn=0){const h=d.heading+d.slipAngle+turn;d.speed=-Math.sin(h)*v.x+Math.cos(h)*v.z;d.sideSpeed=Math.cos(h)*v.x+Math.sin(h)*v.z;if(Math.abs(d.speed)<1e-9)d.speed=0;if(Math.abs(d.sideSpeed)<1e-9)d.sideSpeed=0;}
@@ -16,20 +16,69 @@ function supportPoint(d:Driver,n:{x:number;z:number},turn=0){
  const x=sign(c*n.x+s*n.z)*f.width,z=sign(-s*n.x+c*n.z)*f.length;
  return {x:c*x-s*z,z:s*x+c*z};
 }
-/** Inelastic planar contact with a finite yaw inertia, bounded spin and friction.
- * Project remaining inward COM motion out of a static face to avoid wall riding.
+/** Plastic impact at the supporting corner. Solve normal and friction impulses
+ * together because each impulse changes the other component of patch velocity.
+ * A broad, nearly flush face distributes its normal reaction along the panel.
  */
-export function resolveStaticContactSpeed(d:Driver,normal:{x:number;z:number},frictionCoefficient=.16){
-  const length=Math.hypot(normal.x,normal.z);if(!length)return 0;
-  const nx=normal.x/length,nz=normal.z/length,v=velocity(d),point=supportPoint(d,{x:-nx,z:-nz});
-  const arm=point.x*nz-point.z*nx,ii=inertia(d),closing=-(v.x*nx+v.z*nz+arm*d.impactYaw);
-  if(closing<=0)return 0;
-  const force=closing/(1+arm*arm/ii);
-  d.impactYaw=spin(d.impactYaw+arm*force/ii);
-  v.x+=nx*force;v.z+=nz*force;
-  const inward=Math.min(0,v.x*nx+v.z*nz);v.x-=nx*inward;v.z-=nz*inward;
-  const tangent=-nz*v.x+nx*v.z,friction=Math.min(Math.abs(tangent),(force-inward)*frictionCoefficient)*Math.sign(tangent);
-  v.x+=nz*friction;v.z-=nx*friction;setVelocity(d,v);return closing;
+export function resolveStaticContactSpeed(d:Driver,normal:{x:number;z:number},frictionCoefficient=.16,faceContact=false){
+  const length=Math.hypot(normal.x,normal.z);
+  if(!length)return 0;
+  const nx=normal.x/length,nz=normal.z/length,tx=-nz,tz=nx;
+  const motion=velocity(d),point=supportPoint(d,{x:-nx,z:-nz});
+  const normalArm=point.x*nz-point.z*nx,tangentArm=point.x*tz-point.z*tx;
+  const normalSpeed=motion.x*nx+motion.z*nz,tangentSpeed=motion.x*tx+motion.z*tz;
+  const closing=-(normalSpeed+normalArm*d.impactYaw);
+  if(closing<1e-8)return 0;
+  const yawInertia=inertia(d),mu=Math.max(0,frictionCoefficient);
+  // If both ends of a face are close, its pressure distribution can oppose
+  // sliding friction torque. Use that manifold only if it can support the load.
+  const alignment=Math.min(Math.abs(nx*Math.cos(d.heading)+nz*Math.sin(d.heading)),Math.abs(-nx*Math.sin(d.heading)+nz*Math.cos(d.heading)));
+  const normalLoad=-normalSpeed;
+  const limit=(value:number,bound:number)=>Math.max(-bound,Math.min(bound,value));
+  if((alignment<.07||faceContact)&&normalLoad>0){
+    const drag=limit(-tangentSpeed,mu*normalLoad);
+    const neededArm=(-yawInertia*d.impactYaw-tangentArm*drag)/normalLoad;
+    const shape=footprint(d);
+    const halfFace=Math.abs(tx*Math.cos(d.heading)+tz*Math.sin(d.heading))*shape.width+
+      Math.abs(-tx*Math.sin(d.heading)+tz*Math.cos(d.heading))*shape.length;
+    if(Math.abs(neededArm)<=halfFace){
+      setVelocity(d,{x:tx*(tangentSpeed+drag),z:tz*(tangentSpeed+drag)});
+      d.impactYaw=0;
+      return closing;
+    }
+  }
+  // A loaded tire contact resists sudden yaw. Its angular impulse opposes the
+  // final spin, so it can dissipate energy but cannot drive the body. A car
+  // catching the barrier in flight has only its own yaw inertia.
+  const tireInertia=d.airborne>0?0:yawInertia*Math.min(3,closing/9);
+  const loadedInertia=yawInertia+tireInertia;
+  const freeYaw=d.impactYaw*yawInertia/loadedInertia;
+  const patchClosing=-(normalSpeed+normalArm*freeYaw);
+  if(patchClosing<=0)return 0;
+  const kNormal=1+normalArm*normalArm/loadedInertia;
+  const kTangent=1+tangentArm*tangentArm/loadedInertia;
+  const coupling=normalArm*tangentArm/loadedInertia;
+  const patchTangent=tangentSpeed+tangentArm*freeYaw;
+  // Normal velocity must reach zero. Eliminate the normal impulse to find the
+  // tangent impulse for sticking, then use the Coulomb cone if the patch slides.
+  const stickTangent=(-patchTangent-coupling*patchClosing/kNormal)/(kTangent-coupling*coupling/kNormal);
+  let tangentImpulse=stickTangent;
+  let normalImpulse=(patchClosing-coupling*tangentImpulse)/kNormal;
+  if(Math.abs(tangentImpulse)>mu*normalImpulse){
+    const ratio=Math.sign(stickTangent)*mu;
+    normalImpulse=patchClosing/(kNormal+coupling*ratio);
+    tangentImpulse=ratio*normalImpulse;
+  }
+  const yaw=freeYaw+(normalArm*normalImpulse+tangentArm*tangentImpulse)/loadedInertia;
+  d.impactYaw=spin(yaw);
+  if(d.impactYaw!==yaw){
+    // The yaw limiter absorbs torque. Re-evaluate the contact velocity with
+    // the limited rotation so another solve cannot deliver the same hit again.
+    normalImpulse=Math.max(0,-normalSpeed-normalArm*d.impactYaw);
+    tangentImpulse=limit(-tangentSpeed-tangentArm*d.impactYaw,mu*normalImpulse);
+  }
+  setVelocity(d,{x:motion.x+nx*normalImpulse+tx*tangentImpulse,z:motion.z+nz*normalImpulse+tz*tangentImpulse});
+  return closing;
 }
 /** Equal-mass planar impulse at the contact patch, including off-center yaw.
  * Tire grip settles linear recoil; impact spin is damped separately from steering.

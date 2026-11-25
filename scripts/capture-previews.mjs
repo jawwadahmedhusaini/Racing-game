@@ -8,7 +8,7 @@ const report=cityOnly?JSON.parse(await readFile('artifacts/visual-review.json','
 if(cityOnly){report.cityRecheck=new Date().toISOString();report.errors=[];}
 page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
 await page.addInitScript(()=>localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{adaptiveResolution:false,quality:'high',music:0,engine:0,effects:0}})));
-await page.goto('http://127.0.0.1:5173');await page.waitForSelector('.loading',{state:'detached',timeout:60000});if(!cityOnly){await page.screenshot({path:'artifacts/garage-final.png'});await page.screenshot({path:'artifacts/garage-final.jpg',quality:90});}
+await page.goto('http://127.0.0.1:5173/drive.html');await page.waitForSelector('.loading',{state:'detached',timeout:60000});if(!cityOnly){await page.screenshot({path:'artifacts/garage-final.png'});await page.screenshot({path:'artifacts/garage-final.jpg',quality:90});}
 for(const [name,file] of cityOnly?[]:[['SPECTRE S','spectre-final'],['STRATOS R','stratos-final'],['SOLSTICE GT','solstice-final']]){await page.getByRole('button',{name:`View ${name}`}).click();await page.waitForFunction(name=>window.__apex.state().viewedCar===name,name,{timeout:60000});await page.screenshot({path:`artifacts/${file}.png`});report.vehicles.push({name,bounds:(await page.evaluate(()=>window.__apex.state())).carBounds});}
 if(!cityOnly){
  await page.mouse.move(600,400);await page.mouse.down();await page.mouse.move(1120,400,{steps:12});await page.mouse.up();await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));await page.screenshot({path:'artifacts/solstice-rear.png'});

@@ -1,7 +1,7 @@
 export interface CarSpec {
   id: string; name: string; maker: string; class: string; tagline: string;
   color: string; topSpeed: number; acceleration: number; handling: number;
-  nitro: number; price: number; shape: 'wedge' | 'flow' | 'track' | 'grandtourer';
+  nitro: number; price: number; asset?: string; collision?: {halfWidth:number;halfLength:number}; exhaust?: [number,number,number]; shape: 'wedge' | 'flow' | 'track' | 'grandtourer';
 }
 
 export const CARS: CarSpec[] = [
@@ -10,6 +10,7 @@ export const CARS: CarSpec[] = [
   { id: 'stratos', name: 'STRATOS R', maker: 'KAIROS', class: 'S', tagline: 'Wide stance. Built for the apex.', color: '#e7f069', topSpeed: 338, acceleration: 96, handling: 98, nitro: 88, price: 10000, shape: 'track' },
   { id: 'solstice', name: 'SOLSTICE GT', maker: 'VELORA', class: 'A', tagline: 'Long bonnet. Open horizon.', color: '#287c86', topSpeed: 328, acceleration: 90, handling: 94, nitro: 87, price: 2500, shape: 'grandtourer' },
   { id: 'bmw-m3', name: 'M3 GTR', maker: 'BMW', class: 'A', tagline: 'A community-built touring racer. V8 character.', color: '#a8bdce', topSpeed: 312, acceleration: 87, handling: 96, nitro: 85, price: 2200, shape: 'grandtourer' },
+  { id: 'lf-gt', name: 'LF GT', maker: 'MASTERLIFE', class: 'S', tagline: 'Sculpted bodywork. A soaring V12 voice.', color: '#d93424', topSpeed: 348, acceleration: 94, handling: 88, nitro: 92, price: 4500, shape: 'grandtourer', asset: 'lf-gt', collision: {halfWidth:1.1,halfLength:2.6}, exhaust: [.55,.29,-2.12] },
 ];
 
 export const PAINTS = ['#ff552b', '#b8dce0', '#e7f069', '#f2f1eb', '#7672e8', '#263645'];

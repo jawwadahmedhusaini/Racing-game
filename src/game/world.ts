@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import {Sky} from 'three/addons/objects/Sky.js';
 import {mergeGeometries,mergeVertices} from 'three/addons/utils/BufferGeometryUtils.js';
-import {Track} from './track';
+import {GUARDRAIL_HEIGHT,Track} from './track';
 import {asphaltMaterial,terrainMaterial,tiled,surface,random,signTexture} from './materials';
 import {addTrees} from './vegetation';
 import {spatialInstances,spatialMesh} from './batching';
 import {addLandmarks} from './landmarks';
+import {addImportedCity} from './imported-city';
 import {addHarbor} from './harbor';
 import {RoadSpace} from './road-space';
 import {HeightField} from './heightfield';
@@ -15,7 +16,7 @@ import {RAMP,rampHeight,rampGeometry} from './ramp';
 export interface World {roadSpace:RoadSpace;scene:THREE.Scene;sun:THREE.DirectionalLight;update:(time:number,position:THREE.Vector3,forward?:THREE.Vector3)=>void;}
 const UP=new THREE.Vector3(0,1,0);
 const smooth=(a:number,b:number,x:number)=>{const t=THREE.MathUtils.clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
-export async function createWorld(track:Track,checkpoint:(label:string)=>Promise<void>=async()=>{}):Promise<World> {
+export async function createWorld(track:Track,checkpoint:(label:string)=>Promise<void>=async()=>{},signal?:AbortSignal):Promise<World> {
   const night=track.id==='city',scene=new THREE.Scene(),rng=random(night?312:809),half=track.width/2,roadSpace=new RoadSpace(track);
   try {
   await checkpoint('Sculpting the landscape…');
@@ -77,7 +78,7 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
   instanced(scene,new THREE.BoxGeometry(),concrete,[...piers,...caps],true);
   instanced(scene,new THREE.BoxGeometry(),new THREE.MeshStandardMaterial({color:'#15191b',roughness:.9}),joints,false);
   instanced(scene,new THREE.BoxGeometry(),new THREE.MeshBasicMaterial({color:'#f4d5a2'}),reflectors,false);
-  for(const side of [-1,1])scene.add(ribbon(track,side*(half+.45)-.045,side*(half+.45)+.045,1.6,metal));
+  for(const side of [-1,1])scene.add(ribbon(track,side*(half+.45)-.045,side*(half+.45)+.045,GUARDRAIL_HEIGHT,metal));
   // Tire wear, patch seams and road drains give the tarmac scale without a noisy overlay.
   const skidMat=new THREE.MeshBasicMaterial({color:'#0b1014',transparent:true,opacity:night?.06:.09,depthWrite:false});
   for(const x of [-6.1,-5.0,-1.0,.1,4.1,5.2])scene.add(ribbon(track,x,x+.17,.037,skidMat));
@@ -96,7 +97,7 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
 
   addCircuitDetail(scene,track,roadSpace,groundHeight);
   await checkpoint('Building the surroundings…');
-  if(night){addHarbor(scene,track,roadSpace);addCity(scene,track,rng,roadSpace);}else{
+  if(night){await checkpoint('Loading harbor architecture…');await addImportedCity(scene,track,roadSpace,signal);await checkpoint('Dressing the waterfront…');addHarbor(scene,track,roadSpace);addCity(scene,track,rng,roadSpace);}else{
     addVillas(scene,track,groundHeight,rng,roadSpace);
     await checkpoint('Planting roadside scenery…');
     addPalms(scene,track,rng,roadSpace,groundHeight);

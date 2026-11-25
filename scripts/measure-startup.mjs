@@ -6,7 +6,7 @@ try{
  const page=await browser.newPage({viewport:{width:1100,height:720}});page.setDefaultTimeout(90000);
  page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});page.on('response',r=>{if(r.status()>=400)report.failedRequests.push({url:r.url(),status:r.status()});});
  await page.addInitScript(()=>localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{quality:'low',adaptiveResolution:false,music:0,engine:0,effects:0}})));
- await page.goto('http://127.0.0.1:5173');await page.waitForSelector('.loading',{state:'detached'});
+ await page.goto('http://127.0.0.1:5173/drive.html');await page.waitForSelector('.loading',{state:'detached'});
  for(const [i,track] of ['coast','coast','city'].entries()){
   await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator(`[data-action="track"][data-value="${track}"]`).click();
   const immediate=await page.evaluate(()=>{const start=performance.now();document.querySelector('[data-action="start"]').click();return {clickMs:performance.now()-start,screen:window.__apex.state().screen};});

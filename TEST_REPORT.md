@@ -1,3 +1,15 @@
+# APEX RUSH 2.7.0 preview verification
+
+The final unit run passed 250 tests. Both touch-driven wall workflows passed on the final physics build. They cover both sides of each circuit, deliberate countersteer, head-on contact, reversing away and lateral motion on the speedometer.
+
+The first 25-workflow Chromium run passed 21 and exposed four failures. The follow-up runs verified career earnings and spending, LF purchase and reverse, cancellation and cache reuse, and the revised wall response. The stereo music test was added afterward and passed along with both existing audio workflows. These counts come from separate runs. The raw full-run browser report retains the original failures.
+
+The production preview passed the hosted-path smoke test for garage navigation, city racing, keyboard acceleration, pause, asset credits, model streaming and track-specific downloads. An earlier production smoke test in this cycle covered four viewport sizes, Ultra garage rendering, nitro, reverse and resume. The final title test measured 630,449 bytes of HTTP response bodies including HTML, artwork, circuit images, fonts and code on the local static server. It ran at 1440×900, 390×844 and 844×390; no horizontal overflow or WebGL canvas on the title. The hero image is a studio render of the actual LF GT mesh.
+
+The ZIP passed CRC and all 92 web files matched the standalone build byte for byte. Software WebGL and simulated touch were used. Sustained frame pacing, thermals on physical hardware, and subjective handling and audio quality still need player testing.
+
+## Historical release evidence
+
 # APEX RUSH 2.6.0 — validation
 
 ## Current release gates

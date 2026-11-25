@@ -1,11 +1,14 @@
 {
-  "version": "2.6.0",
-  "date": "2026-10-27",
+  "version": "2.7.0",
+  "date": "2026-11-25",
   "changes": [
-    "Demand-loaded vehicles with shared requests, retry and reference-counted LRU cache",
-    "Redesigned 2.71 km Neon Harbor route with docks, switchbacks and elevated return",
-    "Open harbor water, port structures, illuminated storefronts and original landmark towers",
-    "Readable illuminated signs, patchy wet asphalt and colored road lighting",
-    "Earlier rival braking; existing saves and records retained, new records use v7"
+    "Lightweight title screen with studio artwork of the playable LF GT and circuit-specific entry",
+    "Garage photographs, aligned LF wheel rigs and track-specific asset loading",
+    "Finite-height rail collisions with friction torque, overflight and off-course recovery",
+    "Original 32-bar stereo race score",
+    "New independent LF GT community model, textured body and cockpit, four animated wheels and race LOD",
+    "Four artist-authored building designs integrated into Neon Harbor with road clearance and spatial batching",
+    "City architecture loads on demand; existing vehicles, circuits and saved progression retained",
+    "Asset-specific collision dimensions and exhaust placement; LF uses the existing layered V12 sound bank"
   ]
 }

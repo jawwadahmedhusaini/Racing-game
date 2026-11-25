@@ -1,0 +1,522 @@
+{
+  "date": "2026-11-25T17:12:52.617Z",
+  "purchaseReload": true,
+  "failedCityRetry": true,
+  "cancelledHeldCityDownload": true,
+  "requests": [
+    "concept-car.glb",
+    "lf-gt.glb",
+    "lf-gt.glb",
+    "harbor-architecture.glb",
+    "harbor-architecture.glb",
+    "lf-gt-lod.glb",
+    "concept-car-lod.glb",
+    "solstice-gt-lod.glb",
+    "bmw-m3-lod.glb"
+  ],
+  "moving": {
+    "vehicleCache": [
+      {
+        "key": "lf-gt.glb",
+        "ready": true,
+        "users": 1
+      },
+      {
+        "key": "lf-gt-lod.glb",
+        "ready": true,
+        "users": 2
+      },
+      {
+        "key": "concept-car-lod.glb",
+        "ready": true,
+        "users": 3
+      },
+      {
+        "key": "solstice-gt-lod.glb",
+        "ready": true,
+        "users": 1
+      },
+      {
+        "key": "bmw-m3-lod.glb",
+        "ready": true,
+        "users": 1
+      }
+    ],
+    "vehicleLoading": false,
+    "viewedCar": "LF GT",
+    "audio": {
+      "ready": true,
+      "samples": "ready",
+      "decoded": 24,
+      "transients": 0,
+      "engineLayers": 15,
+      "rpm": 1000,
+      "context": "running"
+    },
+    "preparing": false,
+    "loadMetrics": {
+      "totalMs": 11561.900000000373,
+      "cancelled": false,
+      "stages": [
+        {
+          "label": "Preparing the circuit…",
+          "elapsedSinceYieldMs": 7.599999999627471
+        },
+        {
+          "label": "Loading track surfaces…",
+          "elapsedSinceYieldMs": 0
+        },
+        {
+          "label": "Sculpting the landscape…",
+          "elapsedSinceYieldMs": 14.099999999627471
+        },
+        {
+          "label": "Laying the road and barriers…",
+          "elapsedSinceYieldMs": 3.099999999627471
+        },
+        {
+          "label": "Installing circuit lighting…",
+          "elapsedSinceYieldMs": 139.2999999988824
+        },
+        {
+          "label": "Building the surroundings…",
+          "elapsedSinceYieldMs": 36
+        },
+        {
+          "label": "Loading harbor architecture…",
+          "elapsedSinceYieldMs": 0
+        },
+        {
+          "label": "Dressing the waterfront…",
+          "elapsedSinceYieldMs": 652.9000000003725
+        },
+        {
+          "label": "Finishing the starting grid…",
+          "elapsedSinceYieldMs": 163.30000000074506
+        },
+        {
+          "label": "Optimizing the circuit…",
+          "elapsedSinceYieldMs": 15.599999999627471
+        },
+        {
+          "label": "Setting the light…",
+          "elapsedSinceYieldMs": 49.80000000074506
+        },
+        {
+          "label": "Lighting the circuit · 1 / 6",
+          "elapsedSinceYieldMs": 2.699999999254942
+        },
+        {
+          "label": "Lighting the circuit · 2 / 6",
+          "elapsedSinceYieldMs": 1651.300000000745
+        },
+        {
+          "label": "Lighting the circuit · 3 / 6",
+          "elapsedSinceYieldMs": 1452.0999999996275
+        },
+        {
+          "label": "Lighting the circuit · 4 / 6",
+          "elapsedSinceYieldMs": 5.400000000372529
+        },
+        {
+          "label": "Lighting the circuit · 5 / 6",
+          "elapsedSinceYieldMs": 3
+        },
+        {
+          "label": "Lighting the circuit · 6 / 6",
+          "elapsedSinceYieldMs": 29.300000000745058
+        },
+        {
+          "label": "Finishing the reflections…",
+          "elapsedSinceYieldMs": 133
+        },
+        {
+          "label": "Loading the race grid…",
+          "elapsedSinceYieldMs": 636.1999999992549
+        },
+        {
+          "label": "Preparing car 1 of 7…",
+          "elapsedSinceYieldMs": 549.1000000014901
+        },
+        {
+          "label": "Preparing car 2 of 7…",
+          "elapsedSinceYieldMs": 20.59999999962747
+        },
+        {
+          "label": "Preparing car 3 of 7…",
+          "elapsedSinceYieldMs": 606.2000000011176
+        },
+        {
+          "label": "Preparing car 4 of 7…",
+          "elapsedSinceYieldMs": 44.90000000037253
+        },
+        {
+          "label": "Preparing car 5 of 7…",
+          "elapsedSinceYieldMs": 56.59999999962747
+        },
+        {
+          "label": "Preparing car 6 of 7…",
+          "elapsedSinceYieldMs": 42.5
+        },
+        {
+          "label": "Preparing car 7 of 7…",
+          "elapsedSinceYieldMs": 16.40000000037253
+        },
+        {
+          "label": "Warming up the graphics…",
+          "elapsedSinceYieldMs": 3
+        },
+        {
+          "label": "Ready at the starting line…",
+          "elapsedSinceYieldMs": 282.30000000074506
+        },
+        {
+          "label": "Ready to race",
+          "elapsedSinceYieldMs": 1937.5
+        }
+      ]
+    },
+    "sceneryCount": 277,
+    "importedBuildings": 38,
+    "screen": "racing",
+    "status": "racing",
+    "paused": false,
+    "input": {
+      "throttle": 0,
+      "brake": 0,
+      "steer": 0,
+      "drift": false,
+      "nitro": false
+    },
+    "player": {
+      "id": 0,
+      "name": "YOU",
+      "spec": "lf-gt",
+      "distance": 10.994117581539218,
+      "lateral": -3.050735974604418,
+      "speed": 21.66633564450269,
+      "heading": 0.009033297713666573,
+      "yawVelocity": 0,
+      "impactYaw": 0,
+      "sideSpeed": 0,
+      "brakeInput": 0,
+      "impact": 0,
+      "impactSerial": 0,
+      "impactCooldown": 0,
+      "scrape": 0,
+      "landingSerial": 0,
+      "nitro": 67.90999999999993,
+      "boost": 0,
+      "drift": 0,
+      "driftTotal": 0,
+      "airborne": 0,
+      "verticalSpeed": 0,
+      "rampLift": 0,
+      "jumpRewardPending": false,
+      "jumpClean": false,
+      "finishTime": null,
+      "eliminated": false,
+      "eliminationPosition": null,
+      "collision": 0,
+      "steer": 0,
+      "lap": 1,
+      "targetLane": -3,
+      "lastRamp": -1,
+      "boostCooldown": 0,
+      "boostPrevious": false,
+      "jumpTotal": 0,
+      "reverseHold": 0,
+      "slipAngle": 0,
+      "acceleration": 20.90032871485988,
+      "landingImpact": 0,
+      "throttle": 1,
+      "gear": 2
+    },
+    "elapsed": 1.5083333333333304,
+    "rank": 3,
+    "credits": 500,
+    "selected": "lf-gt",
+    "quality": "low",
+    "reducedMotion": false,
+    "opponents": 6,
+    "cameraMode": 0,
+    "adaptiveScale": 1,
+    "pixelRatio": 0.75,
+    "textures": 86,
+    "skidMarks": 0,
+    "carBounds": [
+      2.1546765565872192,
+      1.1759837865829468,
+      4.901727676391602
+    ],
+    "invalidCarShadows": 0,
+    "fps": 2,
+    "drawCalls": 445,
+    "triangles": 245274,
+    "geometries": 911
+  },
+  "reverse": {
+    "vehicleCache": [
+      {
+        "key": "lf-gt.glb",
+        "ready": true,
+        "users": 1
+      },
+      {
+        "key": "lf-gt-lod.glb",
+        "ready": true,
+        "users": 2
+      },
+      {
+        "key": "concept-car-lod.glb",
+        "ready": true,
+        "users": 3
+      },
+      {
+        "key": "solstice-gt-lod.glb",
+        "ready": true,
+        "users": 1
+      },
+      {
+        "key": "bmw-m3-lod.glb",
+        "ready": true,
+        "users": 1
+      }
+    ],
+    "vehicleLoading": false,
+    "viewedCar": "LF GT",
+    "audio": {
+      "ready": true,
+      "samples": "ready",
+      "decoded": 24,
+      "transients": 0,
+      "engineLayers": 15,
+      "rpm": 1000,
+      "context": "running"
+    },
+    "preparing": false,
+    "loadMetrics": {
+      "totalMs": 11561.900000000373,
+      "cancelled": false,
+      "stages": [
+        {
+          "label": "Preparing the circuit…",
+          "elapsedSinceYieldMs": 7.599999999627471
+        },
+        {
+          "label": "Loading track surfaces…",
+          "elapsedSinceYieldMs": 0
+        },
+        {
+          "label": "Sculpting the landscape…",
+          "elapsedSinceYieldMs": 14.099999999627471
+        },
+        {
+          "label": "Laying the road and barriers…",
+          "elapsedSinceYieldMs": 3.099999999627471
+        },
+        {
+          "label": "Installing circuit lighting…",
+          "elapsedSinceYieldMs": 139.2999999988824
+        },
+        {
+          "label": "Building the surroundings…",
+          "elapsedSinceYieldMs": 36
+        },
+        {
+          "label": "Loading harbor architecture…",
+          "elapsedSinceYieldMs": 0
+        },
+        {
+          "label": "Dressing the waterfront…",
+          "elapsedSinceYieldMs": 652.9000000003725
+        },
+        {
+          "label": "Finishing the starting grid…",
+          "elapsedSinceYieldMs": 163.30000000074506
+        },
+        {
+          "label": "Optimizing the circuit…",
+          "elapsedSinceYieldMs": 15.599999999627471
+        },
+        {
+          "label": "Setting the light…",
+          "elapsedSinceYieldMs": 49.80000000074506
+        },
+        {
+          "label": "Lighting the circuit · 1 / 6",
+          "elapsedSinceYieldMs": 2.699999999254942
+        },
+        {
+          "label": "Lighting the circuit · 2 / 6",
+          "elapsedSinceYieldMs": 1651.300000000745
+        },
+        {
+          "label": "Lighting the circuit · 3 / 6",
+          "elapsedSinceYieldMs": 1452.0999999996275
+        },
+        {
+          "label": "Lighting the circuit · 4 / 6",
+          "elapsedSinceYieldMs": 5.400000000372529
+        },
+        {
+          "label": "Lighting the circuit · 5 / 6",
+          "elapsedSinceYieldMs": 3
+        },
+        {
+          "label": "Lighting the circuit · 6 / 6",
+          "elapsedSinceYieldMs": 29.300000000745058
+        },
+        {
+          "label": "Finishing the reflections…",
+          "elapsedSinceYieldMs": 133
+        },
+        {
+          "label": "Loading the race grid…",
+          "elapsedSinceYieldMs": 636.1999999992549
+        },
+        {
+          "label": "Preparing car 1 of 7…",
+          "elapsedSinceYieldMs": 549.1000000014901
+        },
+        {
+          "label": "Preparing car 2 of 7…",
+          "elapsedSinceYieldMs": 20.59999999962747
+        },
+        {
+          "label": "Preparing car 3 of 7…",
+          "elapsedSinceYieldMs": 606.2000000011176
+        },
+        {
+          "label": "Preparing car 4 of 7…",
+          "elapsedSinceYieldMs": 44.90000000037253
+        },
+        {
+          "label": "Preparing car 5 of 7…",
+          "elapsedSinceYieldMs": 56.59999999962747
+        },
+        {
+          "label": "Preparing car 6 of 7…",
+          "elapsedSinceYieldMs": 42.5
+        },
+        {
+          "label": "Preparing car 7 of 7…",
+          "elapsedSinceYieldMs": 16.40000000037253
+        },
+        {
+          "label": "Warming up the graphics…",
+          "elapsedSinceYieldMs": 3
+        },
+        {
+          "label": "Ready at the starting line…",
+          "elapsedSinceYieldMs": 282.30000000074506
+        },
+        {
+          "label": "Ready to race",
+          "elapsedSinceYieldMs": 1937.5
+        }
+      ]
+    },
+    "sceneryCount": 277,
+    "importedBuildings": 38,
+    "screen": "racing",
+    "status": "racing",
+    "paused": false,
+    "input": {
+      "throttle": 0,
+      "brake": 0,
+      "steer": 0,
+      "drift": false,
+      "nitro": false
+    },
+    "player": {
+      "id": 0,
+      "name": "YOU",
+      "spec": "lf-gt",
+      "distance": 278.3730964345233,
+      "lateral": 0.040408882477709365,
+      "speed": -10,
+      "heading": 0.004570871379111483,
+      "yawVelocity": 0,
+      "impactYaw": 0,
+      "sideSpeed": 0,
+      "brakeInput": 1,
+      "impact": 0,
+      "impactSerial": 0,
+      "impactCooldown": 0,
+      "scrape": 0,
+      "landingSerial": 0,
+      "nitro": 76.51000000000339,
+      "boost": 0,
+      "drift": 0,
+      "driftTotal": 0,
+      "airborne": 0,
+      "verticalSpeed": 0,
+      "rampLift": 0,
+      "jumpRewardPending": false,
+      "jumpClean": false,
+      "finishTime": null,
+      "eliminated": false,
+      "eliminationPosition": null,
+      "collision": 0,
+      "steer": 0,
+      "lap": 1,
+      "targetLane": -3,
+      "lastRamp": -1,
+      "boostCooldown": 0,
+      "boostPrevious": false,
+      "jumpTotal": 0,
+      "reverseHold": 5.7166666666667405,
+      "slipAngle": 0,
+      "acceleration": 0,
+      "landingImpact": 0,
+      "throttle": 0,
+      "gear": 1
+    },
+    "elapsed": 8.12500000000018,
+    "rank": 7,
+    "credits": 500,
+    "selected": "lf-gt",
+    "quality": "low",
+    "reducedMotion": false,
+    "opponents": 6,
+    "cameraMode": 0,
+    "adaptiveScale": 1,
+    "pixelRatio": 0.75,
+    "textures": 86,
+    "skidMarks": 0,
+    "carBounds": [
+      2.1546765565872192,
+      1.1759837865829468,
+      4.901727676391602
+    ],
+    "invalidCarShadows": 0,
+    "fps": 2,
+    "drawCalls": 181,
+    "triangles": 110575,
+    "geometries": 911
+  },
+  "audit": {
+    "track": "city",
+    "samples": 4520,
+    "kinds": {
+      "braking-board": 10,
+      "event-banner": 8,
+      "imported-building": 38,
+      "harbor-crane": 3,
+      "cargo-stack": 41,
+      "harbor-frontage": 33,
+      "harbor-tower": 2,
+      "skyway-pier": 8,
+      "building": 128,
+      "billboard": 5,
+      "station": 1
+    },
+    "placements": 277,
+    "minTerrainClearance": 7.000028798545409,
+    "minSceneryClearance": 2.3503584800565567,
+    "violations": []
+  },
+  "errors": [],
+  "passed": true
+}

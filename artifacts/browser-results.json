@@ -3,7 +3,8 @@
     "argv": [
       "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
       "/workspace/Racing-game/node_modules/.bin/playwright",
-      "test"
+      "test",
+      "--list"
     ],
     "configFile": "/workspace/Racing-game/playwright.config.ts",
     "rootDir": "/workspace/Racing-game/tests/browser",
@@ -16,18 +17,14 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 1
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "/workspace/Racing-game/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "",
         "name": "",
         "testDir": "/workspace/Racing-game/tests/browser",
@@ -45,9 +42,7 @@
         "outputDir": "/workspace/Racing-game/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "name": "",
         "testDir": "/workspace/Racing-game/tests/browser",
         "snapshotDir": "/workspace/Racing-game/tests/browser",
@@ -125,22 +120,8 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4869,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:26:40.501Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "87be2dcdb54c25970a35-3fd93f0edbaad9712a90",
@@ -159,27 +140,33 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 605,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:26:45.607Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "87be2dcdb54c25970a35-9a6a52da6d0da8fd15ce",
           "file": "audio.spec.ts",
           "line": 39,
+          "column": 1
+        },
+        {
+          "title": "stereo race score starts on demand, stops on pause and reuses its decoded buffer",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "87be2dcdb54c25970a35-599c63f07f3a5e33c936",
+          "file": "audio.spec.ts",
+          "line": 44,
           "column": 1
         }
       ]
@@ -201,22 +188,8 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 32612,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:26:46.243Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-878a566b0e32101e19f5",
@@ -235,22 +208,8 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 113863,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:27:18.869Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-f544d09c7b4f6698b8e1",
@@ -269,22 +228,8 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 95498,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:29:12.754Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-bdca365625884a942a65",
@@ -303,27 +248,13 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 42192,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:30:48.306Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-15d65bb34e90212e0cad",
           "file": "game.spec.ts",
-          "line": 58,
+          "line": 61,
           "column": 1
         },
         {
@@ -337,27 +268,13 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 53835,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:31:30.547Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-b30f5d9363957d0a72ae",
           "file": "game.spec.ts",
-          "line": 63,
+          "line": 66,
           "column": 1
         },
         {
@@ -371,27 +288,13 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 75886,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:32:24.429Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-d1f4d1b83da7e010338b",
           "file": "game.spec.ts",
-          "line": 86,
+          "line": 89,
           "column": 1
         },
         {
@@ -400,32 +303,18 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 300000,
+              "timeout": 180000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 159521,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:33:40.348Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-01388c0808c7226c0236",
           "file": "game.spec.ts",
-          "line": 101,
+          "line": 104,
           "column": 1
         },
         {
@@ -439,27 +328,13 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 38657,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:36:19.887Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-ceb667879fa290c8fc6f",
           "file": "game.spec.ts",
-          "line": 122,
+          "line": 125,
           "column": 1
         },
         {
@@ -473,27 +348,13 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 50041,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:36:58.603Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-e9a5f50221bb77239522",
           "file": "game.spec.ts",
-          "line": 128,
+          "line": 131,
           "column": 1
         },
         {
@@ -507,27 +368,13 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 52291,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:37:48.682Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-70a5e17f1b992a0862ea",
           "file": "game.spec.ts",
-          "line": 139,
+          "line": 142,
           "column": 1
         },
         {
@@ -536,32 +383,18 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 240000,
+              "timeout": 180000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 34410,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:38:41.006Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-6b61277580d3385b4b16",
           "file": "game.spec.ts",
-          "line": 147,
+          "line": 150,
           "column": 1
         },
         {
@@ -575,27 +408,13 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 39933,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:39:15.438Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-a4caf0273e5784c71061",
           "file": "game.spec.ts",
-          "line": 164,
+          "line": 167,
           "column": 1
         },
         {
@@ -609,27 +428,13 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 95628,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:39:55.406Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-e191a8e889ebacfef15b",
           "file": "game.spec.ts",
-          "line": 173,
+          "line": 176,
           "column": 1
         },
         {
@@ -643,27 +448,13 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 35489,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:41:31.086Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-03e4df1e675a06849499",
           "file": "game.spec.ts",
-          "line": 186,
+          "line": 189,
           "column": 1
         },
         {
@@ -677,27 +468,41 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 101325,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:42:06.630Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "8b1bb1493a64c9fc3ab6-07f5caf16c0747570737",
           "file": "game.spec.ts",
-          "line": 204,
+          "line": 207,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "imported-art.spec.ts",
+      "file": "imported-art.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "LF purchase persists; imported city retries after a failed download and the new car drives",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "abef976a55699f0058b3-f550ca7fb212a34c7c4c",
+          "file": "imported-art.spec.ts",
+          "line": 3,
           "column": 1
         }
       ]
@@ -719,22 +524,8 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 56933,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:43:48.025Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "2b18674e25e7e9633274-58e3e12ec5b54cde35d3",
@@ -753,22 +544,8 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 51203,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:44:44.985Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "2b18674e25e7e9633274-0073ab666661cf327beb",
@@ -795,22 +572,8 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 40470,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:45:36.260Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "eb8dbd7e6b4f7b40e877-607f425f5af35006842e",
@@ -824,32 +587,46 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 240000,
+              "timeout": 180000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 57861,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:46:16.764Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "eb8dbd7e6b4f7b40e877-655bd72c7769d2d6f743",
           "file": "streaming.spec.ts",
           "line": 29,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "title.spec.ts",
+      "file": "title.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "title opens without WebGL or race assets and its circuit choice reaches race setup",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "6f26f5a83eb45eb8e6dd-b66ccbc1a457a8edd5db",
+          "file": "title.spec.ts",
+          "line": 3,
           "column": 1
         }
       ]
@@ -871,22 +648,8 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 55426,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:47:14.654Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "65b5bb180dbc5e68ac65-94bf2ba004ce405d5f35",
@@ -905,22 +668,8 @@
               "expectedStatus": "passed",
               "projectId": "",
               "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 45875,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-27T13:48:10.100Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "65b5bb180dbc5e68ac65-507354a7fe23249923bc",
@@ -933,10 +682,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-27T13:26:39.798Z",
-    "duration": 1336890.53,
-    "expected": 23,
-    "skipped": 0,
+    "startTime": "2026-11-25T17:20:13.635Z",
+    "duration": 84.63799999999992,
+    "expected": 0,
+    "skipped": 26,
     "unexpected": 0,
     "flaky": 0
   }

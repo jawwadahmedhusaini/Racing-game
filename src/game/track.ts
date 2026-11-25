@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import type { TrackId } from './content';
 import {rampHeight} from './ramp';
 
+export const GUARDRAIL_HEIGHT = 1.6;
+
 export interface TrackSample { position:THREE.Vector3; tangent:THREE.Vector3; right:THREE.Vector3; yaw:number; curvature:number; }
 export class Track {
   id:TrackId; length:number; width=18; curve:THREE.CatmullRomCurve3;

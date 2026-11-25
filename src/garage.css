@@ -1,0 +1,43 @@
+.brand,.footer a { text-decoration: none; color: inherit }
+.garage-screen { background: linear-gradient(90deg,#090f15b5,transparent 48%),linear-gradient(0deg,#0b1015f5 3%,#0b1015dc 17%,transparent 43%) }
+.car-intro .maker { display: flex; align-items: center }
+.maker .engine-preview { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 32px; color: #e6e6e2; font: 600 13px Rajdhani,sans-serif; letter-spacing: .04em; text-transform: uppercase }
+.car-intro h1 { font-family: 'Barlow Condensed',Rajdhani,sans-serif; font-weight: 900; font-style: italic; letter-spacing: -.025em; text-transform: uppercase }
+.car-intro h1 .car-class { font-family: Rajdhani,sans-serif; font-style: normal }
+.car-intro .paint-label,.stat>span,.stat small { text-transform: uppercase }
+.upgrade-row .text-button { min-height: 32px; color: #e1e4e4 }
+.rotate-hint { text-transform: uppercase }
+.collection-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; max-width: calc(100% - 310px) }
+.collection-nav h2 { margin: 0; font: 700 17px/1 Rajdhani,Arial,sans-serif; letter-spacing: .04em; text-transform: uppercase }
+.collection-nav small { margin-left: 7px; color: #b5bfc3; font: 500 11px Inter,sans-serif; letter-spacing: normal; text-transform: none }
+.collection-nav>div { display: flex; gap: 5px }
+.collection-nav button { display: grid; place-items: center; width: 36px; height: 32px; border: 1px solid #8291985e; background: #171e23 }
+.collection-nav button:hover { border-color: var(--accent) }
+.car-list .car-card { flex: 1 0 126px; min-width: 126px; height: 80px; display: grid; grid-template-rows: minmax(0,1fr) auto; justify-content: stretch; gap: 0; padding: 3px 8px 5px; background: #182027dc }
+.car-list .car-card.active { background: #33231fdc }
+.car-list .mini-car { display: block; width: 100%; max-width: 140px; height: 100%; min-height: 0; margin: 0 auto; padding: 0; object-fit: contain }
+.car-list .car-card-info { display: block; text-align: left; margin: 0 }
+.car-list .car-card-info small { display: none }
+.car-list .ownership { top: 5px; right: 5px; bottom: auto; color:#ccd1cd }
+.garage-bottom .performance { margin-bottom: 12px }
+.footer a,.footer button { display: inline-flex; align-items: center; min-height: 28px; color: #afb7bb }
+.race-ui .position-box,.race-ui .timer-box,.race-ui .speed-box { text-shadow: 0 2px 5px #0b141ecc,0 0 16px #0b141e70 }
+@media (max-width:1100px) { .collection-nav { max-width: calc(100% - 260px) } }
+@media (max-width:900px) { .collection-nav { max-width: 100% } }
+@media (max-width:600px) {
+  .garage-screen { background: linear-gradient(180deg,#0c11176b,transparent 42%,#0b1015e6 74%) }
+  .garage-screen .car-intro { top: 23px }
+  .car-intro .maker .engine-preview { min-height: 30px }
+  .garage-screen .paints { top: 96px }
+  .car-list .car-card { flex: 1 0 106px; min-width: 106px; height: 71px }
+  .collection-nav { margin-bottom: 5px }
+}
+@media (orientation:landscape) and (max-height:550px) {
+  .garage-screen .car-intro { top: 9px }
+  .garage-screen .car-intro h1 { margin: 5px 0 }
+  .car-intro .maker .engine-preview,.upgrade-row .text-button { min-height: 26px }
+  .collection-nav { position: absolute; right: 0; bottom: 62px; width: 190px }
+  .collection-nav small { display: none }
+  .car-list .car-card { flex-basis: 120px; min-width: 120px; height: 47px; display: flex; align-items: center; padding: 3px 6px; gap: 4px }
+  .car-list .mini-car { width: 46%; height: auto }
+}

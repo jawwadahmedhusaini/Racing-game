@@ -64,3 +64,7 @@ FBX/Blend/glTF sources must first be inspected and exported as GLB using Blender
 The intended vehicle and road archives are needed, with the license/creator information supplied by the download. They can be attached directly to this project; then geometry, wheel separation, materials and the actual licence can be evaluated. More permission or a paid purchase is not needed. A plain source-page link does not resolve this environment's blocked download access.
 
 No new visual game release is claimed by this intake work. At completion of this asset-intake work, the published playable release was 2.4; subsequent audit patches are tracked in DEEP_AUDIT.md.
+
+### Integrated milestone — 2.7
+
+LF and four raytrace building designs have moved from the ignored asset inbox into prepared runtime GLBs. The Y7/Veneno candidate remains unshipped. See IMPORTED_ART_UPGRADE.md and TEST_REPORT.md for actual scope and checks. This is one additional car design and artist-authored architecture, not a complete premium track import or a multi-car manufacturer collection.

@@ -1,4 +1,4 @@
-APEX RUSH 2.6.0 — browser racing game
+APEX RUSH 2.7.0 — browser racing game
 
 1. Unzip the complete download.
 2. Install Python 3 if it is not already on your computer.
@@ -31,7 +31,7 @@ to the server address/port you use. Clearing site data erases progress.
 
 Credits and licenses are available in Settings and in web/licenses.
 Vanta, Spectre and Stratos adapt the attributed Car Concept asset.
-Solstice GT is separately authored; BMW M3 uses an imported community model.
+Solstice GT is separately authored; BMW M3 and LF GT use community models.
 The BMW model is an unofficial recreation. This independent game is not an
 Asphalt product. See the individual asset credits and licenses.
 
@@ -68,3 +68,7 @@ ENGINE in the garage. Existing saves remain; handling records now use v5.
 
 2.6.0: Redesigned Neon Harbor and demand-loaded cars. Existing garage progress
        remains; new race times use v7 records.
+
+2.7.0: LF GT community car (4,500 credits), separate body and wheel rig, race LOD,
+       and four imported building designs in Neon Harbor. Existing progress stays.
+       New art credits and sources: web/licenses/imported-art.json.

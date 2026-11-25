@@ -14,7 +14,7 @@ try {
     page.on('pageerror', error => results.errors.push(error.message));
     page.on('console', message => { if(message.type()==='error')results.errors.push(message.text()); });
     await page.addInitScript(quality => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality, music: 0, engine: 0, effects: 0 } })), quality);
-    await page.goto('http://127.0.0.1:5173');
+    await page.goto('http://127.0.0.1:5173/drive.html');
     await page.waitForSelector('.loading', { state: 'detached', timeout: 60000 });
     const gpu = await page.evaluate(() => {
       const gl = document.querySelector('canvas').getContext('webgl2');

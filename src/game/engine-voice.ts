@@ -10,7 +10,7 @@ export const ENGINE_BANKS={
   'b-v8':[1000,2000,4000,6000,7000],'b-i6r':[1000,3000,5000,7000,8000],
 } as const;
 export type EngineBank=keyof typeof ENGINE_BANKS;
-export function engineBank(id:string):EngineBank{return id==='spectre'?'v12d':id==='solstice'?'b-i6r':id==='bmw-m3'?'b-v8':'v8f';}
+export function engineBank(id:string):EngineBank{return (id==='spectre'||id==='lf-gt')?'v12d':id==='solstice'?'b-i6r':id==='bmw-m3'?'b-v8':'v8f';}
 /** Adjacent RPM recordings overlap at constant power; never pitch one sample across the entire range. */
 export function engineLayers(bank:EngineBank,rpm:number){
   const points=ENGINE_BANKS[bank],r=MathUtils.clamp(rpm,points[0],points[points.length-1]);

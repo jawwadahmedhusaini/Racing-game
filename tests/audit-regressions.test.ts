@@ -1,7 +1,7 @@
 import {it,expect} from 'vitest';
 import {CARS} from '../src/game/content';
 import {RaceSimulation,NO_INPUT} from '../src/game/simulation';
-import {Track} from '../src/game/track';
+import {GUARDRAIL_HEIGHT,Track} from '../src/game/track';
 const track=new Track('coast');
 const race=()=>{const sim=new RaceSimulation({track,car:CARS[0],mode:'quick',difficulty:'pro',upgrade:0});sim.status='racing';return sim;};
 
@@ -47,7 +47,8 @@ for(const id of ['coast','city'] as const)for(const car of CARS)it(`${car.id} on
   if(i%311===0)sim.recover();sim.step(1/60,input);
   for(const d of sim.drivers){
    expect([d.distance,d.speed,d.heading,d.lateral,d.nitro,d.airborne].every(Number.isFinite)).toBe(true);
-   expect(Math.abs(d.lateral)).toBeLessThanOrEqual(sim.roadClearance(d)+1e-6);
+   const limit=d.airborne+d.rampLift>GUARDRAIL_HEIGHT?sim.track.width/2+8:sim.roadClearance(d);
+   expect(Math.abs(d.lateral)).toBeLessThanOrEqual(limit+1e-6);
    expect(d.nitro).toBeGreaterThanOrEqual(0);expect(d.nitro).toBeLessThanOrEqual(100);expect(d.airborne).toBeGreaterThanOrEqual(0);
   }
  }

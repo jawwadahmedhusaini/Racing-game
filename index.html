@@ -1,15 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1118" />
-  <meta name="description" content="APEX RUSH — an original, playable 3D arcade racer. Build your garage, drift coastal circuits and chase the horizon." />
-  <title>APEX RUSH — Chase the horizon</title>
+  <meta name="theme-color" content="#131416" />
+  <meta name="description" content="Play APEX RUSH, a free browser arcade racer. Race the coast, master Neon Harbor and build your garage." />
+  <title>APEX RUSH — Browser arcade racing</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/src/title.css" />
 </head>
-<body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.ts"></script>
+<body class="title-page">
+  <header class="title-header">
+    <a href="./" class="wordmark" aria-label="Apex Rush home"><img src="%BASE_URL%favicon.svg" width="35" height="35" alt="" />Apex Rush</a>
+    <nav aria-label="Game navigation">
+      <a href="drive.html">Garage</a>
+      <a href="drive.html?view=career">Career</a>
+      <button type="button" id="help">How to play</button>
+      <a href="drive.html?view=settings" class="title-settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h7m4 0h5M4 17h3m4 0h9"/><circle cx="13" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
+      </a>
+    </nav>
+  </header>
+  <main class="title-main">
+    <section class="cover" aria-labelledby="game-name">
+      <div class="cover-art"><img src="%BASE_URL%assets/lf-title.webp" alt="The red LF GT in a trackside pit bay" width="1800" height="1020" fetchpriority="high" /></div>
+      <div class="cover-content">
+        <p class="discipline">Arcade racing</p>
+        <h1 id="game-name" aria-label="Apex Rush"><span>Apex</span><span>Rush</span></h1>
+        <p class="cover-description">From the Italian Riviera to the midnight docks. Six rivals. Your racing line.</p>
+        <a class="race-cta" href="drive.html?view=race">Play now <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="cover-caption"><span>Featured car</span><strong>MasterLife LF GT</strong></div>
+    </section>
+    <section class="circuits" aria-labelledby="circuit-heading">
+      <div class="circuits-heading"><h2 id="circuit-heading">Circuits</h2><span>Choose a destination</span></div>
+      <div class="circuit-links">
+        <a class="destination costa" href="drive.html?track=coast">
+          <img src="%BASE_URL%assets/coast-preview.jpg" width="220" height="120" alt="" />
+          <span><small>Italian Riviera</small><strong>Costa Aurelia</strong></span><b aria-hidden="true">↗</b>
+        </a>
+        <a class="destination harbor" href="drive.html?track=city">
+          <img src="%BASE_URL%assets/city-preview.jpg" width="220" height="120" alt="" />
+          <span><small>Pacific metropolis</small><strong>Neon Harbor</strong></span><b aria-hidden="true">↗</b>
+        </a>
+      </div>
+    </section>
+  </main>
+  <dialog id="driving-help" aria-labelledby="help-title">
+    <form method="dialog"><h2 id="help-title">How to play</h2><button aria-label="Close controls">×</button></form>
+    <dl><div><dt>Accelerate</dt><dd>W / ↑</dd></div><div><dt>Brake · hold to reverse</dt><dd>S / ↓</dd></div><div><dt>Steer</dt><dd>A D / ← →</dd></div><div><dt>Drift</dt><dd>Space</dd></div><div><dt>Nitro</dt><dd>Shift</dd></div><div><dt>Camera / recover</dt><dd>C / R</dd></div><div><dt>Pause</dt><dd>Esc</dd></div></dl>
+    <p>On a phone, turn to landscape and use the on-screen pedals and steering buttons.</p>
+  </dialog>
+  <script type="module" src="/src/title.ts"></script>
 </body>
 </html>

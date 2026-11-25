@@ -1,0 +1,26 @@
+{
+  "layouts": [
+    {
+      "width": 1440,
+      "overflow": false,
+      "hero": 1800,
+      "coldResponseBytes": 630449,
+      "canvas": 0
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "hero": 1800,
+      "coldResponseBytes": 630449,
+      "canvas": 0
+    },
+    {
+      "width": 844,
+      "overflow": false,
+      "hero": 1800,
+      "coldResponseBytes": 630449,
+      "canvas": 0
+    }
+  ],
+  "faults": []
+}

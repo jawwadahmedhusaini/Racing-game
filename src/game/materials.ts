@@ -1,15 +1,27 @@
 import * as THREE from 'three';
 import {publicUrl} from './urls';
+import type {TrackId} from './content';
 
 const surfaces = new Map<string, THREE.Texture>();
-export async function loadSurfaceAssets() {
-  const loader = new THREE.TextureLoader();
-  await Promise.all(['ground-color.png','ground-normal.png','ground-rough.png','grass-color.png','water-normal.png','foliage-color.png','foliage-normal.png','bark-color.jpg','bark-normal.png'].map(async name => {
-    const texture = await loader.loadAsync(publicUrl(`assets/surfaces/${name}`));
-    if (name.includes('color')) texture.colorSpace = THREE.SRGBColorSpace;
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.anisotropy = 8;
-    surfaces.set(name, texture);
+const sharedSurfaces=['ground-color.png','ground-normal.png','water-normal.png'];
+const coastSurfaces=['ground-rough.png','grass-color.png','foliage-color.png','foliage-normal.png','bark-color.jpg','bark-normal.png'];
+const pendingSurfaces=new Map<string,Promise<void>>();
+
+export async function loadSurfaceAssets(track:TrackId) {
+  const loader=new THREE.TextureLoader();
+  const names=track==='coast'?[...sharedSurfaces,...coastSurfaces]:sharedSurfaces;
+  await Promise.all(names.map(name=>{
+    if(surfaces.has(name))return;
+    const pending=pendingSurfaces.get(name);
+    if(pending)return pending;
+    const request=loader.loadAsync(publicUrl(`assets/surfaces/${name}`)).then(texture=>{
+      if(name.includes('color'))texture.colorSpace=THREE.SRGBColorSpace;
+      texture.wrapS=texture.wrapT=THREE.RepeatWrapping;
+      texture.anisotropy=8;
+      surfaces.set(name,texture);
+    }).finally(()=>pendingSurfaces.delete(name));
+    pendingSurfaces.set(name,request);
+    return request;
   }));
 }
 export function surface(name: string) { const texture=surfaces.get(name);if(!texture)throw new Error(`Surface not loaded: ${name}`);return texture; }

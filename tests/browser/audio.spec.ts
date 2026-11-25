@@ -40,3 +40,27 @@ test('unavailable sample downloads keep the fallback engine usable',async({page}
  await page.route('**/assets/audio/*.wav',route=>route.abort());await page.goto('/scripts/audio-lab.html');await page.waitForFunction(()=>(window as any).audioLab);
  const status=await page.evaluate(async()=>{const {AudioSystem,freshSave}=(window as any).audioLab;const audio=new AudioSystem(freshSave().settings);await audio.start();await audio.samplesLoading;audio.preview('vanta');audio.update(null,false);const result=audio.diagnostics();await audio.dispose();return result;});expect(status.ready).toBe(true);expect(status.samples).toBe('fallback');expect(status.context).toBe('running');
 });
+
+test('stereo race score starts on demand, stops on pause and reuses its decoded buffer',async({page})=>{
+ let downloads=0;page.on('request',r=>{if(r.url().endsWith('slipstream-signal.ogg'))downloads++;});
+ await page.goto('/scripts/audio-lab.html');await page.waitForFunction(()=>(window as any).audioLab);
+ const result=await page.evaluate(async()=>{
+   const {AudioSystem,freshSave}=(window as any).audioLab;
+   const audio=new AudioSystem({...freshSave().settings,music:.5});
+   await audio.start();
+   try{
+     audio.update(null,false);
+     const quiet=audio.score===undefined;
+     // The music bus depends on the race mix state; no simulated engine is needed.
+     audio.update(null,true);await audio.scoreRequest;
+     const first=audio.score?.buffer;
+     audio.update(null,false);const paused=!audio.score;
+     audio.update(null,true);await audio.scoreRequest;
+     const reused=!!first&&audio.score?.buffer===first;
+     audio.settings.music=0;audio.update(null,true);
+     return {quiet,paused,reused,muted:!audio.score,channels:first?.numberOfChannels,duration:first?.duration};
+   }finally{await audio.dispose();}
+ });
+ expect(result).toMatchObject({quiet:true,paused:true,reused:true,muted:true,channels:2});
+ expect(result.duration).toBeCloseTo(32*4*60/136,1);expect(downloads).toBe(1);
+});

@@ -3,7 +3,7 @@ import {writeFileSync,statSync} from 'node:fs';
 const state=(page:any)=>page.evaluate(()=>(window as any).__apex.state());
 async function boot(page:any){
   await page.addInitScript(()=>!localStorage.getItem('apex-rush-save-v1')&&localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{quality:'low',adaptiveResolution:false,music:0,engine:0,effects:0}})));
-  await page.goto('/');await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
+  await page.goto('/drive.html');await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
 }
 
 test('garage loads only its model; optional download failure retries and late selection cannot replace the current car',async({page})=>{
@@ -33,7 +33,7 @@ test('race streams LODs, cancels an in-flight grid, retries without duplicate do
   await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await expect.poll(()=>requested,{timeout:120000}).toBe(true);
   await page.locator('[data-action="cancel-load"]').click();await expect(page.getByRole('button',{name:'START YOUR ENGINE'})).toBeVisible();expect((await state(page)).player).toBeNull();release();
   await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await page.waitForFunction(()=>(window as any).__apex.state().screen==='racing',null,{timeout:120000});
-  expect([...requests].sort()).toEqual(['bmw-m3-lod.glb','concept-car-lod.glb','concept-car.glb','solstice-gt-lod.glb'].sort());expect((await state(page)).opponents).toBe(6);
+  expect([...requests].sort()).toEqual(['bmw-m3-lod.glb','concept-car-lod.glb','concept-car.glb','solstice-gt-lod.glb','lf-gt-lod.glb','harbor-architecture.glb'].sort());expect((await state(page)).opponents).toBe(6);
   await page.getByRole('button',{name:'Pause race'}).click();await page.getByRole('button',{name:'SETTINGS',exact:true}).click();
   for(const quality of ['medium','low']){await page.locator('#quality').selectOption(quality);expect((await state(page)).quality).toBe(quality);}
   await page.getByRole('button',{name:'Close settings'}).click();await page.getByRole('button',{name:'QUIT TO GARAGE'}).click();

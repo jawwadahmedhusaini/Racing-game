@@ -4,9 +4,9 @@ A complete, independent single-player browser arcade racer: pick a car, choose a
 
 ## Play online or download
 
-[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/) · [Download APEX RUSH 2.6.0](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH.zip)
+[Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/preview/) · [Download the playable preview](https://jawwadahmedhusaini.github.io/Racing-game/preview/APEX-RUSH.zip)
 
-[Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/raw/refs/heads/main/downloads/APEX-RUSH-SOURCE.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
+[Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/archive/refs/heads/apex-presentation-candidate.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
 
 The next free-asset upgrade is tracked in [ASSET_UPGRADE_PLAN.md](ASSET_UPGRADE_PLAN.md), including verified candidate findings, blocked downloads and the offline GLB inspection command. Version 2.5 imports a CC0 BMW M3 community model and credited CC BY engine/impact samples from Stunt Rally. The other shortlisted manufacturer models still need usable source archives and licensing evidence.
 
@@ -15,6 +15,10 @@ The online link requires the repository's GitHub Pages deployment to be enabled;
 Version **2.4.1** fixes sudden slowdown after boost, head-on/reverse contact response, close-finish timing, elimination standings and keyboard navigation. Older records remain saved; corrected handling uses separate v4 records. See [DEEP_AUDIT.md](DEEP_AUDIT.md) for reproduced defects, validation and remaining limits.
 
 ![APEX RUSH 2.4 garage](artifacts/garage-final.jpg)
+
+## New in 2.7 — Imported cars and architecture
+
+The LF GT adds an independent community car by MasterLife, textured body/cockpit, animated wheels, functional lamps and a 33,532-triangle race LOD. It costs 4,500 earned credits and uses the existing layered V12 sound bank. Neon Harbor now includes four artist-authored building designs by raytrace with adapted Calinou surfaces, distinct glazing and room lighting. The architecture pack loads only when preparing the city. Existing vehicles, circuits, credits and records remain available. See [IMPORTED_ART_UPGRADE.md](IMPORTED_ART_UPGRADE.md) for measured scope and limits.
 
 ## New in 2.6 — Neon Harbor and vehicle loading
 
@@ -37,7 +41,7 @@ Cars straddling the ramp now climb and jump without getting stuck. Raised-side a
 
 ## Play and develop
 
-For the packaged release, unzip `artifacts/apex-rush-web.zip`, then run `START-WINDOWS.bat` on Windows or `python3 start-game.py` on macOS/Linux. Python 3 is the only launcher prerequisite; the launcher opens the game in your browser. Keep its terminal window open while playing. The release includes all game assets and needs no internet connection after download.
+For the packaged release, unzip the downloaded `APEX-RUSH.zip` (local builds produce `artifacts/apex-rush-web.zip`), then run `START-WINDOWS.bat` on Windows or `python3 start-game.py` on macOS/Linux. Python 3 is the only launcher prerequisite; the launcher opens the game in your browser. Keep its terminal window open while playing. The release includes all game assets and needs no internet connection after download.
 
 To run the editable source:
 
@@ -61,7 +65,7 @@ The complete static game is in `dist/`. Serve the contents of that directory wit
 
 ## Included
 
-- Reflective 3D garage with an imported BMW M3 community model, an original long-bonnet grand tourer and three tuned concept-car variants, six paint finishes, unlocks and three upgrade levels.
+- Reflective 3D garage with imported BMW M3 and LF community models, an original long-bonnet grand tourer and three tuned concept-car variants, six paint finishes, unlocks and three upgrade levels.
 - A professionally authored, licensed car chassis with a modeled cockpit, treaded tires, animated wheels, lights and original aero packages.
 - Costa Aurelia: a coastal circuit with elevation, bridges, palms, ridged terrain and textured hills, 3D vegetation, ocean shading and a captured coastal reflection environment.
 - Neon Harbor: a waterfront city circuit with three facade families, stepped towers, recessed lit rooms, streetlights, headlights and damp asphalt.
@@ -111,7 +115,7 @@ After building, run `python3 scripts/package-release.py` to produce the browser 
 
 ## Scope
 
-This release provides the complete single-player play loop. Reflection probes are captured once per scene; they do not update with moving cars or provide ray tracing. Vanta, Spectre and Stratos derive from a licensed concept chassis. Solstice is separately authored original geometry with a long bonnet, rearward cabin, its own lights and wheel assemblies; its detailed and race meshes contain 65,844 and 24,436 triangles. The garage has five choices across three underlying vehicle designs, including the newly imported BMW M3 community model. Spectre has a longer front body and rearward cabin; Stratos has wider fenders and a lower cabin. The authored body and glass normals follow these surface changes, while wheel assemblies remain rigid. Aero, performance and progression also differ. The BMW is an unofficial community recreation; the other four cars are fictional designs. The physics use a track-relative coordinate system with a manually controlled world heading. Forward input does not auto-steer; only rivals use a course-following controller. This is an arcade model with barriers, not a full rigid-body simulator. Multiplayer, branded car collections, photorealistic crash deformation, barrel-roll stunts, a large licensed soundtrack and a major-studio-sized career are not implemented.
+This release provides the complete single-player play loop. Reflection probes are captured once per scene; they do not update with moving cars or provide ray tracing. Vanta, Spectre and Stratos derive from a licensed concept chassis. Solstice is separately authored original geometry with a long bonnet, rearward cabin, its own lights and wheel assemblies; its detailed and race meshes contain 65,844 and 24,436 triangles. The garage has six choices across four underlying vehicle designs, including BMW M3 and LF community models. Spectre has a longer front body and rearward cabin; Stratos has wider fenders and a lower cabin. The authored body and glass normals follow these surface changes, while wheel assemblies remain rigid. Aero, performance and progression also differ. The BMW is an unofficial community recreation; LF uses its creator’s source label; Vanta, Spectre, Stratos and Solstice are fictional game names. The physics use a track-relative coordinate system with a manually controlled world heading. Forward input does not auto-steer; only rivals use a course-following controller. This is an arcade model with barriers, not a full rigid-body simulator. Multiplayer, branded car collections, photorealistic crash deformation, barrel-roll stunts, a large licensed soundtrack and a major-studio-sized career are not implemented.
 
 ## Tuning for your device
 

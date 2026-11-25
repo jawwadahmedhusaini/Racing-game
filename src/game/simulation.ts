@@ -1,5 +1,5 @@
 import {CARS,type CarSpec,type RaceMode,type Difficulty} from './content';
-import {Track,angleDelta} from './track';
+import {Track,angleDelta,GUARDRAIL_HEIGHT} from './track';
 import {contactOffset,footprint,resolveContactSpeed,resolveStaticContactSpeed,velocity,setVelocity,groundSpeed} from './contact';
 import {rampSupport,rampContact,RAMP} from './ramp';
 import {planOpponent} from './opponents';
@@ -18,6 +18,7 @@ export class RaceSimulation {
   track:Track;drivers:Driver[]=[];mode:RaceMode;difficulty:Difficulty;upgrade:number;
   status:'countdown'|'racing'|'finished'='countdown';countdown=3.5;elapsed=0;laps:number;resultPosition=0;
   eliminatedAt=0;nextElimination=28;bestSpeed=0;lastEvent='';eventTimer=0;rank=1;finishedAt=0;
+  private readonly railDeparture=new Map<Driver,number>();
   constructor(options:RaceOptions) {
     this.track=options.track;this.mode=options.mode;this.difficulty=options.difficulty;this.upgrade=options.upgrade;this.laps=options.laps??(options.mode==='time'?1:2);
     const names=['YOU','M. KOVA','J. SANTOS','R. WOLFF','A. RIVERA','K. MORI','L. COSTA'];
@@ -62,7 +63,7 @@ export class RaceSimulation {
     for(const d of this.drivers) {
       if(d.eliminated||d.finishTime!==null)continue;
       const before=d.distance,controls=d.id===0?input:this.aiInput(d);this.integrate(d,dt,controls);
-      if(d.distance>=this.track.length*this.laps){
+      if(d.distance>=this.track.length*this.laps&&!this.railDeparture.has(d)){
         const fraction=clamp((this.track.length*this.laps-before)/Math.max(1e-9,d.distance-before),0,1);
         d.finishTime=this.elapsed-dt+dt*fraction;d.speed=d.sideSpeed=d.impactYaw=d.yawVelocity=0;d.boost=0;
       }
@@ -105,7 +106,7 @@ export class RaceSimulation {
     const nitroRating=clamp(d.spec.nitro/90,.8,1.15);
     const accel=(15+d.spec.acceleration*.09)*(1+up*.06);
     d.boostCooldown=Math.max(0,d.boostCooldown-dt);
-    const pressingWall=Math.abs(d.lateral)>=this.roadClearance(d)-.04&&-Math.sin(d.heading+d.slipAngle)*Math.sign(d.lateral)>.15;
+    const pressingWall=d.airborne+d.rampLift<=GUARDRAIL_HEIGHT&&Math.abs(d.lateral)>=this.roadClearance(d)-.04&&-Math.sin(d.heading+d.slipAngle)*Math.sign(d.lateral)>.15;
     if(c.nitro&&!c.brake&&d.speed>5&&!pressingWall) {
       if(d.nitro>0){
         if(!d.boostPrevious||d.boost===0){d.boost=d.nitro>=95?2:1;if(d.id===0)this.event(d.boost===2?'SHOCKWAVE':'NITRO');}
@@ -136,7 +137,11 @@ export class RaceSimulation {
       else d.speed=Math.min(0,d.speed+dt*(c.brake*39+5.2));
     }else if(d.reverseHold>=.35){d.speed=Math.max(-10,d.speed-dt*8*c.brake);}
     else {
-      const power=throttle*accel*(1-Math.pow(d.speed/(max+(d.boost?25*nitroRating:0)),2));
+      // A driven tire scrubbing sideways against the rail cannot put full engine
+      // power into forward travel. Grip returns as soon as the body unloads.
+      const release=d.id===0?Math.max(0,-steering*Math.sign(d.lateral)*Math.sign(d.speed)):0;
+      const wallGrip=1/(1+18*d.scrape*(1-release));
+      const power=throttle*accel*wallGrip*(1-Math.pow(d.speed/(max+(d.boost?25*nitroRating:0)),2));
       const ceiling=max+(d.boost===2?30:d.boost?19:0)*nitroRating;
       // Releasing/exhausting boost lowers the power ceiling, not existing momentum.
       d.speed=clamp(d.speed+dt*(power-c.brake*39-(throttle?1.4:5.2)-Math.abs(d.drift)*5.5+(d.boost===2?32:d.boost?21:0)*nitroRating),0,Math.max(d.speed,ceiling));
@@ -144,7 +149,10 @@ export class RaceSimulation {
     // Integrate the car's own world heading. Curved road coordinates never steer it.
     // Positive control means physical right, which is negative world-Y yaw.
     const desiredYaw=-steering*this.turnCapacity(d)*(inAir?.16:drifting?1.17:1);
-    d.yawVelocity+=(desiredYaw-d.yawVelocity)*Math.min(1,dt*(d.airborne>.3?1.2:drifting?3.8:7.5));
+    // Countersteering unloads a grounded corner from the rail. Let the tires
+    // respond promptly while the player is actively steering into the road.
+    const unloading=d.id===0&&!inAir&&steering*d.lateral*d.speed<0&&this.roadClearance(d)-Math.abs(d.lateral)<.8;
+    d.yawVelocity+=(desiredYaw-d.yawVelocity)*Math.min(1,dt*(d.airborne>.3?1.2:drifting?3.8:unloading?22:7.5));
     d.heading+=d.yawVelocity*dt;
     // A collision turns the body, not its existing world-space momentum.
     if(Math.abs(d.impactYaw)>1e-9){const motion=velocity(d);d.heading+=d.impactYaw*dt;setVelocity(d,motion);d.impactYaw*=Math.exp(-dt*(inAir?.8:3.5));}else d.impactYaw=0;
@@ -156,7 +164,7 @@ export class RaceSimulation {
     const roadTurn=angleDelta(sample.yaw,this.track.sample(d.distance).yaw);
     d.heading=angleDelta(0,d.heading-roadTurn);
     d.collision=Math.max(0,d.collision-dt);
-    this.constrainToRoad(d,dt);
+    if(this.constrainToRoad(d,dt,previousDistance))return;
     this.constrainRamp(d,advance);
     const floor=rampSupport(this.track,d,footprint(d));
     const lap=Math.floor(Math.max(0,d.distance)/this.track.length);
@@ -172,6 +180,7 @@ export class RaceSimulation {
     if(d.airborne>0||d.verticalSpeed>0){
       if(inAir)d.airborne-=this.track.sample(d.distance).position.y-sample.position.y;
       d.verticalSpeed-=dt*15;d.airborne+=d.verticalSpeed*dt;
+      if(d.airborne<=GUARDRAIL_HEIGHT&&this.railDeparture.has(d)&&this.constrainToRoad(d,dt,previousDistance))return;
       if(d.airborne<=floor){
         const roadVerticalSpeed=(this.track.sample(d.distance).position.y-sample.position.y)/dt;
         d.landingImpact=clamp((roadVerticalSpeed-d.verticalSpeed)/18,0,1);d.landingSerial++;
@@ -179,20 +188,27 @@ export class RaceSimulation {
         if(d.jumpRewardPending){if(d.jumpClean&&Math.abs(d.heading)<.8&&d.impact<.3){d.nitro=Math.min(100,d.nitro+12);if(d.id===0)this.event('CLEAN LANDING · +12 NITRO');}else if(d.id===0)this.event('ROUGH LANDING · LINE UP YOUR APPROACH');d.jumpRewardPending=false;d.jumpClean=false;}
       }
     }
-    if(lap+1>d.lap&&lap<this.laps&&d.id===0)this.event(lap+1===this.laps?'FINAL LAP':`LAP ${lap+1}`);
+    if(!this.railDeparture.has(d)){
+      if(lap+1>d.lap&&lap<this.laps&&d.id===0)this.event(lap+1===this.laps?'FINAL LAP':`LAP ${lap+1}`);
+      d.lap=lap+1;
+    }
     d.gear=shiftGear(d.gear,d.speed);
     d.acceleration=(d.speed-previousSpeed)/Math.max(dt,1/600);
-    d.lap=lap+1;
   }
   roadClearance(d:Driver){
     // Project the full rotated car footprint, including the wider track aero package.
     const {width:halfWidth,length:halfLength}=footprint(d);
-    return this.track.width/2-(Math.abs(Math.cos(d.heading))*halfWidth+Math.abs(Math.sin(d.heading))*halfLength)-.06;
+    const radius=Math.abs(Math.cos(d.heading))*halfWidth+Math.abs(Math.sin(d.heading))*halfLength;
+    // The concrete Jersey face recedes with height. The inboard edge of the
+    // upper metal strip lies 0.405 m outside the road (0.45 m center, 0.09 m wide).
+    const height=d.rampLift+d.airborne;
+    const faceOffset=-.06+.465*clamp(height/1.07,0,1);
+    return this.track.width/2+faceOffset-radius;
   }
   constrainRamp(d:Driver,travel=0){
     const contact=rampContact(this.track,d,footprint(d),d.rampLift+d.airborne,travel);
     if(!contact)return;
-    const yaw=this.track.sample(d.distance).yaw,closing=resolveStaticContactSpeed(d,contact);
+    const yaw=this.track.sample(d.distance).yaw,closing=resolveStaticContactSpeed(d,contact,.16,true);
     d.lateral+=contact.x;d.distance+=contact.z;
     d.heading=angleDelta(0,d.heading-angleDelta(yaw,this.track.sample(d.distance).yaw));
     if(closing>1){this.registerImpact(d,closing);d.collision=Math.max(d.collision,.12);if(closing>8)d.boost=0;}
@@ -203,21 +219,69 @@ export class RaceSimulation {
     d.impact=Math.max(d.impact,clamp(closing/38,0,1));
     if(d.impactCooldown===0){d.impactSerial++;d.impactCooldown=.14;}
   }
-  constrainToRoad(d:Driver,dt:number){
-    const bound=this.roadClearance(d);
-    if(Math.abs(d.lateral)>bound){
-      const side=Math.sign(d.lateral),v=velocity(d);
-      d.lateral=clamp(d.lateral,-bound,bound);
-      const contactClosing=resolveStaticContactSpeed(d,{x:-side,z:0},.6);
-      if(contactClosing>0){
-        this.registerImpact(d,contactClosing);
-        if(contactClosing>8){d.boost=0;if(d.collision===0&&d.id===0)this.event('BARRIER CONTACT · STEER AWAY OR REVERSE');}
-      }
-      d.speed*=Math.exp(-dt*.6);d.sideSpeed*=Math.exp(-dt*.6);
-      d.scrape=Math.min(1,Math.abs(v.z)/55);d.collision=Math.max(d.collision,.12);
+  constrainToRoad(d:Driver,_dt:number,previousDistance=d.distance){
+    const bound=this.roadClearance(d),offset=Math.abs(d.lateral);
+    if(offset<=bound){
+      this.railDeparture.delete(d);
+      return;
     }
+    const above=d.airborne+d.rampLift>GUARDRAIL_HEIGHT;
+    if(above&&!this.railDeparture.has(d))this.railDeparture.set(d,previousDistance);
+    const departure=this.railDeparture.get(d);
+    // Exterior terrain is scenery. Once the center is outside and drops to the
+    // rail, or leaves the short flyover corridor, return to the departure point.
+    if(departure!==undefined&&(offset>this.track.width/2+8||(!above&&offset>this.track.width/2+.45))){
+      this.recoverDeparture(d,departure);
+      return true;
+    }
+    if(above)return;
+    this.railDeparture.delete(d);
+    const side=Math.sign(d.lateral),v=velocity(d);
+    d.lateral=side*bound;
+    let verticalClosing=0;
+    if(departure!==undefined&&d.verticalSpeed<0){
+      // The center is still inboard. A tire or sill clips the upper strip and
+      // slides back onto the deck. Absorb part of the fall at this first touch.
+      verticalClosing=-d.verticalSpeed;
+      d.verticalSpeed*=.65;
+      d.jumpClean=false;
+    }
+    const closing=Math.max(verticalClosing,resolveStaticContactSpeed(d,{x:-side,z:0},.36));
+    if(closing<=0)return;
+    this.registerImpact(d,closing);
+    if(closing>8){d.boost=0;if(d.collision===0&&d.id===0)this.event('BARRIER CONTACT · STEER AWAY OR REVERSE');}
+    d.scrape=Math.min(1,Math.abs(v.z)/55);
+    d.collision=Math.max(d.collision,.12);
   }
-  recover(){if(this.status==='finished')return;this.player.lateral=0;this.player.heading=0;this.player.yawVelocity=0;this.player.impactYaw=0;this.player.sideSpeed=0;this.player.impact=0;this.player.scrape=0;this.player.collision=0;this.player.speed=clamp(this.player.speed,0,25);this.player.reverseHold=0;this.player.slipAngle=0;this.player.drift=0;this.player.acceleration=0;this.player.landingImpact=0;this.player.airborne=0;this.player.verticalSpeed=0;this.player.rampLift=0;this.player.jumpRewardPending=false;this.player.jumpClean=false;this.event('BACK ON TRACK');}
+  private recoverDeparture(d:Driver,departure:number){
+    d.distance=departure;
+    this.resetOnRoad(d,0);
+    // Walk back in full car lengths until the spawn footprint is clear. Check
+    // the wrapped gap too, since another car may be one lap ahead or behind.
+    const occupied=()=>this.drivers.some(other=>{
+      if(other===d||other.eliminated||other.finishTime!==null)return false;
+      const yaw=angleDelta(this.track.sample(d.distance).yaw,this.track.sample(other.distance).yaw);
+      return contactOffset(d,other,this.track.length,yaw)!==null;
+    });
+    while(occupied())d.distance-=8;
+    d.lap=Math.floor(Math.max(0,d.distance)/this.track.length)+1;
+    d.gear=1;
+    if(d.id===0)this.event('BACK ON TRACK');
+  }
+  private resetOnRoad(d:Driver,speed:number){
+    Object.assign(d,{lateral:0,heading:0,yawVelocity:0,impactYaw:0,sideSpeed:0,impact:0,scrape:0,collision:0,
+      speed,reverseHold:0,slipAngle:0,drift:0,acceleration:0,landingImpact:0,airborne:0,verticalSpeed:0,
+      rampLift:0,jumpRewardPending:false,jumpClean:false,boost:0});
+    this.railDeparture.delete(d);
+  }
+  recover(){
+    if(this.status==='finished')return;
+    const d=this.player;
+    const departure=this.railDeparture.get(d);
+    if(departure!==undefined){this.recoverDeparture(d,departure);return;}
+    this.resetOnRoad(d,clamp(d.speed,0,25));
+    this.event('BACK ON TRACK');
+  }
 }
 export function clamp(value:number,min:number,max:number){return Math.max(min,Math.min(max,value));}
 export function formatTime(seconds:number){const mins=Math.floor(seconds/60),secs=Math.floor(seconds%60),ms=Math.floor(seconds%1*100);return `${mins}:${String(secs).padStart(2,'0')}.${String(ms).padStart(2,'0')}`;}

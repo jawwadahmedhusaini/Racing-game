@@ -84,3 +84,13 @@ it('an angled car already stopped against a wall can move under throttle without
   expect(groundSpeed(d)).toBeGreaterThan(3);expect(Math.abs(d.lateral)).toBeLessThanOrEqual(s.roadClearance(d)+1e-6);
  }
 });
+
+for(const track of tracks)for(const side of [-1,1])it(`deliberate countersteer clears the ${track.id} rail on side ${side}`,()=>{
+ const sim=race(track),d=sim.player;
+ Object.assign(d,{speed:35,heading:-side*.55});
+ d.lateral=side*(sim.roadClearance(d)-.12);
+ const start=side*d.lateral;
+ for(let i=0;i<48;i++)sim.step(1/60,{...NO_INPUT,throttle:1});
+ for(let i=0;i<24;i++)sim.step(1/60,{...NO_INPUT,steer:-side,throttle:1});
+ expect(side*d.lateral).toBeLessThan(start-.5);
+});

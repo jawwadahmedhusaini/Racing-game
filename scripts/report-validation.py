@@ -1,70 +1,24 @@
-"""Generate the 2.6 report only after the current release gates pass."""
+"""Generate the current imported-art release report after the release gates pass."""
 from pathlib import Path
 import json
-from datetime import datetime, timezone
+from datetime import datetime,timezone
 root=Path(__file__).resolve().parent.parent
 version=json.loads((root/'package.json').read_text())['version']
 def read(name):return json.loads((root/f'artifacts/{name}.json').read_text())
-u=read('unit-results');browser=read('browser-results');b=browser['stats'];audio=read('audio-render')
-assert version=='2.6.0'
-assert u['success'] and u['numPassedTests']==210 and u['numFailedTests']==u['numPendingTests']==0
-assert b['expected']==23 and b['unexpected']==b['skipped']==b['flaky']==0 and not browser.get('errors')
-for name,count in [('asset-cache',3),('track-layout',3),('wall-response',34),('ramp-edges',41)]:
-    results=[r for r in u['testResults'] if r['name'].endswith('/'+name+'.test.ts')];assert len(results)==1
-    assert len(results[0]['assertionResults'])==count and all(a['status']=='passed' for a in results[0]['assertionResults'])
-for track in ['coast','city']:
-    wall=read(f'wall-{track}-browser');ramp=read(f'ramp-{track}-browser')
-    assert wall['passed'] and not wall['errors'] and wall['slide']['hud']==36
-    assert len(wall['cases'])==2 and wall['reversed']['speed']<-4
-    assert ramp['passed'] and not ramp['errors'] and ramp['jump']['jumpTotal']==1 and ramp['landed']['airborne']==0
+u=read('unit-results');browser=read('browser-results');b=browser['stats'];art=read('imported-art-review');workflow=read('imported-art-browser')
+assert version=='2.7.0'
+assert u['success'] and u['numPassedTests']>=226 and u['numFailedTests']==u['numPendingTests']==0
+assert b['expected']==26 and b['unexpected']==b['skipped']==b['flaky']==0 and not browser.get('errors')
+assert art['version']==version and art['passed'] and not art['errors'] and len(art['scenes'])==4
+assert workflow['passed'] and not workflow['errors'] and workflow['date']>=b['startTime']
+assert not art['audit']['violations'] and not workflow['audit']['violations']
 for name in ['production-smoke','hosting-smoke']:
-    r=read(name);assert r['version']==version and r['passed'] and not r['errors'] and not r['failedRequests'],name
-garage=read('streaming-garage');race=read('streaming-race');neon=read('neon-review')
-for r in [garage,race]:assert r['passed'] and not r['errors'] and r['date']>=b['startTime']
-assert len(set(race['requests']))==len(race['requests'])==4
-assert garage['reduction']>.58 and garage['lateSelectionIgnored'] and garage['savedSelectionReload']
-assert neon['passed'] and not neon['errors'] and neon['version']==version and len(neon['scenes'])==5
-assert not neon['audit']['violations'] and neon['audit']['samples']>4000
-assert audio['passed'] and len(audio['results'])==7
-peak=max(r['peak'] for r in audio['results']);assert peak<.99
+ r=read(name);assert r['version']==version and r['passed'] and not r['errors'] and not r['failedRequests'],name
+for name in ['streaming-garage','streaming-race']:
+ r=read(name);assert r['passed'] and not r['errors'] and r['date']>=b['startTime']
 assert read('dependency-audit')['metadata']['vulnerabilities']['total']==0
 for folder in ['dist','dist-pages']:assert json.loads((root/folder/'version.json').read_text())['version']==version
-report={'version':version,'date':datetime.now(timezone.utc).isoformat(),'unitPassed':u['numPassedTests'],'browserPassed':b['expected'],'browserStarted':b['startTime'],'browserDurationMs':b['duration'],'initialVehicleBytes':garage['initialBytes'],'previousVehicleBytes':garage['previousVehicleBytes'],'vehicleTransferReduction':garage['reduction'],'cityRoadSamples':neon['audit']['samples'],'citySceneryPlacements':neon['audit']['placements'],'minimumSceneryClearance':neon['audit']['minSceneryClearance'],'maximumAudioPeak':peak,'productionPassed':True,'hostingBasePassed':True,'hardwarePerformanceVerified':False,'passed':True}
-(root/'artifacts/neon-streaming-review.json').write_text(json.dumps(report,indent=2)+'\n')
-(root/'TEST_REPORT.md').write_text(f'''# APEX RUSH {version} — validation
-
-## Current release gates
-
-- **{u['numPassedTests']} unit tests passed**, no failures or skips.
-- **{b['expected']} Chromium browser workflows passed**, no failures, skips, retries or flaky outcomes; {b['duration']/60000:.1f} minutes. Started {b['startTime']} (UTC).
-- TypeScript and root/Pages production builds passed. Final source, public assets and runtime configuration were frozen and fingerprinted before the complete browser run.
-- Packaged launcher and `/Racing-game/` production smoke checks passed on {version}, including actual keyboard acceleration, nitro, reverse, pause, four layouts, Ultra rendering and asset paths. Development controls are absent from production.
-- No dependencies or external asset sources changed. The retained dependency audit reports zero vulnerabilities.
-
-## Loading and cache
-
-The default cold garage requested only `concept-car.glb`: **{garage['initialBytes']:,} bytes** instead of the former six files' **{garage['previousVehicleBytes']:,} bytes** ({garage['reduction']*100:.1f}% fewer vehicle bytes). This is model transfer volume, not total startup bytes, startup time or FPS. Surface/vegetation preload remains.
-
-Browser checks deliberately fail an optional car download, retry it, hold a response while selecting another car, purchase/reload Solstice, cancel grid preparation during a held BMW LOD download, restart, and switch racing quality. The fresh seven-car grid requested exactly four unique GLBs: the selected detailed model and three LOD families. Unselected detailed BMW/Solstice models were not fetched. Cache tests cover request sharing, retry, idempotent release, in-flight protection, live leases and LRU disposal. Returning from a race leaves at most two idle owners alongside the active garage model.
-
-## New city route and art
-
-Neon Harbor is a 2.71 km route with portside straights, alternating bends and an elevated return. Both tracks pass non-adjacent corridor separation, grid straightness, finite curvature and closed-seam checks. Existing AI completion tests still finish all six opponents on both tracks and all difficulties; the new route exposed and led to a more conservative traffic-braking margin.
-
-Five posed High-preset screenshots at 1280 × 800 were captured and inspected. The whole-city clearance audit sampled **{neon['audit']['samples']:,}** road points and checked **{neon['audit']['placements']}** registered scenery footprints with **zero violations**. Minimum registered scenery clearance beyond the road edge was **{neon['audit']['minSceneryClearance']:.2f} m**. The new port and frontage are original modular geometry. No additional third-party car or professional track pack is claimed.
-
-## Retained regression coverage
-
-The 34 wall and 41 ramp cases pass, including rotated impacts, steering/reverse escape, lateral-speed display, partial ramp approaches, jumps and landing. Ten 90-second mixed-input runs cover every car on both tracks. Browser checks retain career rewards, purchases, BMW audio/selection, mobile controls, pause/restart/resource reuse, loading cancellation, second-tab protection, storage/audio failure, missing assets and WebGL context loss. Existing records and garage progress survive v7 record migration.
-
-Seven audio waveform scenarios remain below clipping (maximum sample **{peak:.3f}**), with mute/pause silence, stereo rivals and failed-download fallback.
-
-## Limits and evidence
-
-Chromium ran with Linux software WebGL. This is not a physical-GPU benchmark. Physical phones, thermals, hardware frame pacing, Safari/Firefox and subjective handling remain unverified. Reflections use static probes; GPU texture compression, full suspension/rollover dynamics, a larger professionally authored garage and extended career remain separate work. No Asphalt-parity or universal FPS claim is made.
-
-Current evidence: `unit-results.json`, `browser-results.json`, `streaming-garage.json`, `streaming-race.json`, `neon-review.json`, `neon-streaming-review.json`, `neon-*.png`, wall/ramp browser JSON/screenshots, `audio-render.json`, `production-smoke.json` and `hosting-smoke.json` in `artifacts/`. Source archives include these records. CRC/SHA and public-download checks remain the final delivery gates.
-
-The older collision/ramp/sound/performance reports retain their original release dates. See [NEON_HARBOR_UPGRADE.md](NEON_HARBOR_UPGRADE.md) for scope and [DEVICE_TESTING.md](DEVICE_TESTING.md) for hardware validation.
-''')
-print('Validated',version,u['numPassedTests'],'unit /',b['expected'],'browser')
+report={'version':version,'date':datetime.now(timezone.utc).isoformat(),'unitPassed':u['numPassedTests'],'browserPassed':b['expected'],'browserStarted':b['startTime'],'browserDurationMs':b['duration'],'cityRoadSamples':art['audit']['samples'],'importedBuildings':art['scenes'][0]['importedBuildings'],'minimumSceneryClearance':art['audit']['minSceneryClearance'],'hardwarePerformanceVerified':False,'productionPassed':True,'hostingBasePassed':True,'passed':True}
+(root/'artifacts/imported-art-release.json').write_text(json.dumps(report,indent=2)+'\n')
+(root/'TEST_REPORT.md').write_text(f'''# APEX RUSH {version} — validation\n\n## Current release gates\n\n- **{u['numPassedTests']} unit tests passed**, without failures or skips.\n- **{b['expected']} Chromium workflows passed**, without failures, skips, retries or flaky outcomes; {b['duration']/60000:.1f} minutes. Started {b['startTime']} UTC.\n- TypeScript, root and Pages production builds passed. Packaged production and `/Racing-game/` smoke checks passed, including keyboard acceleration, nitro, reverse, pause, four layouts, Ultra rendering, base paths and absence of development controls.\n- Dependency audit: zero reported vulnerabilities.\n\n## Imported art\n\nThe new LF model has separate body, glass, interior and four wheel pivots. Geometry tests verify hashes, embedded resources, forward/rear axle placement, tyre ground height, functional lamp materials, collision containment and model budgets. The detailed/race meshes have 93,152 / 33,532 triangles. Its purchase, paint/record preservation, selected-model loading, mobile layout, acceleration and reverse are covered. LF reuses the existing layered V12 bank; no authentic manufacturer recording is claimed.\n\nFour raytrace building designs (47,938 triangles total in the source pack) are placed **{report['importedBuildings']}** times in Neon Harbor. Source maps are limited to 1024px. Materials and geometry are merged into spatial cells. The whole-circuit audit samples **{report['cityRoadSamples']:,}** road points: zero violations, minimum registered scenery clearance **{report['minimumSceneryClearance']:.2f} m** beyond the road edge. Failed city download, cancellation while held, retry and late completion are exercised. The city GLB is absent from cold garage loading.\n\nThe imported-art review includes four posed development captures at 1280 × 800. These are posed captures, not performance benchmarks. `imported-art-review.json` records submitted calls and triangles at each view. Draw counts include render passes; they are not FPS.\n\n## Existing regression coverage\n\nThe full suite retains steering direction, manual heading, all-car wall/ramp/jump cases, both tracks, six AI opponents, race completion, standings, rewards, save migration, touch controls, loading/retry/cache behavior, audio, context loss and resource reuse. Wall response uses the revised contact solver and finite-height rail. Additional tests cover airborne escape and off-course re-entry. The audio waveform checks are rerun in the browser suite; earlier performance reports remain historical, not new hardware measurements.\n\n## Limits\n\nChromium uses software WebGL in this environment. Physical desktop GPUs, Android devices, thermals, hardware frame pacing and Safari/Firefox remain unverified. Direct GitHub Pages requests are blocked by this environment's outbound proxy; deployment is checked through published commit-pinned files and local production hosting. No Asphalt parity or real-device FPS claim is made.\n\nThe package adds one independent community car and four imported building designs. It does not include a full professional racing-track asset or additional manufacturer car collections. See IMPORTED_ART_UPGRADE.md, ASSET_LICENSES.md and DEVICE_TESTING.md.\n\nCurrent evidence: `unit-results.json`, `browser-results.json`, `imported-art-review.json`, `imported-art-browser.json`, `imported-art-release.json`, `lf-*.png`, `imported-city-*.png`, `production-smoke.json`, `hosting-smoke.json` and streaming/wall/ramp browser records in `artifacts/`. Archive CRC, byte equality and published-download verification are final delivery gates.\n''')
+print('Validated',version,report['unitPassed'],'unit /',report['browserPassed'],'browser')

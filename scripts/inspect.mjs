@@ -2,7 +2,7 @@ import {chromium} from '@playwright/test';
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const page=await browser.newPage({viewport:{width:1440,height:900}});
 page.on('pageerror',e=>console.log('PAGE ERROR',e.message));page.on('console',m=>{if(m.type()==='error')console.log('CONSOLE',m.text())});
-await page.goto('http://127.0.0.1:5173');await page.waitForFunction(()=>window.__apex?.state().screen==='garage');await page.waitForSelector('.loading',{state:'detached',timeout:60000});
+await page.goto('http://127.0.0.1:5173/drive.html');await page.waitForFunction(()=>window.__apex?.state().screen==='garage');await page.waitForSelector('.loading',{state:'detached',timeout:60000});
 await page.screenshot({path:'artifacts/garage.png'});console.log('garage',await page.evaluate(()=>window.__apex.state()));
 await page.getByRole('button',{name:'Settings',exact:true}).click();await page.locator('#quality').selectOption('low');await page.getByRole('button',{name:'Close settings'}).click();
 await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await page.waitForSelector('#countdown',{timeout:90000});await page.waitForFunction(()=>window.__apex.state().screen==='racing');

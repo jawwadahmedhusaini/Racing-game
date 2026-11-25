@@ -5,7 +5,14 @@ import {spatialInstances} from './batching';
 
 interface TreeData {positions:number[];normals:number[];uvs:number[];groups:{bark:number[];leaf:number[]};}
 let trees:Record<'near'|'far',TreeData>;
-export async function loadVegetation(){const response=await fetch(publicUrl('assets/vegetation.json'));if(!response.ok)throw new Error('Tree asset failed to load');trees=await response.json();}
+let pendingTrees:Promise<void>|undefined;
+export function loadVegetation():Promise<void>{
+  if(trees)return Promise.resolve();
+  return pendingTrees??=fetch(publicUrl('assets/vegetation.json')).then(async response=>{
+    if(!response.ok)throw new Error('Tree asset failed to load');
+    trees=await response.json();
+  }).finally(()=>{pendingTrees=undefined;});
+}
 
 /** Nearby trees retain their silhouette; matching lower-detail meshes take over beyond the road. */
 export function addTrees(scene:THREE.Scene,near:THREE.Matrix4[],far:THREE.Matrix4[]){

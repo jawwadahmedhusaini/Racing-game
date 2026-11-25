@@ -11,6 +11,8 @@ try {
   page.on('response', response => { if (response.status() >= 400) report.failedRequests.push({ url: response.url(), status: response.status() }); });
   await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(process.env.GAME_URL || 'http://127.0.0.1:8000');
+  await expect(page.getByRole('heading',{name:'Apex Rush',exact:true})).toBeVisible();
+  await page.getByRole('link',{name:'Garage',exact:true}).click();
   const release = await page.request.get(new URL('version.json',page.url()).href);
   expect(release.status()).toBe(200);expect((await release.json()).version).toBe(version);
   report.version=version;

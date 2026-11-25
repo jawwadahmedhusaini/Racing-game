@@ -16,6 +16,8 @@ try {
   });
   await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(url);
+  await expect(page.getByRole('heading',{name:'Apex Rush',exact:true})).toBeVisible();
+  await page.getByRole('link',{name:'Garage',exact:true}).click();
   const release = await page.request.get(new URL('version.json',url).href);
   expect(release.status()).toBe(200);expect((await release.json()).version).toBe(version);
   report.version=version;
@@ -24,7 +26,7 @@ try {
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('button', { name: 'ASSET CREDITS & LICENSES' }).click();
   const license = await page.getByRole('link', { name: 'CC BY 4.0', exact: true }).getAttribute('href');
-  expect(license).toBe('/Racing-game/licenses/CC-BY-4.0.txt');
+  expect(license).toBe(new URL('licenses/CC-BY-4.0.txt',url).pathname);
   const licenseResponse = await page.request.get(new URL(license, url).href);
   expect(licenseResponse.status()).toBe(200);
   expect(await licenseResponse.text()).toContain('Creative Commons');
@@ -32,6 +34,7 @@ try {
   await page.getByRole('button', { name: 'Close credits' }).click();
   await page.getByRole('button', { name: 'HIT THE ROAD' }).click();
   await page.locator('[data-action="track"][data-value="city"]').click();
+  await page.setViewportSize({width:640,height:360});
   await page.getByRole('button', { name: 'START YOUR ENGINE' }).click();
   await page.waitForSelector('#countdown',{timeout:90000});
   await page.keyboard.down('w');
@@ -47,19 +50,19 @@ try {
   report.pause = true;
   expect(report.assetPaths.some(path => path.endsWith('/concept-car.glb'))).toBe(true);
   expect(report.assetPaths.some(path => path.endsWith('/concept-car-lod.glb'))).toBe(true);
-  for(const model of ['solstice-gt-lod.glb','bmw-m3-lod.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(true);
-  for(const model of ['solstice-gt.glb','bmw-m3.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(false);
+  for(const model of ['solstice-gt-lod.glb','bmw-m3-lod.glb','lf-gt-lod.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(true);
+  for(const model of ['solstice-gt.glb','bmw-m3.glb','lf-gt.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(false);
   report.demandLoadedGrid=true;
   const solstice=await page.request.get(new URL('licenses/solstice.json',url).href);expect(solstice.status()).toBe(200);expect((await solstice.json()).license).toBe('CC0-1.0');
   expect(report.assetPaths.some(path => path.endsWith('/venice_sunset_1k.hdr'))).toBe(true);
-  expect(report.assetPaths.some(path => path.endsWith('/vegetation.json'))).toBe(true);
-  for (const surface of ['ground-color.png','ground-normal.png','ground-rough.png','grass-color.png','water-normal.png','foliage-color.png','foliage-normal.png','bark-color.jpg','bark-normal.png']) {
+  expect(report.assetPaths.some(path => path.endsWith('/vegetation.json'))).toBe(false);
+  for (const surface of ['ground-color.png','ground-normal.png','water-normal.png']) {
     expect(report.assetPaths.some(path => path.endsWith(`/surfaces/${surface}`))).toBe(true);
   }
   for (const asset of ['coast-preview.jpg', 'city-preview.jpg']) {
     expect(report.assetPaths.some(path => path.endsWith(`/${asset}`))).toBe(true);
   }
-  expect(report.assetPaths.every(path => path.startsWith('/Racing-game/assets/'))).toBe(true);
+  expect(report.assetPaths.every(path => path.startsWith(new URL('assets/',url).pathname))).toBe(true);
   expect(report.failedRequests).toEqual([]);
   expect(report.errors).toEqual([]);
   report.passed = true;

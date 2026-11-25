@@ -1,10 +1,12 @@
 {
-  "date": "2026-10-27T13:47:09.550Z",
+  "date": "2026-11-25T17:14:24.658Z",
   "requests": [
     "concept-car.glb",
+    "harbor-architecture.glb",
     "concept-car-lod.glb",
     "solstice-gt-lod.glb",
-    "bmw-m3-lod.glb"
+    "bmw-m3-lod.glb",
+    "lf-gt-lod.glb"
   ],
   "cache": [
     {
@@ -13,12 +15,12 @@
       "users": 1
     },
     {
-      "key": "concept-car-lod.glb",
+      "key": "bmw-m3-lod.glb",
       "ready": true,
       "users": 0
     },
     {
-      "key": "bmw-m3-lod.glb",
+      "key": "lf-gt-lod.glb",
       "ready": true,
       "users": 0
     }

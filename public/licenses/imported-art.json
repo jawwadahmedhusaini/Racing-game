@@ -1,0 +1,73 @@
+{
+  "car": {
+    "creator": "MasterLife",
+    "title": "LF",
+    "license": "CC-BY (version unspecified by source)",
+    "source": "https://github.com/stuntrally/blendfiles/blob/251bc67d5ff52ce535525e144a4a1304e3b2b5ef/cars/LF/LF.blend",
+    "credit": "\nModel by MasterLife\nLicense: CC-BY\nCreated from scratch\n",
+    "textures": [
+      {
+        "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/LF/textures/LF_body_red.png",
+        "sha256": "1370a5df5b571f62492a2530563d1a447e29ddf0f3ca8772f2d6627f172489da",
+        "bytes": 330289
+      },
+      {
+        "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/LF/textures/LF_body_brake.png",
+        "sha256": "713814b01846a7f3658e2fc27588c662af7db50d47c7cfe82d811cede869b9db",
+        "bytes": 2978
+      },
+      {
+        "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/LF/textures/LF_interior.png",
+        "sha256": "2d83b5231fc353d6c14780e09b711865acbbfeee6cfa7522b2dafcc650af92d8",
+        "bytes": 1281417
+      },
+      {
+        "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/LF/textures/LF_wheel.png",
+        "sha256": "358b3e768053d09a134b5b404d671d01c299b2411435b06b8963a611931cdd81",
+        "bytes": 478229
+      },
+      {
+        "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/LF/textures/LF_glass.png",
+        "sha256": "0693c46c00da64b7b115f78486e16df051cf1772fd965d163a3799943c64ddeb",
+        "bytes": 183
+      },
+      {
+        "url": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/cars/LF/textures/LF_refl.png",
+        "sha256": "d11525bdea20de9f6522a3e7335a12275c14d502283c05f8d319d8f505212d98",
+        "bytes": 211
+      }
+    ],
+    "modifications": "Coordinate normalization, four animated wheels, textured PBR materials, functional existing lamp faces, 1024px maps and race LOD. LF GT is the in-game label; handling and V12 sound are game tuning, not manufacturer specifications."
+  },
+  "architecture": {
+    "creator": "raytrace",
+    "title": "12 Buildings (four selected)",
+    "license": "CC-BY (version unspecified by source)",
+    "source": "https://github.com/stuntrally/blendfiles/blob/251bc67d5ff52ce535525e144a4a1304e3b2b5ef/props/buildings/skyscrapers/12Buildings.blend",
+    "credit": "----  skyscraper1..12\n12 Buildings\nAuthor: raytrace\nLicense: CC-BY\nhttp://www.blendswap.com/blends/view/69593\n\ntextures used:\nCalinou's high-resolution texture pack (with normal maps)\nAuthor: Calinou\nLicense(s): CC-BY-SA 3.0\nhttp://opengameart.org/content/calinous-high-resolution-texture-pack-with-normal-maps\n",
+    "textureCreator": "Calinou",
+    "textureLicense": "CC-BY-SA-3.0",
+    "textureLicenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "modifications": "Four selected meshes centered and grounded; atlas and normal map resized to 1024px; glazing separated into dark, warm and cool emissive materials. Adapted textures remain CC-BY-SA-3.0."
+  },
+  "assets": [
+    {
+      "file": "assets/lf-gt.glb",
+      "bytes": 4304848,
+      "sha256": "1a66e0a949158b481b0e4772270eb1f436e646d4f9e87b54ca67659b958ecaf7",
+      "triangles": 93152
+    },
+    {
+      "file": "assets/lf-gt-lod.glb",
+      "bytes": 2978356,
+      "sha256": "97c0e4572e96116a133968bb34da792fb0b21da233302cdd0d78dd6aa41a99a1",
+      "triangles": 33531
+    },
+    {
+      "file": "assets/harbor-architecture.glb",
+      "bytes": 4713320,
+      "sha256": "26c9ed96ac9912cf4c766525327ecba965b1682b2bdbc568fbffcb413b87567f",
+      "triangles": 47938
+    }
+  ]
+}
