@@ -1,0 +1,222 @@
+{
+  "license": "CC-BY-4.0",
+  "revision": "fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8",
+  "engineAuthor": "CryHam",
+  "engineOrigin": "Rendered in Engine Simulator 0.1.14, edited/EQ by CryHam; not real vehicle recordings.",
+  "impactAuthors": "Halleck (original metal impacts/scraping), edited by CryHam",
+  "sourceCredits": [
+    "licenses/stunt-rally_sounds.txt",
+    "licenses/stunt-rally_crash.txt"
+  ],
+  "licenseText": "licenses/CC-BY-4.0.txt",
+  "modifications": "Mono 44.1 kHz PCM16; removed DC; normalized gain; loop beds shortened and crossfaded at seam. In-game RPM interpolation, load filtering and spatial mixing.",
+  "assets": [
+    {
+      "file": "assets/audio/v8f-1.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v8f-1.wav",
+      "sourceSha256": "6de6b5e55a7cf3d05319a00fc1259185fd3ad49303e2c7f804510e42587f49f5",
+      "sha256": "83062b3824875046fd99ea94b534274d120d1d8a922815721df06d3128d9d5cf",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/v8f-3.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v8f-3.wav",
+      "sourceSha256": "e4ef9d756902de5e687692ffce1e0f73cdb947603779a580f4d90ee58b510fa3",
+      "sha256": "f451370a9daf674daad5d80b05877c24f247a037379721c132d8012e5c353b2b",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/v8f-5.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v8f-5.wav",
+      "sourceSha256": "d34b3403426a4dc8f31efd4e4c4af8d0ed26d6c8413794b77a761a193702e9a0",
+      "sha256": "c9f0e8b19cc6c2a6d0357b250b5b330ae893ae42b4ee96a0bd44e0e7f211a2df",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/v8f-7.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v8f-7.wav",
+      "sourceSha256": "d60f0550a6d7495f6f34c6f1376f1459e0231f8427334fd24b319eaf5404ee3b",
+      "sha256": "9ed0fee665961943e4d1dde9271836dafaa43619a8d872a34622a2e807d7b5a3",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/v8f-9.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v8f-9.wav",
+      "sourceSha256": "91abea72dd66f5e52c824b75e039caebe22df33d4328169a12df4d3fa08fdf85",
+      "sha256": "9aa9f92800bc000603cd85227855f33cf9092ebb986f95b675ebfc346eb6d2c9",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/v12d-1.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v12d-1.wav",
+      "sourceSha256": "3f01531e9deb93b653da06a8066f911219ba855db6c835e0c4919ba75c41d12e",
+      "sha256": "91ba74fb594d2eb2ea693f214669377e44cf4c4f3d9699d081a8226bba223bcf",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/v12d-3.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v12d-3.wav",
+      "sourceSha256": "8089dab83e128787b1cc69085a113c4b08b4d25739d1b16011dc9052c3a9bb00",
+      "sha256": "581b0f321d523a4c2859a715e20d43a489a7ec75603b9e343de172c252dcc922",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/v12d-5.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v12d-5.wav",
+      "sourceSha256": "7a87dba764d39927121f1a025731a5d72f149848880c05aeee658d52d41af885",
+      "sha256": "cbd475253615b984344efa7642497f259ab912a58436b6f48fbaf66a9aa59250",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/v12d-7.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v12d-7.wav",
+      "sourceSha256": "a3adf3a79ebea0284824fed1f7209072de5271543f59112bd4b6269defa8b8c0",
+      "sha256": "bb9e0b7541faa79c69e6b7393604a1c4a55045c16aed01a7fcc4b2bb83bebeba",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/v12d-9.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/v12d-9.wav",
+      "sourceSha256": "f9a5e6498a86f4b1300c23f141126a585f27ad1ef5b8de665d5d9bf1a892745c",
+      "sha256": "cb69c09d0a4c0f6f1ae555078c0733dc30e655525d84cdf98ae30c415d77638c",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-v8-1.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-v8-1.wav",
+      "sourceSha256": "621518146dda188e1fcf20d2d0f1b403328cd7abcb346705e5ad8809318cb835",
+      "sha256": "3df69dea73aaaea3f6a3a9031a0b923bd8c4874805554d634154038a4d0954c3",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-v8-2.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-v8-2.wav",
+      "sourceSha256": "ea550121f4d659ae5f7d2b70a18891e7be4b2b89c8254858fd0667068fb9ceff",
+      "sha256": "8a26dc1e8f90edcfc7647903ccd778243043e1f19e7c2754f8c67668bb0b625c",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-v8-4.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-v8-4.wav",
+      "sourceSha256": "06f33de1a99ba55d53a87e8f2d6ac5b2005d9bedba68965986f783402d4e488e",
+      "sha256": "4579a44b9ab388a6692b28c812fbf953e927dbacfec689998d23f0b34e4da2c3",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-v8-6.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-v8-6.wav",
+      "sourceSha256": "3a50454c860b932abe0ce9c4ffb5ea4c95f49052dc135a6ec36eec1821f7f5b2",
+      "sha256": "ed6ad43a75e4db9f3420f85eb7ae175a32bae3bdec81f724d41bcd34271d8feb",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-v8-7.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-v8-7.wav",
+      "sourceSha256": "e4431b0dd4317f743f9a73f319f6fc48557e2359ba12d794509b726bdbee5856",
+      "sha256": "97a422dfa292b089edcc30c8653afc05c9f531de45743ee8a646a4be993cae02",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-i6r-1.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-i6r-1.wav",
+      "sourceSha256": "9c6d3067e802fddb69144c6eb903ebdfb34d70a6ac968083fce8007df904c0b8",
+      "sha256": "3ec752f706a5c3c8161a9a837aabaa65cc42e741c66e11371390c690629d6816",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-i6r-3.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-i6r-3.wav",
+      "sourceSha256": "08e0656aa89416ac00eb14b19bdba809130443a551b7a5e902336753cc532f68",
+      "sha256": "ccd353069ce807c97ce9c4bc4b52f5ee6d0f0a810d6f23a533e339962fae6383",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-i6r-5.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-i6r-5.wav",
+      "sourceSha256": "4c992f785c097f95a70d7cfd7ee0c3dc7c6b857cbc15f495710c638d04697219",
+      "sha256": "b45c6db9da369b72a43e64615cd2e2f8d3c091a74e0a79b552fc806ab2c03528",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-i6r-7.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-i6r-7.wav",
+      "sourceSha256": "764ba8f3d451ee1132dea7ad2002df1be6106150b21ee47446186ace38f39411",
+      "sha256": "6df012c1f84cb2a2df9aa1f4bdc5c8d96fa1a366feeedb72636a50f9081bd88e",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/b-i6r-8.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/engines/b-i6r-8.wav",
+      "sourceSha256": "16afeea952054b725b36294a3513da8e286707e63e74a63456f275834c3d4e0c",
+      "sha256": "dc2c1c732ba24991c2fb0a6db04d51a51aa38a5a29b9603a009bafc77fd7414d",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    },
+    {
+      "file": "assets/audio/impact-light.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/crash/02.wav",
+      "sourceSha256": "02a9ee84d115cf063a1a1ad7ccad4c263c45571dd22be7255574d776f97f9d95",
+      "sha256": "e1774c668b78d62d2b51e1769c11dc4ab90356e7e979319fecc6eb0f9d365287",
+      "seconds": 0.36002267573696145,
+      "bytes": 31798,
+      "loop": false
+    },
+    {
+      "file": "assets/audio/impact-heavy.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/crash/06.wav",
+      "sourceSha256": "996efedf4e995cdca08377d558884796c82eca4832dcdf40f0433381e6ca9997",
+      "sha256": "1bae0a2a962bdb7b45bc98120fd6058d31522b899fc3d7aeee9cebeb23d4e648",
+      "seconds": 0.5296145124716554,
+      "bytes": 46756,
+      "loop": false
+    },
+    {
+      "file": "assets/audio/scrape.wav",
+      "source": "https://raw.githubusercontent.com/stuntrally/stuntrally3/fe3ecd73fff671c3d75ecaeadccea5c5e6afe0d8/data/sounds/crash/screech.wav",
+      "sourceSha256": "20dcd5cf1ebd82c54df641336f7082ff5199ee26a44b9af4003526ca696d7cf9",
+      "sha256": "72acc7a64f934984a4bd9589f77720e40be8d324d9fefecbdf2e89efb2f08419",
+      "seconds": 0.87,
+      "bytes": 76778,
+      "loop": true
+    }
+  ]
+}
