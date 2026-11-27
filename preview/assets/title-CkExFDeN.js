@@ -1,1 +1,0 @@
-import"./modulepreload-polyfill-P2Xu9kJm.js";var e=document.querySelector(`#driving-help`);document.getElementById(`help`).addEventListener(`click`,()=>e.showModal()),e.addEventListener(`click`,t=>{if(t.target!==e)return;let n=e.getBoundingClientRect();(t.clientX<n.left||t.clientX>n.right||t.clientY<n.top||t.clientY>n.bottom)&&e.close()});
