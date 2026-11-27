@@ -28,3 +28,19 @@ it('compresses after landing then settles, and recovers cleanly after a distant 
  driver.landingImpact=0;for(let i=0;i<120;i++)director.update(camera,track,driver,position(0),1/60,i/60,0,true);expect(director.compression).toBeLessThan(.001);
  driver.distance=1000;director.reset();director.update(camera,track,driver,position(1000),1/60,3,0,true);expect(camera.position.distanceTo(position(1000))).toBeLessThan(13);expect(new Vector3().copy(camera.position).length()).toBeGreaterThan(0);
 });
+
+it('eases braking and boost framing without a one-frame camera jump',()=>{
+ const {director,camera,driver}=setup();
+ driver.speed=55;
+ for(let i=0;i<120;i++)director.update(camera,track,driver,position(0),1/60,i/60,0,true);
+ const baselineFov=camera.fov;
+ driver.boost=2;
+ director.update(camera,track,driver,position(0),1/60,2,0,true);
+ expect(camera.fov-baselineFov).toBeLessThan(.2);
+ for(let i=0;i<60;i++)director.update(camera,track,driver,position(0),1/60,2+i/60,0,true);
+ expect(camera.fov-baselineFov).toBeGreaterThan(5);
+
+ driver.boost=0;driver.acceleration=-36;
+ for(let i=0;i<120;i++)director.update(camera,track,driver,position(0),1/60,3+i/60,0,true);
+ expect(camera.fov).toBeLessThan(baselineFov-.65);
+});

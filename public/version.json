@@ -1,14 +1,11 @@
 {
-  "version": "2.7.0",
-  "date": "2026-11-25",
+  "version": "3.0.0",
+  "date": "2026-11-27",
   "changes": [
-    "Lightweight title screen with studio artwork of the playable LF GT and circuit-specific entry",
-    "Garage photographs, aligned LF wheel rigs and track-specific asset loading",
-    "Finite-height rail collisions with friction torque, overflight and off-course recovery",
-    "Original 32-bar stereo race score",
-    "New independent LF GT community model, textured body and cockpit, four animated wheels and race LOD",
-    "Four artist-authored building designs integrated into Neon Harbor with road clearance and spatial batching",
-    "City architecture loads on demand; existing vehicles, circuits and saved progression retained",
-    "Asset-specific collision dimensions and exhaust placement; LF uses the existing layered V12 sound bank"
+    "Aurel Orion R original hypercar with a dedicated garage model, race LOD and driving profile",
+    "Rebuilt Neon Harbor with a dockside launch, container chicane, lit underpass and waterfront straight",
+    "In-game title artwork, persistent race selection, circuit briefing and best-lap timing",
+    "Race preparation downloads vehicles alongside the circuit and reuses graphics warmup on restart",
+    "Revised rival personalities, chase-camera response and race sounds"
   ]
 }

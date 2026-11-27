@@ -41,3 +41,37 @@
   .car-list .car-card { flex-basis: 120px; min-width: 120px; height: 47px; display: flex; align-items: center; padding: 3px 6px; gap: 4px }
   .car-list .mini-car { width: 46%; height: auto }
 }
+
+.race-briefing {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: stretch;
+  justify-items: stretch;
+  padding: max(22px,env(safe-area-inset-top)) max(5vw,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(5vw,env(safe-area-inset-left));
+  background: #0a1018;
+}
+.race-briefing .race-loading-art { filter: none; opacity: .85; transform: none; background-position: center; }
+.race-briefing::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg,#0a1018 5%,#0a1018bd 31%,transparent 69%,#0a101899); pointer-events: none; }
+.briefing-header,.briefing-body,.briefing-status { position: relative; z-index: 1; }
+.briefing-header,.briefing-body { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.briefing-header .secondary { padding: 0 18px; background: #0a1018ba; }
+.briefing-body { align-self: end; align-items: end; margin-bottom: 20px; text-shadow: 0 2px 15px #000; }
+.briefing-body h1 { font: italic 900 clamp(52px,10vw,142px)/.8 'Barlow Condensed',sans-serif; margin: 8px 0 16px; }
+.briefing-body p,.briefing-status p { margin: 0; font: 500 clamp(12px,2vw,16px)/1.45 Inter,sans-serif; }
+.briefing-body svg { width: clamp(65px,16vw,175px); aspect-ratio: 1; filter: drop-shadow(0 2px 7px #000); }
+.briefing-body svg path { stroke: #fff; stroke-width: 2.5; fill: none; }
+.briefing-status progress { display: block; width: 100%; height: 5px; margin-top: 13px; accent-color: var(--accent); }
+
+@media (min-width: 601px) and (max-height: 660px) {
+  .garage-screen .topbar { height: 53px; min-height: 53px; }
+  .garage-screen .car-intro { top: 8px; width: min(350px,44vw); }
+  .garage-screen .maker .engine-preview { min-height: 25px; }
+  .garage-screen .car-intro h1 { display: flex; flex-wrap: wrap; align-items: baseline; gap: .15em; font-size: clamp(30px,4.6vw,58px); margin: 5px 0 8px; }
+  .garage-screen .car-intro h1 > span { gap: 8px; margin: 0; }
+  .garage-screen .paints { padding: 6px 0 9px; }
+  .garage-screen .upgrade-row { padding-top: 4px; }
+}
+@media (max-width: 370px) {
+  .garage-screen .paints { gap: 5px; }
+  .garage-screen .upgrade-row { width: 132px; }
+}

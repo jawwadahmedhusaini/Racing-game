@@ -6,7 +6,7 @@ A complete, independent single-player browser arcade racer: pick a car, choose a
 
 [Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/preview/) · [Download the playable preview](https://jawwadahmedhusaini.github.io/Racing-game/preview/APEX-RUSH.zip)
 
-[Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/archive/refs/heads/apex-presentation-candidate.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
+[Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/archive/refs/heads/apex-3-neon-harbor.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
 
 The next free-asset upgrade is tracked in [ASSET_UPGRADE_PLAN.md](ASSET_UPGRADE_PLAN.md), including verified candidate findings, blocked downloads and the offline GLB inspection command. Version 2.5 imports a CC0 BMW M3 community model and credited CC BY engine/impact samples from Stunt Rally. The other shortlisted manufacturer models still need usable source archives and licensing evidence.
 
@@ -15,6 +15,12 @@ The online link requires the repository's GitHub Pages deployment to be enabled;
 Version **2.4.1** fixes sudden slowdown after boost, head-on/reverse contact response, close-finish timing, elimination standings and keyboard navigation. Older records remain saved; corrected handling uses separate v4 records. See [DEEP_AUDIT.md](DEEP_AUDIT.md) for reproduced defects, validation and remaining limits.
 
 ![APEX RUSH 2.4 garage](artifacts/garage-final.jpg)
+
+## New in 3.0 — Neon Harbor
+
+Aurel Orion R is the new starter and featured car. It uses original geometry, four independently rigged wheels, suspension response, functional lamps and a separate race LOD. The rebuilt 3.19 km Neon Harbor circuit links the docks, a container chicane, a lit underpass and an elevated waterfront return. The title uses a frame from the running race, and the new circuit briefing leads directly into the grid.
+
+Existing cars, selections, progress and previous lap records carry forward. The rebuilt route writes to the separate `city-v8-*` record keys. **Continue** restores the last regular race setup.
 
 ## New in 2.7 — Imported cars and architecture
 

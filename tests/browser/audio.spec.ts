@@ -64,3 +64,38 @@ test('stereo race score starts on demand, stops on pause and reuses its decoded 
  expect(result).toMatchObject({quiet:true,paused:true,reused:true,muted:true,channels:2});
  expect(result.duration).toBeCloseTo(32*4*60/136,1);expect(downloads).toBe(1);
 });
+
+test('underpass adds stereo reflections and countdown and result cues use the effects bus',async({page})=>{
+ await page.goto('/scripts/audio-lab.html');await page.waitForFunction(()=>(window as any).audioLab);
+ const report=await page.evaluate(async()=>{
+  const {AudioSystem,freshSave}=(window as any).audioLab;
+  async function render(mode:string){
+   const context=new OfflineAudioContext(2,44100*2,44100);
+   const Original=window.AudioContext;
+   const resume=context.resume.bind(context);
+   (context as any).resume=async()=>{};
+   (window as any).AudioContext=function(){return context;};
+   const audio=new AudioSystem({...freshSave().settings,engine:mode==='cues'?0:1,effects:mode==='cues'?1:0,music:0});
+   try{await audio.start();}finally{window.AudioContext=Original;(context as any).resume=resume;}
+   await audio.samplesLoading;
+   const id=mode==='orion'?'orion-r':mode==='lf'?'lf-gt':'vanta';
+   const driver={id:0,spec:{id},gear:3,throttle:1,speed:45,sideSpeed:0,drift:0,airborne:0,brakeInput:0,
+     boost:0,scrape:0,impactSerial:0,landingSerial:0};
+   audio.setUnderpass(mode==='underpass');
+   audio.update(driver,mode!=='cues');
+   const cueTime=mode==='cues'?context.suspend(.4):null;
+   const rendering=context.startRendering();
+   if(cueTime){await cueTime;audio.countdown(0);audio.finish(true);await resume();}
+   const buffer=await rendering,left=buffer.getChannelData(0),right=buffer.getChannelData(1);
+   let stereo=0,energy=0,peak=0;
+   for(let i=0;i<left.length;i++){stereo+=(left[i]-right[i])**2;energy+=left[i]**2;peak=Math.max(peak,Math.abs(left[i]),Math.abs(right[i]));}
+   return {stereo:Math.sqrt(stereo/left.length),rms:Math.sqrt(energy/left.length),peak};
+  }
+  return {dry:await render('dry'),wet:await render('underpass'),cues:await render('cues'),orion:await render('orion'),lf:await render('lf')};
+ });
+ expect(report.dry.stereo).toBeLessThan(.00001);
+ expect(report.wet.stereo).toBeGreaterThan(.001);
+ expect(report.cues.rms).toBeGreaterThan(.006);
+ expect(Math.abs(report.orion.rms-report.lf.rms)).toBeGreaterThan(.001);
+ expect(Math.max(report.wet.peak,report.cues.peak)).toBeLessThan(.99);
+});

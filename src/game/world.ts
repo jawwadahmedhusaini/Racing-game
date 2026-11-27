@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {Sky} from 'three/addons/objects/Sky.js';
 import {mergeGeometries,mergeVertices} from 'three/addons/utils/BufferGeometryUtils.js';
-import {GUARDRAIL_HEIGHT,Track} from './track';
+import {GUARDRAIL_HEIGHT,HARBOR_UNDERPASS,isHarborUnderpass,Track} from './track';
 import {asphaltMaterial,terrainMaterial,tiled,surface,random,signTexture} from './materials';
 import {addTrees} from './vegetation';
 import {spatialInstances,spatialMesh} from './batching';
@@ -51,7 +51,7 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
     const field=new HeightField(-1080,-850,1900,1700,240,220,heights);groundHeight=(x,z)=>field.height(x,z)??rawHeight(x,z);
     const terrain=spatialMesh(grid,terrainMaterial());terrain.name='terrain';scene.add(terrain);
   }else{
-    const ground=new THREE.Mesh(new THREE.PlaneGeometry(1120,1400),new THREE.MeshStandardMaterial({color:'#283438',map:tiled('ground-color.png',70),normalMap:tiled('ground-normal.png',70),roughness:.8}));ground.name='terrain';ground.rotation.x=-Math.PI/2;ground.position.set(-340,-2,0);ground.receiveShadow=true;scene.add(ground);
+    const ground=new THREE.Mesh(new THREE.PlaneGeometry(1120,1196),new THREE.MeshStandardMaterial({color:'#283438',map:tiled('ground-color.png',70),normalMap:tiled('ground-normal.png',70),roughness:.8}));ground.name='terrain';ground.rotation.x=-Math.PI/2;ground.position.set(-340,-2,126);ground.receiveShadow=true;scene.add(ground);
   }
   await checkpoint('Laying the road and barriers…');
   const concrete=new THREE.MeshStandardMaterial({color:night?'#79828a':'#d0cabd',map:tiled('ground-color.png',1),normalMap:tiled('ground-normal.png',1),normalScale:new THREE.Vector2(.12,.12),roughness:.92});
@@ -71,7 +71,7 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
     jerseys.push(at(s,side*(half+.45),.54,new THREE.Vector3(.55,1.06,4.16*Math.max(.6,1+s.curvature*side*(half+.45)))));
     if(Math.floor(d/4.1)%3===0){posts.push(at(s,side*(half+.45),1.26,new THREE.Vector3(.055,.72,.065)));reflectors.push(at(s,side*(half+.12),.77,new THREE.Vector3(.07,.08,.2)));}
   }}
-  for(let d=0;d<track.length;d+=32){const s=track.sample(d);if(night||s.position.x>135){const base=night?-2:-11,height=s.position.y-2.2-base;for(const side of [-1,1])piers.push(matrix(new THREE.Vector3(s.position.x+s.right.x*side*5.7,base+height/2,s.position.z+s.right.z*side*5.7),new THREE.Vector3(1.8,height,2.7),s.yaw));caps.push(at(s,0,-2.5,new THREE.Vector3(track.width+1,.8,3.8)));joints.push(at(s,0,.032,new THREE.Vector3(track.width,.012,.07)));}}
+  for(let d=0;d<track.length;d+=32){const s=track.sample(d);if(night||s.position.x>135){const base=night&&s.position.z>-472?-2:-11,height=s.position.y-2.2-base;for(const side of [-1,1])piers.push(matrix(new THREE.Vector3(s.position.x+s.right.x*side*5.7,base+height/2,s.position.z+s.right.z*side*5.7),new THREE.Vector3(1.8,height,2.7),s.yaw));caps.push(at(s,0,-2.5,new THREE.Vector3(track.width+1,.8,3.8)));joints.push(at(s,0,.032,new THREE.Vector3(track.width,.012,.07)));}}
   instanced(scene,new THREE.BoxGeometry(),white,laneMarks,false);
   instanced(scene,jerseyGeometry(),concrete,jerseys,true);
   instanced(scene,new THREE.BoxGeometry(),metal,posts,true);
@@ -87,7 +87,7 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
 
   await checkpoint('Installing circuit lighting…');
   const poleTransforms:THREE.Matrix4[]=[],armTransforms:THREE.Matrix4[]=[],bulbs:THREE.Matrix4[]=[];
-  for(let d=18;d<track.length;d+=night?38:64){const s=track.sample(d);for(const side of night?[-1,1]:[1]){
+  for(let d=18;d<track.length;d+=night?38:64){if(night&&isHarborUnderpass(d,track.length))continue;const s=track.sample(d);for(const side of night?[-1,1]:[1]){
     poleTransforms.push(at(s,side*(half+1.5),4.3,new THREE.Vector3(.12,8.6,.12)));
     armTransforms.push(at(s,side*(half+.35),8.4,new THREE.Vector3(2.5,.10,.12)));
     bulbs.push(at(s,side*(half-.8),8.32,new THREE.Vector3(.85,.07,.34)));
@@ -97,7 +97,7 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
 
   addCircuitDetail(scene,track,roadSpace,groundHeight);
   await checkpoint('Building the surroundings…');
-  if(night){await checkpoint('Loading harbor architecture…');await addImportedCity(scene,track,roadSpace,signal);await checkpoint('Dressing the waterfront…');addHarbor(scene,track,roadSpace);addCity(scene,track,rng,roadSpace);}else{
+  if(night){await checkpoint('Loading harbor architecture…');addHarbor(scene,track,roadSpace);await addImportedCity(scene,track,roadSpace,signal);await checkpoint('Dressing the waterfront…');addCity(scene,track,rng,roadSpace);}else{
     addVillas(scene,track,groundHeight,rng,roadSpace);
     await checkpoint('Planting roadside scenery…');
     addPalms(scene,track,rng,roadSpace,groundHeight);
@@ -139,7 +139,29 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
     water.material.uniforms.time.value=time;
     for(const mesh of details){const radius=mesh.boundingSphere?.radius??0,center=mesh.boundingSphere?.center;if(center)mesh.visible=center.distanceTo(position)<(scene.userData.quality==='low'?65:scene.userData.quality==='medium'?95:130)+radius;}
     sun.position.copy(position).addScaledVector(sunDirection,180);sun.target.position.copy(position);
-    if(night){const n=nearest(position.x,position.z);streetLights.forEach((light,i)=>{const d=Math.floor(n.progress/38)*38+18+(i-1)*38,s=track.sample(d);light.position.copy(s.position).addScaledVector(s.right,half-.8);light.position.y+=8.2;light.color.set(['#82deff','#ff83bc','#ffd29d'][((Math.floor(d/120)%3)+3)%3]);light.target.position.copy(s.position);});headlights.forEach((light,i)=>{const right=new THREE.Vector3().crossVectors(forward,UP);light.position.copy(position).addScaledVector(right,(i-.5)*1.6).addScaledVector(forward,1.7);light.position.y+=.55;light.target.position.copy(position).addScaledVector(forward,28);light.target.position.y-=.25;});}
+    if(night){
+      const progress=nearest(position.x,position.z).progress;
+      const inside=isHarborUnderpass(progress,track.length);
+      streetLights.forEach((light,i)=>{
+        const spacing=inside?27:38;
+        const center=inside?HARBOR_UNDERPASS.start:18;
+        const d=center+Math.floor((progress-center)/spacing)*spacing+(i-1)*spacing;
+        const sample=track.sample(d);
+        const covered=isHarborUnderpass(d,track.length);
+        light.position.copy(sample.position).addScaledVector(sample.right,covered?0:half-.8);
+        light.position.y+=covered?HARBOR_UNDERPASS.clearance-.5:8.2;
+        light.color.set(covered?'#ffba78':['#91caff','#ffc290','#7bdae9'][((Math.floor(d/120)%3)+3)%3]);
+        light.intensity=covered?940:550;
+        light.target.position.copy(sample.position);
+      });
+      headlights.forEach((light,i)=>{
+        const right=new THREE.Vector3().crossVectors(forward,UP);
+        light.position.copy(position).addScaledVector(right,(i-.5)*1.6).addScaledVector(forward,1.7);
+        light.position.y+=.55;
+        light.target.position.copy(position).addScaledVector(forward,28);
+        light.target.position.y-=.25;
+      });
+    }
   }};
   }catch(error){disposeWorldScene(scene);throw error;}
 }
@@ -187,7 +209,7 @@ function createWater(night:boolean,sun:THREE.Vector3){
 function addGantry(scene:THREE.Scene,track:Track,night:boolean){
   const s=track.sample(0),group=new THREE.Group();group.position.copy(s.position);group.rotation.y=s.yaw;scene.add(group);
   const metal=new THREE.MeshStandardMaterial({color:'#20282d',metalness:.7,roughness:.35});for(const x of [-10.2,10.2]){const pole=new THREE.Mesh(new THREE.CylinderGeometry(.18,.26,7.4,12),metal);pole.position.set(x,3.7,0);pole.castShadow=true;group.add(pole);}
-  const gantryMap=signTexture('APEX / RUSH',night?'#7cdaee':'#ff7649',night?'NEON HARBOR · STREET CIRCUIT':'COSTA AURELIA · GRAND TOUR');
+  const gantryMap=signTexture('APEX / RUSH',night?'#7cdaee':'#ff7649',night?'NEON HARBOR · THE BREAKWATER RUN':'COSTA AURELIA · GRAND TOUR');
   const sign=new THREE.Mesh(new THREE.BoxGeometry(21,1.9,.36),[metal,metal,metal,metal,new THREE.MeshStandardMaterial({map:gantryMap,emissiveMap:gantryMap,emissive:'#ffffff',emissiveIntensity:night?.35:0}),new THREE.MeshStandardMaterial({map:signTexture('APEX / RUSH')})]);sign.position.y=6.8;sign.castShadow=true;group.add(sign);
   const boxes:THREE.Matrix4[]=[],colors:THREE.Color[]=[];for(let x=-8.5;x<9;x++)for(let z=-1;z<1;z++){boxes.push(at(s,x,.043,new THREE.Vector3(1,.012,1),z));colors.push(new THREE.Color((Math.round(x+.5)+z)%2?'#dddace':'#25282b'));}instanced(scene,new THREE.BoxGeometry(),new THREE.MeshStandardMaterial({roughness:.9}),boxes,false,colors);
 }
@@ -301,6 +323,18 @@ export function auditRoad(world:World,track:Track){
     let distance=Infinity;for(const s of track.samples)distance=Math.min(distance,Math.hypot(item.x-s.position.x,item.z-s.position.z));
     const clearance=distance-track.width/2-item.radius;minSceneryClearance=Math.min(minSceneryClearance,clearance);if(clearance<1.9)violations.push({kind:item.kind,distance,clearance});
   }
+  let minimumUnderpassClearance=Infinity;
+  const roof=world.scene.getObjectByName('harbor-underpass-roof');
+  if(roof){
+    for(let d=HARBOR_UNDERPASS.start+1;d<HARBOR_UNDERPASS.end;d+=2)for(const lateral of [-track.width/2,0,track.width/2]){
+      const sample=track.sample(d);
+      ray.set(sample.position.addScaledVector(sample.right,lateral),UP);
+      const hit=ray.intersectObject(roof,true)[0];
+      const clearance=hit?.distance??0;
+      minimumUnderpassClearance=Math.min(minimumUnderpassClearance,clearance);
+      if(clearance<HARBOR_UNDERPASS.clearance-.2)violations.push({kind:'underpass-roof',distance:d,lateral,clearance});
+    }
+  }
   const kinds:Record<string,number>={};for(const p of world.roadSpace.placements)kinds[p.kind]=(kinds[p.kind]??0)+1;
-  return {track:track.id,samples,kinds,placements:world.roadSpace.placements.length,minTerrainClearance:Number.isFinite(minTerrainClearance)?minTerrainClearance:null,minSceneryClearance,violations};
+  return {track:track.id,samples,kinds,placements:world.roadSpace.placements.length,minTerrainClearance:Number.isFinite(minTerrainClearance)?minTerrainClearance:null,minSceneryClearance,minUnderpassClearance:Number.isFinite(minimumUnderpassClearance)?minimumUnderpassClearance:null,violations};
 }

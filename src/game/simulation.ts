@@ -2,7 +2,7 @@ import {CARS,type CarSpec,type RaceMode,type Difficulty} from './content';
 import {Track,angleDelta,GUARDRAIL_HEIGHT} from './track';
 import {contactOffset,footprint,resolveContactSpeed,resolveStaticContactSpeed,velocity,setVelocity,groundSpeed} from './contact';
 import {rampSupport,rampContact,RAMP} from './ramp';
-import {planOpponent} from './opponents';
+import {planOpponent,rivalProfile} from './opponents';
 import {shiftGear} from './engine-voice';
 
 export interface Controls {throttle:number; brake:number; steer:number; drift:boolean; nitro:boolean;}
@@ -18,6 +18,9 @@ export class RaceSimulation {
   track:Track;drivers:Driver[]=[];mode:RaceMode;difficulty:Difficulty;upgrade:number;
   status:'countdown'|'racing'|'finished'='countdown';countdown=3.5;elapsed=0;laps:number;resultPosition=0;
   eliminatedAt=0;nextElimination=28;bestSpeed=0;lastEvent='';eventTimer=0;rank=1;finishedAt=0;
+  bestLap:number|null=null;
+  private lapStart=0;
+  private nextLap=1;
   private readonly railDeparture=new Map<Driver,number>();
   constructor(options:RaceOptions) {
     this.track=options.track;this.mode=options.mode;this.difficulty=options.difficulty;this.upgrade=options.upgrade;this.laps=options.laps??(options.mode==='time'?1:2);
@@ -46,9 +49,10 @@ export class RaceSimulation {
   aiInput(d:Driver):Controls {
     const {lane,speedLimit,bend}=planOpponent(d,this.drivers,this.track);
     const factor={rookie:.77,pro:.91,expert:1.02}[this.difficulty],personality=.96+(d.id%3)*.025;
-    const targetSpeed=Math.min((d.spec.topSpeed/3.6)*factor*personality,Math.sqrt(36/(bend+.0015))*.83,speedLimit);
+    const profile=rivalProfile(d.id);
+    const targetSpeed=Math.min((d.spec.topSpeed/3.6)*factor*personality,Math.sqrt(36/(bend+.0015))*.83*profile.corner,speedLimit);
     d.targetLane=lane;
-    return {throttle:targetSpeed<.5?0:d.speed<targetSpeed?1:.15,brake:d.speed>targetSpeed+1?.75:0,steer:this.steeringFor(d,d.targetLane),drift:false,nitro:d.nitro>35&&bend<.002&&d.speed>40&&(Math.sin(this.elapsed*.2+d.id)>0)};
+    return {throttle:targetSpeed<.5?0:d.speed<targetSpeed?1:.15,brake:d.speed>targetSpeed+1?.75:0,steer:this.steeringFor(d,d.targetLane),drift:false,nitro:d.speed<speedLimit-10&&d.nitro>profile.reserve&&bend<profile.boostBend&&d.speed>40&&Math.sin(this.elapsed*.2+d.id)>profile.boostWindow};
   }
   step(dt:number,input:Controls) {
     if(!Number.isFinite(dt)||dt<=0)return;
@@ -63,6 +67,15 @@ export class RaceSimulation {
     for(const d of this.drivers) {
       if(d.eliminated||d.finishTime!==null)continue;
       const before=d.distance,controls=d.id===0?input:this.aiInput(d);this.integrate(d,dt,controls);
+      if(d===this.player&&!this.railDeparture.has(d)&&d.distance>=this.track.length*this.nextLap){
+        const line=this.track.length*this.nextLap;
+        const fraction=clamp((line-before)/Math.max(1e-9,d.distance-before),0,1);
+        const crossing=this.elapsed-dt+dt*fraction;
+        const lapTime=crossing-this.lapStart;
+        this.bestLap=Math.min(this.bestLap??Infinity,lapTime);
+        this.lapStart=crossing;
+        this.nextLap++;
+      }
       if(d.distance>=this.track.length*this.laps&&!this.railDeparture.has(d)){
         const fraction=clamp((this.track.length*this.laps-before)/Math.max(1e-9,d.distance-before),0,1);
         d.finishTime=this.elapsed-dt+dt*fraction;d.speed=d.sideSpeed=d.impactYaw=d.yawVelocity=0;d.boost=0;

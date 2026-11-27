@@ -27,6 +27,6 @@ for(const asset of manifest.assets)it(`${asset.file} has verified content and us
  }
 });
 it('LF purchase preserves previous cars and records, selects its own LOD and V12 bank',()=>{
- const save=freshSave();save.credits=5000;save.bestTimes={'city-v7-time':90};expect(buyCar(save,'lf-gt')).toBe(true);expect(save.owned).toEqual(['vanta','lf-gt']);expect(save.credits).toBe(500);expect(parseSave(JSON.stringify(save))).toEqual(save);
+ const save=freshSave();save.credits=5000;save.bestTimes={'city-v7-time':90};expect(buyCar(save,'lf-gt')).toBe(true);expect(save.owned).toEqual(['orion-r','lf-gt']);expect(save.credits).toBe(500);expect(parseSave(JSON.stringify(save))).toEqual(save);
  const spec=CARS.find(c=>c.id==='lf-gt')!;expect(vehicleAssetKey(spec,true)).toBe('lf-gt-lod.glb');expect(vehicleAssetKey(spec)).toBe('lf-gt.glb');expect(engineBank(spec.id)).toBe('v12d');
 });

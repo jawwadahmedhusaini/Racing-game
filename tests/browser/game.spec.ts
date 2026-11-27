@@ -140,8 +140,8 @@ test('blocked storage and a failed audio graph do not stop driving',async({page}
 });
 
 test('asset download failure offers retry and context loss gives a usable reload action',async({page})=>{
-  await page.route('**/assets/concept-car.glb',route=>route.abort());await page.goto('/drive.html');await expect(page.getByRole('heading',{name:'Game files could not load'})).toBeVisible();
-  await page.unroute('**/assets/concept-car.glb');await Promise.all([page.waitForEvent('domcontentloaded'),page.getByRole('button',{name:'RELOAD GAME'}).click()]);await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible({timeout:60000});await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
+  await page.route('**/assets/orion-r.glb',route=>route.abort());await page.goto('/drive.html');await expect(page.getByRole('heading',{name:'Game files could not load'})).toBeVisible();
+  await page.unroute('**/assets/orion-r.glb');await Promise.all([page.waitForEvent('domcontentloaded'),page.getByRole('button',{name:'RELOAD GAME'}).click()]);await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible({timeout:60000});await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
   await page.evaluate(()=>{const canvas=document.querySelector<HTMLCanvasElement>('#game-canvas')!;canvas.getContext('webgl2')!.getExtension('WEBGL_lose_context')!.loseContext();});
   await expect(page.getByRole('heading',{name:'Graphics interrupted'})).toBeVisible();await Promise.all([page.waitForEvent('domcontentloaded'),page.getByRole('button',{name:'RELOAD GAME'}).click()]);await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible({timeout:60000});await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});await expect(page.getByRole('button',{name:'HIT THE ROAD'})).toBeVisible();
 });

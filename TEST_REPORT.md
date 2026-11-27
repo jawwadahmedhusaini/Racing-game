@@ -1,3 +1,14 @@
+# APEX RUSH 3.0 preview verification
+
+- 270 unit tests passed, including mixed driving inputs, isolated race and showroom models, wheel and lamp geometry, revised record keys, legacy saves, and six-rival finishes on both courses.
+- Chromium completed the featured race from title to results with the Orion R and six rivals, using the development simulation driver for the full race. The workflow checked best-lap results, restart, Continue and separate Neon Harbor records.
+- The circuit audit covered 5,320 road samples and 339 scene placements with zero violations. The underpass has at least 10 m of clearance in the scene audit.
+- Four Chromium audio workflows passed, including underpass reflections, sound cues and the Orion engine mix. The production hosting smoke test checked keyboard acceleration, pause, and model delivery with no failed requests.
+- The cold desktop title transferred 376,589 bytes of HTTP response bodies before WebGL. The title was captured on desktop, portrait phone and landscape phone viewports. Four garage layouts verified that the upgrade row ends above the performance panel.
+- The offline ZIP passes CRC and contains 97 web files with bytes matching the production root build. Production checks used Chromium with software WebGL. Physical-device frame pacing, thermal testing and hands-on play sessions remain pending.
+
+## Historical release evidence
+
 # APEX RUSH 2.7.0 preview verification
 
 The final unit run passed 250 tests. Both touch-driven wall workflows passed on the final physics build. They cover both sides of each circuit, deliberate countersteer, head-on contact, reversing away and lateral motion on the speedometer.

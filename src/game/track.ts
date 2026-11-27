@@ -3,6 +3,11 @@ import type { TrackId } from './content';
 import {rampHeight} from './ramp';
 
 export const GUARDRAIL_HEIGHT = 1.6;
+export const HARBOR_UNDERPASS = { start:1140, end:1248, clearance:10 };
+export function isHarborUnderpass(distance:number,length:number){
+  const local=((distance%length)+length)%length;
+  return local>=HARBOR_UNDERPASS.start&&local<HARBOR_UNDERPASS.end;
+}
 
 export interface TrackSample { position:THREE.Vector3; tangent:THREE.Vector3; right:THREE.Vector3; yaw:number; curvature:number; }
 export class Track {
@@ -14,7 +19,14 @@ export class Track {
     const points=id==='coast'?[
       [0,8,0],[0,10,180],[-110,19,330],[-280,24,290],[-365,16,110],[-280,10,-65],[-190,15,-255],[20,20,-320],[210,13,-180],[235,9,-25],[120,8,-40],
     ]:[
-      [180,6,-260],[180,6,40],[180,7,310],[90,8,400],[-60,10,360],[-180,10,300],[-330,10,340],[-410,12,220],[-320,19,130],[-200,23,80],[-210,20,-30],[-380,13,-100],[-400,8,-260],[-260,6,-370],[-60,5,-360],[90,6,-345],
+      // Straight dock, double direction change through the freight yard,
+      // then a westbound underpass and the elevated southern return.
+      [180,7,-340],[180,7,-120],[180,7,200],[176,8,350],
+      [139,8,436],[56,9,467],[-16,9,424],[-104,9,439],
+      [-172,9,505],[-280,9,520],[-420,10,520],[-510,12,477],
+      [-549,14,386],[-550,15,182],[-561,16,45],[-528,17,-75],
+      [-532,19,-220],[-510,23,-365],[-440,27,-450],[-321,28,-478],
+      [-155,28,-480],[14,26,-480],[121,18,-464],[174,10,-414],
     ];
     this.curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(p[0],p[1],p[2])),true,'catmullrom',id==='coast'?.65:.5);
     this.curve.arcLengthDivisions=3600;this.curve.updateArcLengths();this.length=this.curve.getLength();

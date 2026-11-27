@@ -14,9 +14,9 @@ try {
     const parsed = new URL(response.url());
     if (parsed.pathname.includes('/assets/')) report.assetPaths.push(parsed.pathname);
   });
-  await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
+  await page.addInitScript(() => localStorage.setItem('apex-rush-save-v1', JSON.stringify({ version: 1, selected:'orion-r', owned:['orion-r'], settings: { adaptiveResolution:false, quality: 'low', engine: 0, music: 0, effects: 0 } })));
   await page.goto(url);
-  await expect(page.getByRole('heading',{name:'Apex Rush',exact:true})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Neon Harbor',exact:true})).toBeVisible();
   await page.getByRole('link',{name:'Garage',exact:true}).click();
   const release = await page.request.get(new URL('version.json',url).href);
   expect(release.status()).toBe(200);expect((await release.json()).version).toBe(version);
@@ -48,9 +48,9 @@ try {
   report.sampledAudioPaths=true;report.bmwAssets=true;
   report.keyboardAcceleration = true;
   report.pause = true;
-  expect(report.assetPaths.some(path => path.endsWith('/concept-car.glb'))).toBe(true);
+  expect(report.assetPaths.some(path => path.endsWith('/orion-r.glb'))).toBe(true);
   expect(report.assetPaths.some(path => path.endsWith('/concept-car-lod.glb'))).toBe(true);
-  for(const model of ['solstice-gt-lod.glb','bmw-m3-lod.glb','lf-gt-lod.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(true);
+  for(const model of ['solstice-gt-lod.glb','bmw-m3-lod.glb','lf-gt-lod.glb','orion-r-lod.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(true);
   for(const model of ['solstice-gt.glb','bmw-m3.glb','lf-gt.glb'])expect(report.assetPaths.some(path=>path.endsWith('/'+model))).toBe(false);
   report.demandLoadedGrid=true;
   const solstice=await page.request.get(new URL('licenses/solstice.json',url).href);expect(solstice.status()).toBe(200);expect((await solstice.json()).license).toBe('CC0-1.0');
@@ -59,7 +59,7 @@ try {
   for (const surface of ['ground-color.png','ground-normal.png','water-normal.png']) {
     expect(report.assetPaths.some(path => path.endsWith(`/surfaces/${surface}`))).toBe(true);
   }
-  for (const asset of ['coast-preview.jpg', 'city-preview.jpg']) {
+  for (const asset of ['coast-preview.jpg', 'harbor-cover.webp']) {
     expect(report.assetPaths.some(path => path.endsWith(`/${asset}`))).toBe(true);
   }
   expect(report.assetPaths.every(path => path.startsWith(new URL('assets/',url).pathname))).toBe(true);

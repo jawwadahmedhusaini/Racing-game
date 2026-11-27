@@ -1,3 +1,11 @@
+import {readRaceChoice} from './game/race-choice';
+
+const featured = document.querySelector<HTMLAnchorElement>('#featured-race')!;
+if (readRaceChoice()) {
+  featured.firstChild!.textContent = 'Continue ';
+  featured.href = 'drive.html?view=continue';
+}
+
 const help = document.querySelector<HTMLDialogElement>('#driving-help')!;
 document.getElementById('help')!.addEventListener('click', () => help.showModal());
 help.addEventListener('click', event => {

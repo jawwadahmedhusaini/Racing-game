@@ -1,4 +1,5 @@
 import {MathUtils} from 'three';
+import {STARTER_CAR_ID} from './content';
 export function shiftGear(gear:number,speed:number){
   speed=Math.abs(speed);
   while(gear<7&&speed>gear*17+2)gear++;
@@ -10,7 +11,7 @@ export const ENGINE_BANKS={
   'b-v8':[1000,2000,4000,6000,7000],'b-i6r':[1000,3000,5000,7000,8000],
 } as const;
 export type EngineBank=keyof typeof ENGINE_BANKS;
-export function engineBank(id:string):EngineBank{return (id==='spectre'||id==='lf-gt')?'v12d':id==='solstice'?'b-i6r':id==='bmw-m3'?'b-v8':'v8f';}
+export function engineBank(id:string):EngineBank{return (id==='spectre'||id==='lf-gt'||id===STARTER_CAR_ID)?'v12d':id==='solstice'?'b-i6r':id==='bmw-m3'?'b-v8':'v8f';}
 /** Adjacent RPM recordings overlap at constant power; never pitch one sample across the entire range. */
 export function engineLayers(bank:EngineBank,rpm:number){
   const points=ENGINE_BANKS[bank],r=MathUtils.clamp(rpm,points[0],points[points.length-1]);
@@ -25,13 +26,16 @@ export class EngineVoice {
     dt=MathUtils.clamp(dt,0,.1);speed=Math.abs(speed);throttle=MathUtils.clamp(throttle,0,1);
     if(id!==this.car){this.car=id;this.gear=Math.min(7,Math.floor(speed/17)+1);this.shiftRemaining=0;this.rpm=1000;}
     const previous=this.gear;this.gear=gearOverride??shiftGear(this.gear,speed);
-    if(previous!==this.gear)this.shiftRemaining=.13;
+    const orion=id===STARTER_CAR_ID;
+    if(previous!==this.gear)this.shiftRemaining=orion ? .087 : .13;
     else this.shiftRemaining=Math.max(0,this.shiftRemaining-dt);
-    const ratio=[3.1,2.13,1.58,1.23,1,.84,.72][this.gear-1],bank=engineBank(id);
+    const ratios=orion ? [3.33,2.27,1.66,1.31,1.08,.91,.78] : [3.1,2.13,1.58,1.23,1,.84,.72];
+    const ratio=ratios[this.gear-1];
+    const bank=engineBank(id);
     const redline=ENGINE_BANKS[bank].at(-1)!;
     const desired=unloaded?1000+throttle*(redline-1000):Math.min(redline,Math.max(950+throttle*1100,950+speed*86*ratio+throttle*160));
-    this.rpm+=(desired-this.rpm)*(1-Math.exp(-dt*(previous>this.gear?18:9)));
+    this.rpm+=(desired-this.rpm)*(1-Math.exp(-dt*(previous>this.gear?18:orion?12:9)));
     const cylinders=bank==='v12d'?12:bank==='b-i6r'?6:8;
-    return {rpm:this.rpm,gear:this.gear,frequency:this.rpm/60*cylinders/2,load:.28+throttle*.72,shift:this.shiftRemaining>0,changed:previous!==this.gear,downshift:previous>this.gear};
+    return {rpm:this.rpm,gear:this.gear,frequency:this.rpm/60*cylinders/2,load:orion ? .2+Math.sqrt(throttle)*.8 : .28+throttle*.72,shift:this.shiftRemaining>0,changed:previous!==this.gear,downshift:previous>this.gear};
   }
 }

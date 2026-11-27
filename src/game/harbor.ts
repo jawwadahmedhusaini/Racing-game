@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {spatialMesh} from './batching';
 import {RoadSpace} from './road-space';
-import {Track} from './track';
-import {random} from './materials';
+import {HARBOR_UNDERPASS,Track} from './track';
+import {random,signTexture,tiled} from './materials';
 
 /** Original modular harbor set. Static meshes are merged by material and cell.
  * All roadside solids reserve a whole-circuit footprint before skyline placement.
@@ -66,10 +66,116 @@ export function addHarbor(scene:THREE.Scene,track:Track,space:RoadSpace){
   box(ship.clone().add(new THREE.Vector3(0,13,51)),23,18,21,concrete);box(ship.clone().add(new THREE.Vector3(0,20,52)),25,3,22,glass);
   box(ship.clone().add(new THREE.Vector3(0,21.6,52)),25,.15,22,warm);
 
+  const asphaltDeck = new THREE.MeshStandardMaterial({
+    color:'#3e4a52', map:tiled('ground-color.png',3), normalMap:tiled('ground-normal.png',3),
+    normalScale:new THREE.Vector2(.23,.23), roughness:.88,
+  });
+  const roofMaterial=asphaltDeck.clone();
+  roofMaterial.color.set('#46515c');
+  const safety = new THREE.MeshStandardMaterial({color:'#eff3e9',roughness:.72});
+  const barrierRed = new THREE.MeshStandardMaterial({color:'#a04434',roughness:.74});
+  const position=(distance:number)=>track.sample(distance);
+  // The launch has a visible service apron with setbacks for freight infrastructure.
+  for(let d=-30;d<174;d+=17){
+    const sample=position(d);
+    const base=sample.position.clone().addScaledVector(sample.right,17);
+    box(base.clone().add(new THREE.Vector3(0,-.67,0)),14,1.2,17.03,asphaltDeck,sample.yaw);
+    if(d%3===0){
+      const pierHeight=base.y+.7;
+      box(new THREE.Vector3(base.x,-2+pierHeight/2,base.z),2.7,pierHeight,3.9,concrete,sample.yaw);
+    }
+    for(const x of [-5.9,5.9])box(local(base,sample.yaw,x,-.05,0),.14,.024,16.99,safety,sample.yaw);
+    if(d%2===0)for(const x of [-3,3])box(local(base,sample.yaw,x,-.048,4),.12,.024,6,warm,sample.yaw);
+  }
+
+  const freightMap=signTexture('FREIGHT YARD','#ffce86','SLOW / DOUBLE BEND');
+  const freightSign=new THREE.MeshStandardMaterial({map:freightMap,emissiveMap:freightMap,emissive:'#ffffff',emissiveIntensity:1.15,side:THREE.DoubleSide});
+  for(let distance=735,index=0;distance<1100;distance+=24,index++){
+    const sample=position(distance),side=index%3===1?1:-1;
+    const base=sample.position.clone().addScaledVector(sample.right,side*20);
+    if(!space.reserve('freight-chicane-stack',base.x,base.z,8))continue;
+    const yaw=sample.yaw+.09*side;
+    const deckHeight=base.y+1.93;
+    box(new THREE.Vector3(base.x,-2+deckHeight/2,base.z),8,deckHeight,14,asphaltDeck,yaw);
+    const levels=2+index%2;
+    for(let level=0;level<levels;level++){
+      const container=local(base,yaw,0,1.27+level*2.57,0);
+      box(container,5.7,2.54,12.8,cargo[(index+level)%cargo.length],yaw);
+      for(const x of [-2.88,2.88])for(let z=-5.8;z<=5.9;z+=.84)box(local(container,yaw,x,0,z),.08,2.34,.105,steel,yaw);
+      for(const z of [-6.42,6.42])for(const x of [-2.87,2.87]){
+        box(local(container,yaw,x,0,z),.19,2.6,.19,concrete,yaw);
+        box(local(container,yaw,x*.37,0,z),.09,2.27,.15,steel,yaw);
+      }
+    }
+    if(index%4===0){
+      const panel=new THREE.PlaneGeometry(4.9,1.5);
+      add(panel,freightSign,local(base,yaw,0,2.1,-6.51),yaw+Math.PI);
+    }
+  }
+
+  // The open-sided floodgate underpass follows the track surface and keeps roof
+  // clearance above the vehicle and chase camera envelopes through the section.
+  const {start,end,clearance}=HARBOR_UNDERPASS;
+  const half=track.width/2;
+  add(underpassRoof(track),roofMaterial);
+  for(let d=start;d<end;d+=9){
+    const length=Math.min(9,end-d),sample=position(d+length/2);
+    const supportWidth=half+3.42;
+    for(const side of [-1,1]){
+      const foot=sample.position.clone().addScaledVector(sample.right,side*supportWidth);
+      if(space.reserve('underpass-pier',foot.x,foot.z,.85)){
+        const pierHeight=foot.y+clearance+2.3;
+        box(new THREE.Vector3(foot.x,-2+pierHeight/2,foot.z),1.21,pierHeight,1.10,asphaltDeck,sample.yaw);
+        box(foot.clone().add(new THREE.Vector3(0,.25,0)),1.4,.5,1.4,barrierRed,sample.yaw);
+        box(foot.clone().add(new THREE.Vector3(0,1.15,0)),1.26,.17,1.15,safety,sample.yaw);
+      }
+      const lamp=sample.position.clone().addScaledVector(sample.right,side*3.9);
+      box(lamp.clone().add(new THREE.Vector3(0,clearance-.19,0)),.47,.3,3.9,steel,sample.yaw);
+      box(lamp.clone().add(new THREE.Vector3(0,clearance-.35,0)),.32,.03,3.7,warm,sample.yaw);
+    }
+    box(sample.position.clone().add(new THREE.Vector3(0,clearance-.24,0)),track.width+5,.45,.69,steel,sample.yaw);
+  }
+  const gateTex=signTexture('FLOODGATE 01','#ffcca3','NEON HARBOR  /  WESTBOUND');
+  const gateFace=new THREE.MeshStandardMaterial({map:gateTex,emissiveMap:gateTex,emissive:'#fff3e5',emissiveIntensity:1.25,side:THREE.DoubleSide});
+  const entry=position(start);
+  add(new THREE.PlaneGeometry(13,2),gateFace,entry.position.clone().add(new THREE.Vector3(0,clearance-.4,0)),entry.yaw+Math.PI);
+  for(const d of [start-.45,end+.45]){
+    const sample=position(d);
+    box(sample.position.clone().add(new THREE.Vector3(0,clearance+.25,0)),track.width+7,.55,1.18,steel,sample.yaw);
+    box(sample.position.clone().add(new THREE.Vector3(0,clearance+.62,0)),track.width+7.1,.12,.15,warm,sample.yaw);
+  }
+
+  // Breakwater crossing. The outer attachment line stays clear of street
+  // lights and the active barrier; the water-facing side stays open to the basin.
+  for(const distance of [2585,2728]){
+    const s=track.sample(distance),width=13.25;
+    const feet=[-1,1].map(side=>s.position.clone().addScaledVector(s.right,side*width));
+    if(!feet.every(foot=>space.clear(foot.x,foot.z,1.35)))continue;
+    const tops:THREE.Vector3[]=[];
+    for(let i=0;i<2;i++){
+      const foot=feet[i],side=i===0?-1:1;
+      space.reserve('breakwater-pier',foot.x,foot.z,1.35);
+      const base=foot.clone();base.y=-11;
+      const top=foot.clone().addScaledVector(s.right,-side*1.2).add(new THREE.Vector3(0,22,0));
+      tops.push(top);beam(base,top,.85,concrete);
+      beam(foot.clone().add(new THREE.Vector3(0,8,0)).addScaledVector(s.tangent,-.88),top.clone().addScaledVector(s.tangent,-.88),.12,cyan);
+      for(const direction of [-1,1])for(const span of [18,33,47,59]){
+        const sample=track.sample(distance+direction*span),anchor=sample.position.clone().addScaledVector(sample.right,side*12.35);
+        if(!space.clear(anchor.x,anchor.z,.55))continue;
+        space.reserve('breakwater-stay',anchor.x,anchor.z,.55);
+        box(anchor.clone().add(new THREE.Vector3(0,-.15,0)),1,.65,.82,steel,sample.yaw);
+        box(anchor.clone().add(new THREE.Vector3(0,.16,0)),.75,.14,.52,warm,sample.yaw);
+        beam(anchor,top.clone().add(new THREE.Vector3(0,-7+span/14,0)),.08,steel);
+      }
+    }
+    beam(tops[0],tops[1],.36,steel);
+    beam(tops[0].clone().add(new THREE.Vector3(0,.39,0)),tops[1].clone().add(new THREE.Vector3(0,.39,0)),.08,cyan);
+  }
+
   // Low-rise frontage brings readable scale, shop windows and signage close to the road.
   for(let distance=60,index=0;distance<track.length;distance+=86,index++)for(const side of [-1,1]){
     const s=track.sample(distance),base=s.position.clone().addScaledVector(s.right,side*25),yaw=s.yaw;
-    if(base.x>190||!space.reserve('harbor-frontage',base.x,base.z,11))continue;
+    if(base.x>190||base.z < -478||!space.reserve('harbor-frontage',base.x,base.z,11))continue;
     const light=palette[index%3],h=10+index%4*3;
     base.y=-2;box(local(base,yaw,0,h/2,0),12,h,17,steel,yaw);
     box(local(base,yaw,0,h+.3,0),12.8,.6,17.8,concrete,yaw);
@@ -94,16 +200,37 @@ export function addHarbor(scene:THREE.Scene,track:Track,space:RoadSpace){
     beam(new THREE.Vector3(x,h,z),new THREE.Vector3(x,h+26,z),.2,steel);
   }
 
-  // High portal frames mark the elevated return. Minimum overhead clearance is 22 m.
-  for(const f of [.50,.515,.53,.545]){
-    const s=track.sample(track.length*f),left=s.position.clone().addScaledVector(s.right,-13),right=s.position.clone().addScaledVector(s.right,13);
-    if(!space.clear(left.x,left.z,.6)||!space.clear(right.x,right.z,.6))continue;
-    space.reserve('skyway-pier',left.x,left.z,.6);space.reserve('skyway-pier',right.x,right.z,.6);
-    for(const p of [left,right]){box(p.clone().add(new THREE.Vector3(0,11,0)),.9,22,.9,steel,s.yaw);box(p.clone().add(new THREE.Vector3(0,11,-.48)),.09,21,.10,cyan,s.yaw);}
-    box(s.position.clone().add(new THREE.Vector3(0,22.5,0)),27,1,.9,steel,s.yaw);box(s.position.clone().add(new THREE.Vector3(0,21.95,0)),25,.09,.12,cyan,s.yaw);
+  for(let d=4;d<track.length;d+=12){const s=track.sample(d);for(const side of [-1,1])box(s.position.clone().addScaledVector(s.right,side*(half+.35)).add(new THREE.Vector3(0,.9,0)),.055,.045,5,palette[Math.floor(d/220)%3],s.yaw);}
+  for(const [m,parts] of buckets){const merged=mergeGeometries(parts);parts.forEach(g=>g.dispose());if(merged){const group=spatialMesh(merged,m,!(m instanceof THREE.MeshBasicMaterial),110);group.name=m===roofMaterial?'harbor-underpass-roof':'harbor-district';scene.add(group);}}
+}
+
+/** A continuous roof section shares the same samples as the road; curved
+ * deck seams stay closed without extending a straight slab across the course. */
+function underpassRoof(track:Track){
+  const {start,end,clearance}=HARBOR_UNDERPASS,half=track.width/2+3.5,thickness=.76;
+  const positions:number[]=[],uvs:number[]=[];
+  const corners=[[-half,0],[half,0],[half,thickness],[-half,thickness]];
+  for(let d=start;d<end;d+=3){
+    const next=Math.min(d+3,end);
+    const back=track.sample(d),front=track.sample(next);
+    const put=(sample:ReturnType<Track['sample']>,distance:number,index:number,u:number)=>{
+      const [side,height]=corners[index];
+      const point=sample.position.clone().addScaledVector(sample.right,side);
+      point.y+=clearance+height;
+      positions.push(point.x,point.y,point.z);
+      uvs.push(u,distance/24);
+    };
+    for(let j=0;j<4;j++){
+      const k=(j+1)%4;
+      put(back,d,j,0);put(front,next,k,1);put(back,d,k,1);
+      put(back,d,j,0);put(front,next,j,0);put(front,next,k,1);
+    }
   }
-  for(let d=4;d<track.length;d+=12){const s=track.sample(d);for(const side of [-1,1])box(s.position.clone().addScaledVector(s.right,side*9.35).add(new THREE.Vector3(0,.9,0)),.055,.045,5,palette[Math.floor(d/220)%3],s.yaw);}
-  for(const [m,parts] of buckets){const merged=mergeGeometries(parts);parts.forEach(g=>g.dispose());if(merged){const group=spatialMesh(merged,m,!(m instanceof THREE.MeshBasicMaterial),110);group.name='harbor-district';scene.add(group);}}
+  const geometry=new THREE.BufferGeometry();
+  geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+  geometry.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
+  geometry.computeVertexNormals();
+  return geometry;
 }
 
 function signAtlas(){

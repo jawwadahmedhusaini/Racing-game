@@ -52,4 +52,4 @@ for(const id of ['coast','city'] as const)for(const car of CARS)it(`${car.id} on
    expect(d.nitro).toBeGreaterThanOrEqual(0);expect(d.nitro).toBeLessThanOrEqual(100);expect(d.airborne).toBeGreaterThanOrEqual(0);
   }
  }
-});
+},15000);

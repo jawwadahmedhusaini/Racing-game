@@ -1,0 +1,21 @@
+{
+  "name": "Aurel Orion R",
+  "author": "APEX RUSH project",
+  "license": "CC0-1.0",
+  "source": "scripts/build-orion.py",
+  "description": "Original hypercar geometry and materials. Four independently rigged wheels, fixed brake calipers, separate race LOD, no imported manufacturer geometry or logos.",
+  "assets": [
+    {
+      "file": "assets/orion-r.glb",
+      "bytes": 1944760,
+      "triangles": 63950,
+      "sha256": "8ad53be97f471752b5bd8ac8dabff43b5ec3d283a8a7ec1fe3f4c2b8c1e7fc45"
+    },
+    {
+      "file": "assets/orion-r-lod.glb",
+      "bytes": 941088,
+      "triangles": 26822,
+      "sha256": "1a1bdcc50c3fb6047b3171ebb43e299165ce4c248fba783fbb15ba37c055251b"
+    }
+  ]
+}

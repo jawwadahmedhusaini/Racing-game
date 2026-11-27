@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import type {CarSpec} from './content';
+import {STARTER_CAR_ID,type CarSpec} from './content';
 import {publicUrl} from './urls';
 import {random} from './materials';
 import {wingGeometry} from './aero';
@@ -29,7 +29,7 @@ export function createCar(spec:CarSpec,color=spec.color,racing=false):CarModel {
   group.traverse(o=>{if(o instanceof THREE.Mesh){const clone=(m:THREE.Material)=>{let own=materials.get(m);if(!own){own=m.clone();materials.set(m,own);}return own;};o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);}});
   const paint=materials.get(source.paint) as THREE.MeshPhysicalMaterial;paint.color.set(color);
   for(const [original,own] of materials)if(original.name.startsWith('Interior 3'))(own as THREE.MeshStandardMaterial).color.set(color).multiplyScalar(.55);
-  return animateCar(group,group.getObjectByName('vehicle-body') as THREE.Group,source.wheels.map(w=>group.getObjectByName(w.name) as THREE.Group),source.dimensions.clone(),paint,materials.get(source.brake) as THREE.MeshStandardMaterial,materials.get(source.headlamps) as THREE.MeshStandardMaterial,group.getObjectsByProperty('name','boost-flame') as THREE.Mesh[],()=>{materials.forEach(m=>m.dispose());lease.release();});
+  return animateCar(group,group.getObjectByName('vehicle-body') as THREE.Group,source.wheels.map(w=>group.getObjectByName(w.name) as THREE.Group),source.dimensions.clone(),paint,materials.get(source.brake) as THREE.MeshStandardMaterial,materials.get(source.headlamps) as THREE.MeshStandardMaterial,spec.suspension,group.getObjectsByProperty('name','boost-flame') as THREE.Mesh[],()=>{materials.forEach(m=>m.dispose());lease.release();});
 }
 
 // Car Concept by Eric Chadwick / DGG (CC BY 4.0), adapted for this game.
@@ -52,12 +52,12 @@ function buildCar(spec:CarSpec,template:THREE.Group,color=spec.color,racing=fals
     if(!mat){mat=source.clone() as THREE.MeshPhysicalMaterial;materials.set(source,mat);mat.envMapIntensity=1;mat.aoMapIntensity=.7;
       if(source.name.startsWith('Paint 1')){mat.color.set(color);mat.metalness=.72;mat.roughness=.27;mat.clearcoat=1;mat.clearcoatRoughness=.09;mat.normalScale?.setScalar(.065);paint=mat;}
       if(source.name.startsWith('Paint 2')){mat.color.set('#222a30');mat.metalness=.45;mat.roughness=.32;}
-      if(source.name==='Glass'){mat.color.set(racing?'#1c2c35':'#455c66');mat.metalness=.22;mat.roughness=.075;mat.transmission=0;mat.transparent=!racing;mat.opacity=racing?1:.73;mat.depthWrite=racing;mat.envMapIntensity=1.25;mat.aoMap=null;mat.normalMap=null;}
+      if(source.name==='Glass'){mat.color.set(racing?'#1c2c35':'#455c66');mat.metalness=.22;mat.roughness=.075;mat.transmission=0;mat.transparent=!racing;mat.opacity=racing ? 1 : spec.id===STARTER_CAR_ID ? .62 : .73;mat.depthWrite=racing;mat.envMapIntensity=1.25;mat.aoMap=null;mat.normalMap=null;}
       if(source.name.startsWith('Interior 3'))mat.color.set(color).multiplyScalar(.55);
       if(source.name==='Reverse'){mat.emissive.set('#deefff');mat.emissiveIntensity=0;}
       if(source.name==='Brakelight'){mat.emissive.set('#ff1733');mat.emissiveIntensity=2.8;brake=mat;}
       if(source.name==='Headlight'){mat.emissive.set('#cbebff');mat.emissiveIntensity=3.5;headlamps=mat;}
-      if(source.name==='Rim2'){mat.color.set(spec.shape==='track'?'#b9a273':'#98a8b7');mat.roughness=.24;}
+      if(source.name==='Rim2'){if(spec.id!==STARTER_CAR_ID)mat.color.set(spec.shape==='track'?'#b9a273':'#98a8b7');mat.roughness=.24;}
     }
     const geo=o.geometry.clone().applyMatrix4(o.matrixWorld);
     if(wheelIndex>=0){const center=wheels[wheelIndex].position;geo.translate(-center.x,-center.y,-center.z);}
@@ -125,15 +125,38 @@ function buildCar(spec:CarSpec,template:THREE.Group,color=spec.color,racing=fals
   }
   group.scale.setScalar(1);
   const shell=body.getObjectByName('body-shell') as THREE.Mesh;const dimensions=new THREE.Box3().setFromBufferAttribute(shell.geometry.attributes.position as THREE.BufferAttribute).getSize(new THREE.Vector3());
-  return animateCar(group,body,wheels,dimensions,paint,brake,headlamps,flames,()=>{throw new Error('Prepared vehicle templates live for the page lifetime.');});
+  return animateCar(group,body,wheels,dimensions,paint,brake,headlamps,spec.suspension,flames,()=>{throw new Error('Prepared vehicle templates live for the page lifetime.');});
 }
 
-function animateCar(group:THREE.Group,body:THREE.Group,wheels:THREE.Group[],dimensions:THREE.Vector3,paint:THREE.MeshPhysicalMaterial,brake:THREE.MeshStandardMaterial,headlamps:THREE.MeshStandardMaterial,flames:THREE.Mesh[],dispose:()=>void):CarModel {
-  let wheelAngle=0,previousTime=0;
+function animateCar(group:THREE.Group,body:THREE.Group,wheels:THREE.Group[],dimensions:THREE.Vector3,paint:THREE.MeshPhysicalMaterial,brake:THREE.MeshStandardMaterial,headlamps:THREE.MeshStandardMaterial,suspension:CarSpec['suspension'],flames:THREE.Mesh[],dispose:()=>void):CarModel {
+  let wheelAngle=0,previousTime=0,heaveVelocity=0;
   const reverse=group.getObjectByName('reverse-lamp') as THREE.Mesh;
   return {group,body,wheels,dimensions,paint,brake,headlamps,flames,dispose,update(speed,steer,drift,boost,braking,time,acceleration=0,landing=0){
-    const delta=previousTime?Math.max(0,Math.min(.1,time-previousTime)):1/60;previousTime=time;wheelAngle+=speed*delta/.38;wheels.forEach((w,i)=>{w.children[0].rotation.x=wheelAngle;if(i>=2)w.rotation.y=-steer*.26;});
-    const settle=1-Math.exp(-delta*9);body.rotation.z=THREE.MathUtils.lerp(body.rotation.z,-steer*Math.min(Math.abs(speed)/600,.045)-drift*.02,settle);body.rotation.x=THREE.MathUtils.lerp(body.rotation.x,THREE.MathUtils.clamp(-acceleration*.001,-.035,.025),settle);body.position.y=THREE.MathUtils.lerp(body.position.y,-landing*.045,settle);brake.emissiveIntensity=braking&&speed>=0?6:2.4;
+    const delta=previousTime?Math.max(0,Math.min(.1,time-previousTime)):1/60;
+    previousTime=time;
+    wheelAngle+=speed*delta/(suspension?.wheelRadius??.38);
+    wheels.forEach((wheel,index)=>{
+      wheel.children[0].rotation.x=wheelAngle;
+      if(index>=2)wheel.rotation.y=-steer*.26;
+    });
+    const settle=1-Math.exp(-delta*9);
+    const roll=-steer*Math.min(Math.abs(speed)/600,.045)-drift*.02;
+    const pitch=THREE.MathUtils.clamp(-acceleration*.001,-.035,.025);
+    body.rotation.z=THREE.MathUtils.lerp(body.rotation.z,roll,settle);
+    body.rotation.x=THREE.MathUtils.lerp(body.rotation.x,pitch,settle);
+    if(suspension){
+      // Integrate chassis heave in small steps while the wheel pivots stay planted.
+      const substeps=Math.max(1,Math.ceil(delta*120));
+      const step=delta/substeps;
+      const compression=-Math.min(1,landing)*suspension.travel;
+      for(let i=0;i<substeps;i++){
+        heaveVelocity+=(260*(compression-body.position.y)-24*heaveVelocity)*step;
+        body.position.y+=heaveVelocity*step;
+      }
+    }else{
+      body.position.y=THREE.MathUtils.lerp(body.position.y,-landing*.045,settle);
+    }
+    brake.emissiveIntensity=braking&&speed>=0?6:2.4;
     if(reverse)(reverse.material as THREE.MeshStandardMaterial).emissiveIntensity=speed<-.1?5:0;
     flames.forEach((f,i)=>{f.visible=boost>0;f.scale.y=(.75+Math.sin(time*70+i)*.15)*(boost===2?1.65:1);(f.material as THREE.MeshBasicMaterial).color.set(i%2?'#ffffff':boost===2?'#b56bff':'#53c5ff');});
   }};

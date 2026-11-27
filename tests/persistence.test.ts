@@ -13,3 +13,18 @@ it('preserves old circuit records separately from the revised circuit records',(
 it('retains Solstice ownership, reduced motion and separate 2.4 records across parsing',()=>{const save=freshSave();save.owned.push('solstice');save.selected='solstice';save.settings.reducedMotion=true;save.bestTimes={'coast-v2-quick':85,'coast-v3-quick':84};expect(parseSave(JSON.stringify(save))).toEqual(save);});
 
 it('retains all earlier record versions alongside the audited v4 handling records',()=>{const save=freshSave();save.bestTimes={'coast-time':30,'coast-v2-time':31,'coast-v3-time':32,'coast-v4-time':33};expect(parseSave(JSON.stringify(save))).toEqual(save);});
+
+it('gives new players Orion and migrates implicit Vanta ownership without changing selection',()=>{
+  const fresh=freshSave();
+  expect(fresh.owned).toEqual(['orion-r']);
+  expect(fresh.selected).toBe('orion-r');
+  expect(parseSave(JSON.stringify(fresh))).toEqual(fresh);
+  const old=parseSave(JSON.stringify({version:1,credits:4200,paints:{vanta:'#334455'},upgrades:{vanta:1},
+    bestTimes:{'city-v7-time':97,'city-v8-time':82}}));
+  expect(old.owned).toEqual(['vanta','orion-r']);
+  expect(old.selected).toBe('vanta');
+  expect(old.bestTimes).toEqual({'city-v7-time':97,'city-v8-time':82});
+  expect(old.credits).toBe(4200);
+  expect(old.paints.vanta).toBe('#334455');
+  expect(old.upgrades.vanta).toBe(1);
+});

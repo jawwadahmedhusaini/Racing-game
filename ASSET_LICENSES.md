@@ -85,3 +85,7 @@ Four models from **12 Buildings** by **raytrace**, **CC-BY** as stated by the so
 Original credit text, pinned sources, texture hashes and exported-file hashes are preserved in [public/licenses/imported-art.json](public/licenses/imported-art.json). Use `python scripts/fetch-imported-art.py` then `blender -b --disable-autoexec --python scripts/prepare-imported-art.py` to rebuild. No unrelated reference images or HDR files are included. Attribution does not imply endorsement by the artists or any manufacturer.
 
 The title photograph depicts the adapted MasterLife LF model with studio lighting. Garage cards are renders of the credited game vehicles. Barlow Condensed is distributed under the SIL Open Font License in public/licenses/Barlow-Condensed-OFL.txt. Slipstream Signal is an original 32-bar stereo composition for APEX RUSH, rendered from scripts/compose-score.py and dedicated to the public domain under CC0 1.0.
+
+### Aurel Orion R
+
+The Aurel Orion R is original APEX RUSH geometry and materials under CC0. The showroom GLB contains 63,950 triangles and the race GLB contains 26,822. Both models are credited in [public/licenses/orion-r.json](public/licenses/orion-r.json). Orion uses the existing credited Stunt Rally V12 sample layers with a distinct filter and shift mix.

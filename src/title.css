@@ -130,3 +130,25 @@ button { background: transparent; border: 0; cursor: pointer }
 @media (max-width:600px) { .cover { flex: 0 0 auto } .circuits { flex: 1; align-content: start } }
 .destination b { width: 11px; height: 11px; font-size: 0; border-right: 1.5px solid currentColor; border-top: 1.5px solid currentColor; position: relative }
 .destination b::after { content: ''; position: absolute; right: -1px; top: 4px; width: 15px; height: 1.5px; background: currentColor; transform: rotate(-45deg) }
+
+.cover-art { inset: 0; }
+.cover-art img { object-position: 50% 53%; }
+.cover::before {
+  background: linear-gradient(90deg,#081019f0 0%,#0810199c 28%,transparent 69%),
+    linear-gradient(0deg,#081019cc,transparent 32%);
+}
+.cover h1 { font-size: clamp(76px,10vw,170px); }
+.cover-content { position: relative; z-index: 1; max-width: 43%; }
+.circuits { border-top-color: #ffffff30; }
+@media (max-width: 600px) {
+  .cover { display: flex; min-height: clamp(440px,70svh,560px); position: relative; align-items: end; padding: 0; }
+  .cover-art { position: absolute; inset: 0; height: 100%; }
+  .cover-art img { object-position: 81% center; }
+  .cover-art::after { background: linear-gradient(0deg,#081019 4%,#0810198c 35%,transparent 68%); }
+  .cover-content { display: block; margin: 0; max-width: none; width: 100%; padding: 18px 0 26px; }
+  .cover h1 { font-size: clamp(53px,14vw,84px); display: flex; flex-wrap: wrap; margin-bottom: 18px; }
+  .race-cta { display: flex; }
+}
+@media (max-height: 520px) and (min-width: 601px) {
+  .cover h1 { font-size: clamp(55px,9vw,76px); }
+}

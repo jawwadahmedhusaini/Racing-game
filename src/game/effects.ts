@@ -1,9 +1,12 @@
 import * as THREE from 'three';
 import type {Driver} from './simulation';
-interface Particle {position:THREE.Vector3;velocity:THREE.Vector3;life:number;max:number;size:number;}
+import {footprint} from './contact';
+const smokeColor=[.56,.62,.67] as const, sparkColor=[3.8,1.8,.36] as const;
+interface Particle {position:THREE.Vector3;velocity:THREE.Vector3;life:number;max:number;size:number;spark:boolean;}
 export class Effects {
-  particles:Particle[]=Array.from({length:220},()=>({position:new THREE.Vector3(),velocity:new THREE.Vector3(),life:0,max:1,size:1}));
+  particles:Particle[]=Array.from({length:220},()=>({position:new THREE.Vector3(),velocity:new THREE.Vector3(),life:0,max:1,size:1,spark:false}));
   points:THREE.Points;cursor=0;geometry=new THREE.BufferGeometry();positions=new Float32Array(660);colors=new Float32Array(660);sizes=new Float32Array(220);
+  private emissions=0;
   skids:THREE.InstancedMesh;skidCursor=0;dummy=new THREE.Object3D();lastSkid:THREE.Vector3|null=null;
   constructor(scene:THREE.Scene){
     this.geometry.setAttribute('position',new THREE.BufferAttribute(this.positions,3));this.geometry.setAttribute('color',new THREE.BufferAttribute(this.colors,3));this.geometry.setAttribute('size',new THREE.BufferAttribute(this.sizes,1));
@@ -13,15 +16,46 @@ export class Effects {
   }
   update(dt:number,driver:Driver,position:THREE.Vector3,yaw:number,pitch=0,roadNormal?:THREE.Vector3){
     const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw)),back=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
-    if(Math.abs(driver.drift)>.18&&driver.speed>15&&driver.airborne<.1&&driver.rampLift<.1) {
+    const ground=driver.airborne<.1&&driver.rampLift<.1;
+    const skid=ground&&driver.speed>15&&(Math.abs(driver.drift)>.18||driver.brakeInput>.65&&Math.abs(driver.sideSpeed)>3.5);
+    const rates=ground&&driver.speed>12?Math.max(skid?22:0,driver.scrape*40):0;
+    this.emissions=(rates?this.emissions:0)+dt*rates;
+    const emit=Math.min(4,Math.floor(this.emissions));
+    this.emissions-=emit;
+    if(skid){
       const stamp=!this.lastSkid||position.distanceTo(this.lastSkid)>.65;
       const roadRotation=new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch,yaw,0,'YXZ'));
       if(roadNormal){const forward=new THREE.Vector3(Math.sin(yaw),0,Math.cos(yaw)).projectOnPlane(roadNormal).normalize(),across=new THREE.Vector3().crossVectors(roadNormal,forward).normalize();roadRotation.setFromRotationMatrix(new THREE.Matrix4().makeBasis(across,roadNormal,forward));}
-      for(const side of [-1,1]){const p=this.particles[this.cursor++%this.particles.length];p.position.copy(position).addScaledVector(right,side*.95).addScaledVector(back,1.4);p.position.y+=.2;p.velocity.set((Math.random()-.5)*2,.8+Math.random(),(Math.random()-.5)*2);p.life=p.max=.6+Math.random()*.7;p.size=.7;
+      for(const side of [-1,1]){
+        for(let i=0;i<emit;i++){
+          const p=this.particles[this.cursor++%this.particles.length];
+          p.position.copy(position).addScaledVector(right,side*.95).addScaledVector(back,1.4);p.position.y+=.2;
+          p.velocity.copy(back).multiplyScalar(Math.min(driver.speed*.095,5)).addScaledVector(right,(Math.random()-.5)*1.8);p.velocity.y=.45+Math.random()*.7;
+          p.life=p.max=.55+Math.random()*.55;p.size=.68;p.spark=false;
+        }
         if(stamp){this.dummy.position.set(side*.95,.06,-1.4).applyQuaternion(roadRotation).add(position);this.dummy.quaternion.copy(roadRotation).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2));this.dummy.scale.setScalar(1);this.dummy.updateMatrix();this.skids.setMatrixAt(this.skidCursor++%400,this.dummy.matrix);this.skids.instanceMatrix.needsUpdate=true;}
-      }if(stamp)this.lastSkid=position.clone();
+      }
+      if(stamp)this.lastSkid=position.clone();
     }else this.lastSkid=null;
-    for(let i=0;i<this.particles.length;i++){const p=this.particles[i];p.life-=dt;if(p.life>0){p.position.addScaledVector(p.velocity,dt);this.positions.set(p.position.toArray(),i*3);const fade=p.life/p.max;this.colors.set([.62*fade,.67*fade,.68*fade],i*3);this.sizes[i]=(p.size+1.2*(1-fade))*fade;}else this.sizes[i]=0;}
+    if(ground&&driver.scrape>.2&&driver.speed>12){
+      const edge=-Math.sign(driver.lateral)*footprint(driver).width;
+      for(let i=0;i<emit;i++){
+        const p=this.particles[this.cursor++%this.particles.length];
+        p.position.copy(position).addScaledVector(right,edge).addScaledVector(back,(Math.random()-.5)*2.4);p.position.y+=.21;
+        p.velocity.copy(back).multiplyScalar(7+Math.random()*9).addScaledVector(right,-Math.sign(edge)*Math.random()*2.1);p.velocity.y=1+Math.random()*2;
+        p.life=p.max=.09+Math.random()*.16;p.size=.18;p.spark=true;
+      }
+    }
+    for(let i=0;i<this.particles.length;i++){
+      const p=this.particles[i];p.life-=dt;
+      if(p.life<=0){this.sizes[i]=0;continue;}
+      if(p.spark)p.velocity.y-=dt*13;
+      p.position.addScaledVector(p.velocity,dt);p.position.toArray(this.positions,i*3);
+      const fade=p.life/p.max;
+      const color=p.spark?sparkColor:smokeColor;
+      this.colors[i*3]=color[0]*fade;this.colors[i*3+1]=color[1]*fade;this.colors[i*3+2]=color[2]*fade;
+      this.sizes[i]=(p.size+(p.spark?0:1.3*(1-fade)))*fade;
+    }
     this.geometry.attributes.position.needsUpdate=true;this.geometry.attributes.color.needsUpdate=true;this.geometry.attributes.size.needsUpdate=true;
   }
   dispose(){this.points.removeFromParent();this.geometry.dispose();(this.points.material as THREE.Material).dispose();this.skids.removeFromParent();this.skids.geometry.dispose();(this.skids.material as THREE.Material).dispose();}

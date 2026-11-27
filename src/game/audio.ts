@@ -8,11 +8,12 @@ const target=(param:AudioParam,value:number,t:number,fade=.035)=>{param.cancelSc
 type Layer={source:AudioBufferSourceNode;gain:GainNode};
 /** Bounded five-layer engine; all buffers are shared by player and nearby opponents. */
 class SampleVoice {
-  bank?:EngineBank;layers:Layer[]=[];filter:BiquadFilterNode;gain:GainNode;pan:StereoPannerNode;
+  bank?:EngineBank;layers:Layer[]=[];filter:BiquadFilterNode;body:BiquadFilterNode;gain:GainNode;pan:StereoPannerNode;
   constructor(private ctx:AudioContext,output:AudioNode,private buffers:Map<string,AudioBuffer>){
     this.filter=ctx.createBiquadFilter();this.filter.type='lowpass';this.filter.Q.value=.45;
+    this.body=ctx.createBiquadFilter();this.body.type='lowshelf';this.body.frequency.value=185;
     this.gain=ctx.createGain();this.gain.gain.value=0;this.pan=ctx.createStereoPanner();
-    this.filter.connect(this.gain);this.gain.connect(this.pan);this.pan.connect(output);
+    this.filter.connect(this.body);this.body.connect(this.gain);this.gain.connect(this.pan);this.pan.connect(output);
   }
   update(id:string,rpm:number,load:number,volume:number,pan=0,doppler=1){
     const bank=engineBank(id),t=this.ctx.currentTime;
@@ -21,10 +22,12 @@ class SampleVoice {
       for(const base of ENGINE_BANKS[bank]){const source=this.ctx.createBufferSource(),gain=this.ctx.createGain();source.buffer=this.buffers.get(`${bank}-${base/1000}`)!;source.loop=true;gain.gain.value=0;source.connect(gain);gain.connect(this.filter);source.start();this.layers.push({source,gain});}
     }
     engineLayers(bank,rpm).forEach((layer,i)=>{target(this.layers[i].source.playbackRate,layer.rate*doppler,t,.045);target(this.layers[i].gain.gain,layer.gain,t,.045);});
-    target(this.filter.frequency,650+rpm*.6+load*2700,t,.055);target(this.gain.gain,volume*(.32+load*.68),t);target(this.pan.pan,clamp(pan,-1,1),t,.06);
+    const orion=id==='orion-r';
+    target(this.filter.frequency,650+rpm*.6+load*(orion?3450:2700),t,.055);
+    target(this.body.gain,orion?1.4+load*1.1:0,t,.07);target(this.gain.gain,volume*(.32+load*.68),t);target(this.pan.pan,clamp(pan,-1,1),t,.06);
   }
   silence(){target(this.gain.gain,0,this.ctx.currentTime,.02);}
-  dispose(){for(const {source,gain} of this.layers){source.stop();source.disconnect();gain.disconnect();}this.layers=[];this.filter.disconnect();this.gain.disconnect();this.pan.disconnect();}
+  dispose(){for(const {source,gain} of this.layers){source.stop();source.disconnect();gain.disconnect();}this.layers=[];this.filter.disconnect();this.body.disconnect();this.gain.disconnect();this.pan.disconnect();}
 }
 export function tireIntensity(driver:Pick<Driver,'speed'|'drift'|'sideSpeed'|'brakeInput'|'airborne'>){
   if(driver.airborne>.05)return 0;
@@ -41,6 +44,8 @@ export class AudioSystem {
   private scoreRequest?:Promise<void>;
   private scoreWanted=false;
   private scoreRetryAfter=0;
+  private underpass=false;
+  private reflection?:GainNode;
   previewUntil=0;previewId='vanta';
   constructor(settings:SaveData['settings']){this.settings=settings;}
   start(){if(this.starting)return this.starting;this.starting=this.initialize().finally(()=>this.starting=undefined);return this.starting;}
@@ -53,6 +58,18 @@ export class AudioSystem {
       this.master.connect(this.limiter);this.limiter.connect(ctx.destination);
       this.engineBus=ctx.createGain();this.effectsBus=ctx.createGain();this.musicGain=ctx.createGain();
       for(const bus of [this.engineBus,this.effectsBus,this.musicGain]){bus.gain.value=0;bus.connect(this.master);}
+      // Short band-limited reflections give the enclosure a sense of space.
+      // Keep music/UI dry and avoid a feedback loop across the transition.
+      const chamber=ctx.createBiquadFilter();
+      chamber.type='lowpass';chamber.frequency.value=2100;
+      this.reflection=ctx.createGain();this.reflection.gain.value=0;
+      this.engineBus.connect(chamber);
+      for(const [seconds,amount,side] of [[.046,.68,-.65],[.093,.32,.65]]){
+        const tap=ctx.createDelay(.15),level=ctx.createGain(),pan=ctx.createStereoPanner();
+        tap.delayTime.value=seconds;level.gain.value=amount;pan.pan.value=side;
+        chamber.connect(tap);tap.connect(level);level.connect(pan);pan.connect(this.reflection);
+      }
+      this.reflection.connect(this.master);
       this.fallback=ctx.createOscillator();this.fallback.type='sawtooth';this.fallbackGain=ctx.createGain();this.fallbackGain.gain.value=0;
       const low=ctx.createBiquadFilter();low.frequency.value=1500;this.fallback.connect(low);low.connect(this.fallbackGain);this.fallbackGain.connect(this.engineBus);this.fallback.start();this.loops.push(this.fallback);
       const noise=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),data=noise.getChannelData(0);let seed=714;
@@ -78,12 +95,15 @@ export class AudioSystem {
       this.sampleStatus='ready';
     }catch{if(this.context===ctx)this.sampleStatus='fallback';}
   }
+  setUnderpass(value:boolean){this.underpass=value;}
   preview(id:string){this.previewId=id;this.previewUntil=(this.context?.currentTime??0)+2.5;}
   cancelPreview(){this.previewUntil=0;}
   update(driver:Driver|null,playing:boolean,rivals:Driver[]=[],trackLength=1,camera=0,freeRev:number|null=null){
     const ctx=this.context;if(!ctx||!this.ready)return;
     const t=ctx.currentTime,dt=this.lastUpdate?clamp(t-this.lastUpdate,0,.1):1/60;this.lastUpdate=t;
     target(this.master!.gain,this.muted?0:.72,t,.015);target(this.engineBus!.gain,this.settings.engine,t);target(this.effectsBus!.gain,this.settings.effects,t);target(this.musicGain!.gain,this.settings.music*.40,t,.15);
+    const enclosed=this.underpass&&playing&&!!driver;
+    target(this.reflection!.gain,enclosed?.33:0,t,.12);
     const preview=!driver&&this.previewUntil>t&&!this.muted,active=playing||preview;
     const throttle=freeRev??(preview?Math.sin(clamp((this.previewUntil-t)/2.5)*Math.PI)*.9:driver?.speed&&driver.speed<0?driver.brakeInput:driver?.throttle??0);
     const engine=this.voice.update(preview?this.previewId:driver?.spec.id??'vanta',Math.abs(driver?.speed??0),active?throttle:0,dt,driver?.gear,freeRev!==null||preview||(driver?.airborne??0)>.05);
@@ -91,7 +111,7 @@ export class AudioSystem {
     this.playerVoice?.update(preview?this.previewId:driver?.spec.id??'vanta',engine.rpm,engine.load,gain);
     target(this.fallback!.frequency,engine.frequency,t,.05);target(this.fallbackGain!.gain,!this.playerVoice?gain*.08:0,t);
     const speed=Math.abs(driver?.speed??0),tire=driver&&playing?tireIntensity(driver):0;
-    target(this.wind!.gain,playing?Math.pow(clamp(speed/115),2)*.16:0,t,.12);
+    target(this.wind!.gain,playing?Math.pow(clamp(speed/115),2)*(enclosed?.095:.16):0,t,.12);
     target(this.tires!.gain,tire*.26,t,.035);target(this.tireFilter!.frequency,1000+tire*1700,t,.05);
     target(this.squeal!.frequency,700+tire*400+Math.sin(t*21)*17,t,.03);target(this.squealGain!.gain,tire*tire*.045,t);
     target(this.boost!.gain,playing&&driver?.boost ? .14 : 0,t,.07);if(this.scrape)target(this.scrape.gain,playing?(driver?.scrape??0)*.32:0,t,.035);
@@ -135,11 +155,31 @@ export class AudioSystem {
     source.connect(filter);filter.connect(level);level.connect(bus);this.track(source,[filter,level]);source.start(t);source.stop(t+Math.min(duration,buffer.duration));
   }
   private impact(strength:number,landing:boolean){if(this.settings.effects<=0||strength<.04)return;this.burst(strength>.45?'impact-heavy':'impact-light',landing?.28:.42,clamp(strength)*.95,this.effectsBus!,landing?750:7500);this.oscTone(landing?52:76,.16,strength*.12,this.effectsBus!);}
-  private oscTone(freq:number,duration:number,gain:number,bus:AudioNode){
-    const ctx=this.context;if(!ctx||this.muted||this.transients.size>=12)return;const osc=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime;
-    osc.frequency.setValueAtTime(freq,t);osc.frequency.exponentialRampToValueAtTime(freq*.62,t+duration);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+duration);osc.connect(g);g.connect(bus);this.track(osc,[g]);osc.start();osc.stop(t+duration);
+  private oscTone(freq:number,duration:number,gain:number,bus:AudioNode,delay=0,tailRatio=.62,type:OscillatorType='sine'){
+    const ctx=this.context;if(!ctx||this.muted||this.transients.size>=12)return;const osc=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+delay;
+    osc.type=type;osc.frequency.setValueAtTime(freq,t);osc.frequency.exponentialRampToValueAtTime(freq*tailRatio,t+duration);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+duration);osc.connect(g);g.connect(bus);this.track(osc,[g]);osc.start(t);osc.stop(t+duration);
   }
   tone(freq=700,duration=.1,gain=.1){if(!this.ready||this.muted||this.settings.effects<=0||!this.effectsBus)return;this.oscTone(freq,duration,gain,this.effectsBus);}
+  countdown(count:number){
+    const bus=this.effectsBus;
+    if(!this.ready||this.muted||this.settings.effects<=0||!bus)return;
+    if(count===0){
+      this.oscTone(100,.32,.27,bus,0,.48,'triangle');
+      this.oscTone(660,.2,.17,bus,0,1.12);
+      this.oscTone(990,.24,.12,bus,.055,1.04);
+    }else if(count>=1&&count<=3){
+      const pitch=440+(3-count)*68;
+      this.oscTone(pitch,.115,.16,bus,0,.91,'triangle');
+      this.oscTone(pitch*2,.058,.07,bus,0,.71);
+    }
+  }
+  finish(won:boolean){
+    const bus=this.effectsBus;
+    if(!this.ready||this.muted||this.settings.effects<=0||!bus)return;
+    this.oscTone(78,.35,.19,bus,0,.54,'triangle');
+    const notes=won?[392,494,587,784]:[440,523,587];
+    notes.forEach((pitch,index)=>this.oscTone(pitch,index===notes.length-1?.37:.22,.115,bus,index*.085,1,'triangle'));
+  }
   diagnostics(){return {ready:this.ready,samples:this.sampleStatus,decoded:this.buffers.size,transients:this.transients.size,engineLayers:(this.playerVoice?.layers.length??0)+this.rivals.reduce((n,v)=>n+v.layers.length,0),rpm:this.voice.rpm,context:this.context?.state};}
   async dispose(){this.ready=false;this.scoreWanted=false;this.score?.stop();this.score?.disconnect();this.score=undefined;this.cancelPreview();this.playerVoice?.dispose();this.rivals.forEach(v=>v.dispose());this.loops.forEach(s=>{try{s.stop();s.disconnect();}catch{}});this.transients.forEach(s=>{try{s.stop();s.disconnect();}catch{}});const ctx=this.context;this.context=undefined;this.buffers.clear();await ctx?.close();}
 }

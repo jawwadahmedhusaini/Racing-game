@@ -18,7 +18,7 @@ export async function addImportedCity(scene:THREE.Scene,track:Track,space:RoadSp
     const building=template.getObjectByName(names[index%names.length])!;
     const box=new THREE.Box3().setFromObject(building),size=box.getSize(new THREE.Vector3()),radius=Math.hypot(size.x,size.z)/2;
     const s=track.sample(distance),p=s.position.clone().addScaledVector(s.right,side*(radius+19));p.y=-2;
-    if(p.x>185||!space.reserve('imported-building',p.x,p.z,radius+1))continue;
+    if(p.x>185||p.z < -478||!space.reserve('imported-building',p.x,p.z,radius+1))continue;
     const transform=new THREE.Matrix4().compose(p,new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),s.yaw),new THREE.Vector3(1,1,1));
     building.traverse(o=>{if(!(o instanceof THREE.Mesh))return;
       const original=o.material as THREE.Material,bucket=buckets.get(original)??{material:original.clone(),parts:[]};
