@@ -4,6 +4,9 @@ export interface CarSpec {
   nitro: number; price: number; asset?: string; collision?: {halfWidth:number;halfLength:number}; exhaust?: [number,number,number]; suspension?: {wheelRadius:number;travel:number}; shape: 'wedge' | 'flow' | 'track' | 'grandtourer';
 }
 
+// Preview access stays separate from purchases recorded in player saves.
+export const OPEN_GARAGE = true;
+
 export const STARTER_CAR_ID = 'orion-r';
 
 export const CARS: CarSpec[] = [
@@ -18,6 +21,11 @@ export const CARS: CarSpec[] = [
     topSpeed: 350, acceleration: 93, handling: 96, nitro: 90, price: 0, shape: 'grandtourer',
     asset: 'orion-r', collision: {halfWidth:1.14,halfLength:2.58}, exhaust: [.29,.355,-2.52],
     suspension: {wheelRadius:.38,travel:.062} },
+  { id: 'cavallo-575', name: '575 GTC', maker: 'CAVALLO', class: 'A',
+    tagline: 'A front-engined V12 endurance racer.', color: '#b4172c',
+    topSpeed: 324, acceleration: 89, handling: 94, nitro: 86, price: 3800,
+    shape: 'grandtourer', asset: 'cavallo-575', collision: {halfWidth:1.04,halfLength:2.44},
+    exhaust: [.93,.148,-.49], suspension: {wheelRadius:.337,travel:.045} },
 ];
 
 export const PAINTS = ['#ff552b', '#b8dce0', '#e7f069', '#f2f1eb', '#7672e8', '#263645'];

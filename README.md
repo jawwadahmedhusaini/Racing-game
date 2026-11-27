@@ -6,7 +6,7 @@ A complete, independent single-player browser arcade racer: pick a car, choose a
 
 [Play in your browser](https://jawwadahmedhusaini.github.io/Racing-game/preview/) · [Download the playable preview](https://jawwadahmedhusaini.github.io/Racing-game/preview/APEX-RUSH.zip)
 
-[Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/archive/refs/heads/apex-3-neon-harbor.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
+[Download editable source and tests](https://github.com/jawwadahmedhusaini/Racing-game/archive/refs/heads/apex-31-studio-garage.zip) · [Audit response and remaining targets](AUDIT_RESPONSE.md)
 
 The next free-asset upgrade is tracked in [ASSET_UPGRADE_PLAN.md](ASSET_UPGRADE_PLAN.md), including verified candidate findings, blocked downloads and the offline GLB inspection command. Version 2.5 imports a CC0 BMW M3 community model and credited CC BY engine/impact samples from Stunt Rally. The other shortlisted manufacturer models still need usable source archives and licensing evidence.
 
@@ -15,6 +15,10 @@ The online link requires the repository's GitHub Pages deployment to be enabled;
 Version **2.4.1** fixes sudden slowdown after boost, head-on/reverse contact response, close-finish timing, elimination standings and keyboard navigation. Older records remain saved; corrected handling uses separate v4 records. See [DEEP_AUDIT.md](DEEP_AUDIT.md) for reproduced defects, validation and remaining limits.
 
 ![APEX RUSH 2.4 garage](artifacts/garage-final.jpg)
+
+## New in 3.1 — Studio garage
+
+The garage has a dedicated 3D viewing area and a make-and-model roster. All cars are available during this preview, and the game remembers the selected car without changing ownership or charging credits. The Ferrari 575 GTC–derived Cavallo 575 GTC joins the BMW M3 GTR and the rest of the roster. See [asset credits](ASSET_LICENSES.md).
 
 ## New in 3.0 — Neon Harbor
 

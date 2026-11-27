@@ -107,30 +107,63 @@ export class RenderSystem {
 }
 
 export function createShowroom() {
-  const scene=new THREE.Scene();scene.background=new THREE.Color('#0c151e');scene.fog=new THREE.FogExp2('#0c151e',.015);scene.environmentIntensity=.8;
-  const group=new THREE.Group();scene.add(group);
-  const floorMaterial=new THREE.MeshStandardMaterial({color:'#18232d',metalness:.12,roughness:.65});
-  const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),floorMaterial);floor.rotation.x=-Math.PI/2;floor.position.y=-.08;floor.receiveShadow=true;scene.add(floor);
-  const platform=new THREE.Mesh(new THREE.CylinderGeometry(4.1,4.25,.14,100),new THREE.MeshStandardMaterial({color:'#222c35',metalness:.28,roughness:.5}));platform.position.y=-.045;platform.receiveShadow=true;scene.add(platform);
-  const ring=new THREE.Mesh(new THREE.TorusGeometry(4.12,.012,5,150),new THREE.MeshBasicMaterial({color:'#8de0e5',transparent:true,opacity:.65}));ring.rotation.x=Math.PI/2;ring.position.y=.02;scene.add(ring);
-  for(let i=0;i<40;i++) {
-    const a=i*Math.PI/20;
-    const tick=new THREE.Mesh(new THREE.BoxGeometry(.018,.004,i%5===0?.16:.06),new THREE.MeshBasicMaterial({color:i%5===0?'#9bb7c1':'#44545c'}));tick.position.set(Math.sin(a)*3.92,.03,Math.cos(a)*3.92);tick.rotation.y=a;scene.add(tick);
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color('#353534');
+  scene.fog=new THREE.FogExp2('#353534',.031);
+  scene.environmentIntensity=1.05;
+  const group=new THREE.Group();
+  scene.add(group);
+
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(180,180),new THREE.MeshStandardMaterial({
+    color:'#333331',roughness:.48,metalness:.12,
+  }));
+  floor.rotation.x=-Math.PI/2;
+  floor.position.y=-.034;
+  floor.receiveShadow=true;
+  scene.add(floor);
+
+  // A soft contact patch grounds the car even on presets without shadow maps.
+  const canvas=document.createElement('canvas');
+  canvas.width=canvas.height=128;
+  const context=canvas.getContext('2d')!;
+  const gradient=context.createRadialGradient(64,64,6,64,64,64);
+  gradient.addColorStop(0,'rgba(3,3,3,.9)');
+  gradient.addColorStop(.46,'rgba(3,3,3,.65)');
+  gradient.addColorStop(1,'rgba(3,3,3,0)');
+  context.fillStyle=gradient;
+  context.fillRect(0,0,128,128);
+  const shadow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({
+    map:new THREE.CanvasTexture(canvas),transparent:true,depthWrite:false,
+  }));
+  shadow.rotation.x=-Math.PI/2;
+  shadow.position.y=-.022;
+  group.add(shadow);
+
+  scene.add(new THREE.HemisphereLight('#eef1f5','#57534d',.74));
+  const key=new THREE.DirectionalLight('#fff2da',2.1);
+  key.position.set(3,7,5);
+  key.castShadow=true;
+  key.shadow.mapSize.set(2048,2048);
+  Object.assign(key.shadow.camera,{left:-6,right:6,top:6,bottom:-6});
+  key.shadow.normalBias=.025;
+  key.shadow.bias=-.0001;
+  scene.add(key);
+  const rim=new THREE.DirectionalLight('#e2eaff',1.4);
+  rim.position.set(-5,3,-2.5);
+  scene.add(rim);
+  const fill=new THREE.DirectionalLight('#f9fafb',.55);
+  fill.position.set(3,1,-6);
+  scene.add(fill);
+
+  // Off-camera panels are captured into the reflection probe.
+  const softbox=new THREE.MeshBasicMaterial({color:new THREE.Color(2.45,2.35,2.22),side:THREE.DoubleSide});
+  for(const [x,y,z,width,height] of [[-5,4,1,2.6,8],[3,6,-1,4.5,7],[1,3,6,6,1.2]]){
+    const panel=new THREE.Mesh(new THREE.PlaneGeometry(width,height),softbox);
+    panel.position.set(x,y,z);
+    panel.lookAt(0,.35,0);
+    panel.userData.probeOnly=true;
+    panel.visible=false;
+    scene.add(panel);
   }
-  const ambient=new THREE.HemisphereLight('#c4e4ff','#263238',.65);scene.add(ambient);
-  const key=new THREE.DirectionalLight('#f3f6ff',1.6);key.position.set(3,8,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-6;key.shadow.camera.right=6;key.shadow.camera.top=6;key.shadow.camera.bottom=-6;key.shadow.normalBias=.03;key.shadow.bias=-.0001;scene.add(key);
-  const rim=new THREE.DirectionalLight('#87d2e9',1.0);rim.position.set(-4,3,-4);scene.add(rim);
-  const warm=new THREE.PointLight('#ff8159',9,12,2);warm.position.set(-3,2,1);scene.add(warm);
-  // Architectural light bars and wall ribs give the garage real depth.
-  const lit=new THREE.MeshBasicMaterial({color:'#b0e8ed',toneMapped:false});
-  for(let i=-5;i<=5;i++) {
-    const rib=new THREE.Mesh(new THREE.BoxGeometry(.12,7,.2),new THREE.MeshStandardMaterial({color:'#293944',metalness:.7,roughness:.4}));rib.position.set(i*2,3,-9);scene.add(rib);
-    if(i%2===0){const bar=new THREE.Mesh(new THREE.BoxGeometry(.025,5,.03),lit);bar.position.set(i*2-.12,2.8,-8.85);scene.add(bar);}
-  }
-  const wall=new THREE.Mesh(new THREE.BoxGeometry(35,12,.2),new THREE.MeshStandardMaterial({color:'#1c2833',roughness:.75}));wall.position.set(0,5,-9.3);scene.add(wall);
-  // Broad photographic softboxes produce clean, curved highlights across the bodywork.
-  const softbox=new THREE.MeshBasicMaterial({color:new THREE.Color(2.1,2.2,2.3),side:THREE.DoubleSide});
-  for(const x of [-4.8,4.8]){const panel=new THREE.Mesh(new THREE.PlaneGeometry(2.7,8),softbox);panel.position.set(x,5,0);panel.lookAt(0,0,0);panel.userData.probeOnly=true;panel.visible=false;scene.add(panel);}
-  const ceiling=new THREE.Mesh(new THREE.PlaneGeometry(7,2),softbox);ceiling.position.set(0,6,-2);ceiling.lookAt(0,0,0);ceiling.userData.probeOnly=true;ceiling.visible=false;scene.add(ceiling);
-  return {scene,group};
+  return {scene,group,shadow};
 }

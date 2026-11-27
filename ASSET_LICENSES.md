@@ -89,3 +89,7 @@ The title photograph depicts the adapted MasterLife LF model with studio lightin
 ### Aurel Orion R
 
 The Aurel Orion R is original APEX RUSH geometry and materials under CC0. The showroom GLB contains 63,950 triangles and the race GLB contains 26,822. Both models are credited in [public/licenses/orion-r.json](public/licenses/orion-r.json). Orion uses the existing credited Stunt Rally V12 sample layers with a distinct filter and shift mix.
+
+### Cavallo 575 GTC
+
+The Cavallo 575 GTC adapts Speed Dreams' Ferrari 575 GTC interpretation. The downloadable assets are distributed under the Free Art License 1.3. The adapted mesh uses the original shape and a neutralized surface atlas with new wheels, lamps, glass, and paint. Author credits, the original files, the license text, and changes are linked in [public/licenses/cavallo-575.json](public/licenses/cavallo-575.json). The car uses the game's credited V12 sample bank.

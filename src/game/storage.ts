@@ -3,7 +3,7 @@ export interface SaveData {version:1;credits:number;owned:string[];selected:stri
 export const SAVE_KEY='apex-rush-save-v1';
 const KEY=SAVE_KEY;let loadedRaw:string|null=null;
 export const freshSave=():SaveData=>({version:1,credits:2500,owned:[STARTER_CAR_ID],selected:STARTER_CAR_ID,paints:{},upgrades:{},career:0,stars:0,races:0,wins:0,bestTimes:{},settings:{quality:'high',difficulty:'rookie',music:.15,engine:.5,effects:.55,autoAccelerate:false,adaptiveResolution:true,showPerformance:false,reducedMotion:false}});
-export function parseSave(raw:string|null):SaveData {
+export function parseSave(raw:string|null,openGarage=false):SaveData {
   const base=freshSave();if(!raw)return base;
   try {
     const data=JSON.parse(raw);if(!data||data.version!==1)return base;
@@ -13,7 +13,7 @@ export function parseSave(raw:string|null):SaveData {
     const valid=new Set(CARS.map(car=>car.id));
     // Old saves always owned the free Vanta, even when ownership was left implicit.
     base.owned=[...new Set([...(legacy?['vanta']:[]),...owned.filter((id):id is string=>typeof id==='string'&&valid.has(id)),STARTER_CAR_ID])];
-    base.selected=base.owned.includes(data.selected)?data.selected:legacy?'vanta':STARTER_CAR_ID;
+    base.selected=canDriveCar(base,data.selected,openGarage)?data.selected:legacy?'vanta':STARTER_CAR_ID;
     for(const car of CARS){const paint=data.paints?.[car.id];if(typeof paint==='string'&&/^#[0-9a-f]{6}$/i.test(paint))base.paints[car.id]=paint;const up=data.upgrades?.[car.id];if(Number.isInteger(up)&&up>=0&&up<=3)base.upgrades[car.id]=up;}
     if(data.bestTimes&&typeof data.bestTimes==='object')for(const [key,value] of Object.entries(data.bestTimes))if(/^(coast|city)-(v[2345678]-)?(time|quick|career|elimination)$/.test(key)&&typeof value==='number'&&Number.isFinite(value)&&value>0)base.bestTimes[key]=value;
     const settings=data.settings??{};
@@ -24,7 +24,10 @@ export function parseSave(raw:string|null):SaveData {
     return base;
   }catch{return base;}
 }
-export function loadSave(){try{loadedRaw=localStorage.getItem(KEY);return parseSave(loadedRaw);}catch{return freshSave();}}
+export function canDriveCar(data:SaveData,id:string,openGarage=false){
+  return CARS.some(car=>car.id===id)&&(openGarage||data.owned.includes(id));
+}
+export function loadSave(openGarage=false){try{loadedRaw=localStorage.getItem(KEY);return parseSave(loadedRaw,openGarage);}catch{return freshSave();}}
 export function saveProgress(data:SaveData){try{if(localStorage.getItem(KEY)!==loadedRaw)return 'conflict' as const;const raw=JSON.stringify(data);localStorage.setItem(KEY,raw);loadedRaw=raw;return 'saved' as const;}catch{return 'unavailable' as const;}}
 export function buyCar(data:SaveData,id:string){const car=CARS.find(c=>c.id===id);if(!car||data.owned.includes(id)||data.credits<car.price)return false;data.credits-=car.price;data.owned.push(id);data.selected=id;return true;}
-export function upgradeCar(data:SaveData,id:string){const level=data.upgrades[id]??0,cost=(level+1)*1800;if(!data.owned.includes(id)||level>=3||data.credits<cost)return false;data.credits-=cost;data.upgrades[id]=level+1;return true;}
+export function upgradeCar(data:SaveData,id:string,openGarage=false){const level=data.upgrades[id]??0,cost=(level+1)*1800;if(!canDriveCar(data,id,openGarage)||level>=3||data.credits<cost)return false;data.credits-=cost;data.upgrades[id]=level+1;return true;}

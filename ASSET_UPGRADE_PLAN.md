@@ -68,3 +68,11 @@ No new visual game release is claimed by this intake work. At completion of this
 ### Integrated milestone — 2.7
 
 LF and four raytrace building designs have moved from the ignored asset inbox into prepared runtime GLBs. The Y7/Veneno candidate remains unshipped. See IMPORTED_ART_UPGRADE.md and TEST_REPORT.md for actual scope and checks. This is one additional car design and artist-authored architecture, not a complete premium track import or a multi-car manufacturer collection.
+
+## 3.1 marque research
+
+The preview includes the Cavallo 575 GTC, adapted from the Speed Dreams Ferrari 575 GTC interpretation under the Free Art License. Its asset manifest links the original files and lists the adaptations and authors. [Asset manifest](public/licenses/cavallo-575.json)
+
+The Three.js maintainers' sample media audit attributes their 458 GLB to vicent091036 and records CC BY 4.0. The source has four separate wheel assemblies and 51 Draco meshes. The existing import pipeline needs a Draco decode step, geometry reduction, new race materials and review of separately modeled badges before considering this candidate for inclusion. [Three.js sample media audit](https://github.com/mrdoob/three.js/issues/23089)
+
+The Chiron candidate's distributor lists CC BY-NC and identifies a different uploader from the original modeller. Upstream rights and unrestricted reuse remain unverified, so it stays out of the distributed build. [Chiron source credits](https://github.com/1337Impact/bugatti-chiron-showroom/blob/main/ASSETS.md)

@@ -1,3 +1,12 @@
+# APEX RUSH 3.1 preview verification
+
+- 286 unit tests passed. Coverage includes preview car selection with zero credits, persistent ownership, Cavallo wheel rigs and cockpit materials, and the existing race and save regressions.
+- Chromium selected every vehicle at zero credits, restored the BMW M3 GTR selection after reload, and loaded and drove the Cavallo using its own race model.
+- Browser layout checks verified separate rendering and controls in the garage on desktop, portrait and landscape viewports. Software WebGL was used.
+- The offline ZIP passed CRC and 102 packaged web files matched the root production build byte for byte.
+
+## Historical release evidence
+
 # APEX RUSH 3.0 preview verification
 
 - 270 unit tests passed, including mixed driving inputs, isolated race and showroom models, wheel and lamp geometry, revised record keys, legacy saves, and six-rival finishes on both courses.

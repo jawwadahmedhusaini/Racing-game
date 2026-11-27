@@ -1,0 +1,34 @@
+{
+  "name": "Cavallo 575 GTC",
+  "sourceInspiration": "A Ferrari 575 GTC interpretation, as identified by the Speed Dreams source credits.",
+  "license": "LAL-1.3",
+  "licenseFile": "licenses/LAL-1.3.txt",
+  "authors": [
+    "RSDG (base model)",
+    "Andrew Sumner (2007 and 2009 conversion and rework)",
+    "Haruna (2011 texture rework)",
+    "Eckhard M. Jaeger (2011 texture and mapping)",
+    "W-E-C (2011 3D improvements)",
+    "APEX RUSH project (game adaptation)"
+  ],
+  "originals": [
+    "https://raw.githubusercontent.com/dglanzman/speed-dreams/e359f47009d1bfc6e01d642f684d9c0b81d7929d/data/cars/models/ls1-cavallo-570s1/readme.txt",
+    "https://raw.githubusercontent.com/dglanzman/speed-dreams/e359f47009d1bfc6e01d642f684d9c0b81d7929d/data/cars/models/ls1-cavallo-570s1/ls1-cavallo-570s1.ac",
+    "https://raw.githubusercontent.com/dglanzman/speed-dreams/e359f47009d1bfc6e01d642f684d9c0b81d7929d/data/cars/models/ls1-cavallo-570s1/ls1-cavallo-570s1.png"
+  ],
+  "modifications": "Converted from the AC3D original, retaining its main body, hood, glass and wing geometry and neutralised panel-detail atlas. Applied new PBR lamp, glazing and metal materials, replaced wheels and rigged both axles with new calipers, and exported detailed and race GLBs. The standalone adapted assets retain the Free Art License.",
+  "assets": [
+    {
+      "file": "assets/cavallo-575.glb",
+      "bytes": 882416,
+      "triangles": 24287,
+      "sha256": "e44879e0b335d65bb72877ef598607fd28ff591ed44c9b5771bbf5174750a45c"
+    },
+    {
+      "file": "assets/cavallo-575-lod.glb",
+      "bytes": 497988,
+      "triangles": 11459,
+      "sha256": "ac3ceed13b481af5e2c46ec1f4675eb3cd4e31b1eb80e0a7d5970b3cc030de85"
+    }
+  ]
+}

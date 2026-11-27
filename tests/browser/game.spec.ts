@@ -46,13 +46,13 @@ test('real keyboard controls, pause, boost, complete race, rewards and replay',a
   await page.keyboard.press('Escape');await page.getByRole('button',{name:'QUIT TO GARAGE'}).click();await page.reload();await expect(page.getByRole('button',{name:'Paint blue'})).toHaveAttribute('aria-pressed','true');expect((await state(page)).credits).toBe(credits);expect(errors).toEqual([]);
 });
 
-test('career unlock, purchase, exact car selection, upgrades and persistent settings',async({page})=>{
+test('career unlock, exact car selection, upgrades and persistent settings',async({page})=>{
   test.setTimeout(300_000);
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
   await page.getByRole('button',{name:'CAREER',exact:true}).click();await expect(page.locator('[data-action="event"][data-value="1"]')).toBeDisabled();await page.locator('[data-action="event"][data-value="0"]').click();await advance(page,130,{throttle:1,nitro:true},'race');if((await state(page)).credits<6000){
     await page.getByRole('button',{name:'RACE AGAIN'}).click();await advance(page,130,{throttle:1,nitro:true},'race');
   }expect((await state(page)).credits).toBeGreaterThanOrEqual(6000);await expect(page.getByText('FINAL STANDINGS')).toBeVisible();
-  await page.getByRole('button',{name:'BACK TO GARAGE'}).click();await page.getByRole('button',{name:'View SPECTRE S'}).click();await page.getByRole('button',{name:'UNLOCK · 6,000'}).click();expect((await state(page)).selected).toBe('spectre');
+  await page.getByRole('button',{name:'BACK TO GARAGE'}).click();await page.getByRole('button',{name:'View SPECTRE S'}).click();await expect.poll(async()=>(await state(page)).selected).toBe('spectre');
   await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.locator('[data-action="mode"][data-value="time"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();expect((await state(page)).player.spec).toBe('spectre');await advance(page,90,{throttle:1,nitro:true},true);await expect(page.getByText('FINAL STANDINGS')).toBeVisible();await page.getByRole('button',{name:'RACE AGAIN'}).click();await advance(page,90,{throttle:1,nitro:true},true);await page.getByRole('button',{name:'BACK TO GARAGE'}).click();await page.getByRole('button',{name:'UPGRADE · 1,800'}).click();await expect(page.getByText('STAGE 1 / 3')).toBeVisible();
   await page.getByRole('button',{name:'CAREER',exact:true}).click();await expect(page.locator('[data-action="event"][data-value="1"]')).toBeEnabled();await page.getByRole('button',{name:'GARAGE',exact:true}).click();
   await page.getByRole('button',{name:'Settings',exact:true}).click();await page.locator('#difficulty').selectOption('pro');await page.locator('#autoAccelerate').check();await page.getByRole('button',{name:'Close settings'}).click();await page.reload();await page.getByRole('button',{name:'Settings',exact:true}).click();await expect(page.locator('#difficulty')).toHaveValue('pro');await expect(page.locator('#autoAccelerate')).toBeChecked();expect(errors).toEqual([]);
@@ -175,9 +175,9 @@ test('reverse works with real keys, auto acceleration, a positive speed display 
 
 test('original Solstice selection, paint, six opponents and reduced-motion preference survive racing and reload',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
- await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await page.getByRole('button',{name:'UNLOCK · 2,500'}).click();expect((await state(page)).credits).toBe(0);
+ await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await expect.poll(async()=>(await state(page)).selected).toBe('solstice');expect((await state(page)).credits).toBe(2500);
  await page.setViewportSize({width:390,height:844});
- await expect.poll(()=>page.evaluate(()=>{const list=document.querySelector('.car-list')!.getBoundingClientRect(),card=document.querySelector('.car-card.active')!.getBoundingClientRect();return card.left>=list.left-.5&&card.right<=list.right+.5;})).toBe(true);
+ await expect.poll(()=>page.evaluate(()=>{const list=document.querySelector('.car-list')!.getBoundingClientRect(),card=document.querySelector('.studio-car.active')!.getBoundingClientRect();return card.left>=list.left-.5&&card.right<=list.right+.5;})).toBe(true);
  await page.screenshot({path:'artifacts/solstice-mobile.png'});await page.setViewportSize({width:1280,height:800});
  await page.getByRole('button',{name:'Paint blue'}).click();await page.getByRole('button',{name:'Settings',exact:true}).click();await page.locator('#reducedMotion').check();await page.getByRole('button',{name:'Close settings'}).click();
  await start(page);let s=await state(page);expect(s.player.spec).toBe('solstice');expect(s.opponents).toBe(6);expect(s.reducedMotion).toBe(true);
@@ -206,7 +206,7 @@ test('keyboard buttons, dialog links and focus restoration work without injectin
 
 test('BMW model, garage rev audition and sampled race audio work with saved selection',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/drive.html');await expect(page.locator('.loading')).toHaveCount(0,{timeout:90000});
- await page.getByRole('button',{name:'View M3 GTR'}).click();await page.getByRole('button',{name:'UNLOCK · 2,200'}).click();
+ await page.getByRole('button',{name:'View BMW M3 GTR'}).click();await expect.poll(async()=>(await state(page)).selected).toBe('bmw-m3');
  await page.getByRole('button',{name:'Settings',exact:true}).click();
  for(const key of ['engine','effects'])await page.locator('#'+key).evaluate((input:HTMLInputElement)=>{input.value='.6';input.dispatchEvent(new Event('change',{bubbles:true}));});
  await page.getByRole('button',{name:'Close settings'}).click();

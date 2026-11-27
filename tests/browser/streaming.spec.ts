@@ -18,8 +18,8 @@ test('garage loads only its model; optional download failure retries and late se
   await page.getByRole('button',{name:'View VANTA GT'}).click();release();
   await expect.poll(async()=>(await state(page)).vehicleCache.some((e:any)=>e.key==='solstice-gt.glb'&&e.ready)).toBe(true);
   expect((await state(page)).viewedCar).toBe('VANTA GT');await expect(page.locator('.vehicle-status')).toBeHidden();
-  await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await expect(page.getByRole('button',{name:'UNLOCK · 2,500'})).toBeVisible();
-  await page.getByRole('button',{name:'UNLOCK · 2,500'}).click();expect((await state(page)).selected).toBe('solstice');
+  await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await expect.poll(async()=>(await state(page)).selected).toBe('solstice');
+  expect((await state(page)).credits).toBe(2500);
   await page.reload();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});expect((await state(page)).viewedCar).toBe('SOLSTICE GT');
   expect((await state(page)).vehicleCache.map((e:any)=>e.key)).toEqual(['solstice-gt.glb']);expect(errors).toEqual([]);
   const previousBytes=['concept-car.glb','concept-car-lod.glb','solstice-gt.glb','solstice-gt-lod.glb','bmw-m3.glb','bmw-m3-lod.glb'].reduce((sum,f)=>sum+statSync('public/assets/'+f).size,0);

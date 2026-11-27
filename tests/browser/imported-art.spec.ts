@@ -1,10 +1,10 @@
 import {test,expect} from '@playwright/test';
 import {writeFileSync} from 'node:fs';
-test('LF purchase persists; imported city retries after a failed download and the new car drives',async({page})=>{
+test('LF preview selection persists; imported city retries after a failed download and the new car drives',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[],requests:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().endsWith('.glb'))requests.push(r.url().split('/').at(-1)!);});
  await page.addInitScript(()=>{if(!localStorage.getItem('apex-rush-save-v1'))localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,credits:5000,settings:{quality:'low',adaptiveResolution:false,engine:0,music:0,effects:0}}));});
  await page.goto('/drive.html');await page.locator('.loading').waitFor({state:'detached',timeout:90000});expect(requests).toEqual(['concept-car.glb']);
- await page.getByRole('button',{name:'View LF GT',exact:true}).click();await page.waitForFunction(()=>(window as any).__apex.state().viewedCar==='LF GT');await page.getByRole('button',{name:'UNLOCK · 4,500'}).click();
+ await page.getByRole('button',{name:'View LF GT',exact:true}).click();await page.waitForFunction(()=>(window as any).__apex.state().viewedCar==='LF GT');expect(await page.evaluate(()=>(window as any).__apex.state().credits)).toBe(5000);
  await page.reload();await page.locator('.loading').waitFor({state:'detached',timeout:90000});expect(await page.evaluate(()=>(window as any).__apex.state().selected)).toBe('lf-gt');
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.body.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'artifacts/lf-mobile.png'});await page.setViewportSize({width:1280,height:800});
  await page.route('**/harbor-architecture.glb',route=>route.abort());await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();
@@ -15,5 +15,5 @@ test('LF purchase persists; imported city retries after a failed download and th
  await page.evaluate(()=>(window as any).__apex.advance(4));await page.keyboard.down('w');await page.evaluate(()=>(window as any).__apex.advance(1,null));await page.keyboard.up('w');const moving=await page.evaluate(()=>(window as any).__apex.state());expect(moving.player.speed).toBeGreaterThan(10);expect(moving.importedBuildings).toBeGreaterThan(10);expect(moving.opponents).toBe(6);
  await page.evaluate(()=>{const game=(window as any).__apex;game.useManualClock();game.viewAt(320);game.advance(.6,{throttle:1});});await page.keyboard.down('s');await page.evaluate(()=>(window as any).__apex.advance(6,null));await page.keyboard.up('s');const reverse=await page.evaluate(()=>(window as any).__apex.state());expect(reverse.player.speed).toBeLessThan(0);await expect(page.locator('#gear')).toHaveText('R');
  const audit=await page.evaluate(()=>(window as any).__apex.auditRoad());expect(audit.violations).toEqual([]);expect(errors).toEqual([]);
- writeFileSync('artifacts/imported-art-browser.json',JSON.stringify({date:new Date().toISOString(),purchaseReload:true,failedCityRetry:true,cancelledHeldCityDownload:true,requests,moving,reverse,audit,errors,passed:true},null,2));
+ writeFileSync('artifacts/imported-art-browser.json',JSON.stringify({date:new Date().toISOString(),selectionReload:true,failedCityRetry:true,cancelledHeldCityDownload:true,requests,moving,reverse,audit,errors,passed:true},null,2));
 });

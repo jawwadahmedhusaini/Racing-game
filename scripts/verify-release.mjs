@@ -22,19 +22,21 @@ try {
   for (const [width, height] of [[1280, 800], [1600, 900], [844, 390], [390, 844]]) {
     await page.setViewportSize({ width, height });
     const layout = await page.evaluate(() => {
-      const upgrade = document.querySelector('.upgrade-row').getBoundingClientRect();
-      const stats = document.querySelector('.performance').getBoundingClientRect();
-      return { width: innerWidth, height: innerHeight, overflow: document.body.scrollWidth > innerWidth, upgradeBottom: upgrade.bottom, statsTop: stats.top };
+      const stage = document.querySelector('.studio-stage').getBoundingClientRect();
+      const details = document.querySelector('.studio-details').getBoundingClientRect();
+      return { width: innerWidth, height: innerHeight, overflow: document.body.scrollWidth > innerWidth,
+        separate: stage.right <= details.left + .5 || stage.bottom <= details.top + .5 };
     });
     report.layouts.push(layout);
     expect(layout.overflow).toBe(false);
-    expect(layout.upgradeBottom).toBeLessThan(layout.statsTop);
+    expect(layout.separate).toBe(true);
   }
   await page.setViewportSize({ width: 1280, height: 800 });
-  await page.getByRole('button',{name:'View SOLSTICE GT'}).click();
-  await page.getByRole('button',{name:'UNLOCK · 2,500'}).click();
-  report.solsticePurchased=true;
-  for(const file of ['assets/bmw-m3.glb','assets/bmw-m3-lod.glb','assets/audio/v8f-9.wav','licenses/audio.json','licenses/bmw-m3.json']){const response=await page.request.get(new URL(file,page.url()).href);expect(response.status()).toBe(200);}
+  await page.getByRole('button',{name:'View 575 GTC'}).click();
+  await expect(page.getByRole('heading',{name:'CAVALLO 575 GTC'})).toBeVisible();
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('apex-rush-save-v1')).credits)).toBe(2500);
+  report.cavalloSelectedWithoutCharge=true;
+  for(const file of ['assets/bmw-m3.glb','assets/bmw-m3-lod.glb','assets/audio/v8f-9.wav','licenses/audio.json','licenses/bmw-m3.json','assets/cavallo-575.glb','assets/cavallo-575-lod.glb','licenses/cavallo-575.json','licenses/LAL-1.3.txt']){const response=await page.request.get(new URL(file,page.url()).href);expect(response.status()).toBe(200);}
   report.bmwAndAudioAssets=true;
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.locator('#quality').selectOption('ultra');
