@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-25T17:14:49.876Z",
+  "date": "2026-11-27T18:10:49.947Z",
   "production": true,
   "errors": [],
   "layouts": [
@@ -7,35 +7,31 @@
       "width": 1280,
       "height": 800,
       "overflow": false,
-      "upgradeBottom": 515.328125,
-      "statsTop": 528.65625
+      "separate": true
     },
     {
       "width": 1600,
       "height": 900,
       "overflow": false,
-      "upgradeBottom": 571.71875,
-      "statsTop": 618.65625
+      "separate": true
     },
     {
       "width": 844,
       "height": 390,
       "overflow": false,
-      "upgradeBottom": 206.546875,
-      "statsTop": 237.15625
+      "separate": true
     },
     {
       "width": 390,
       "height": 844,
       "overflow": false,
-      "upgradeBottom": 265,
-      "statsTop": 556.25
+      "separate": true
     }
   ],
   "failedRequests": [],
-  "version": "2.7.0",
+  "version": "3.1.0",
   "testApiAbsent": true,
-  "solsticePurchased": true,
+  "cavalloSelectedWithoutCharge": true,
   "bmwAndAudioAssets": true,
   "ultraRendered": true,
   "keyboardAcceleration": true,
