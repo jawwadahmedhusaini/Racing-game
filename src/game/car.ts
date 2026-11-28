@@ -51,11 +51,19 @@ function buildCar(spec:CarSpec,template:THREE.Group,color=spec.color,racing=fals
     const source=sourceMaterials[0];let mat=materials.get(source) as THREE.MeshPhysicalMaterial|undefined;
     if(!mat){mat=source.clone() as THREE.MeshPhysicalMaterial;materials.set(source,mat);mat.envMapIntensity=1;mat.aoMapIntensity=.7;
       if(source.name.startsWith('Paint 1')){mat.color.set(color);mat.metalness=.72;mat.roughness=.27;mat.clearcoat=1;mat.clearcoatRoughness=.09;mat.normalScale?.setScalar(.065);paint=mat;}
+      if(source.name==='Paint 1 BMW'){mat.metalness=.59;mat.roughness=racing?.275:.242;mat.clearcoatRoughness=.15;}
       if(source.name.startsWith('Paint 2')){mat.color.set('#222a30');mat.metalness=.45;mat.roughness=.32;}
       if(source.name==='Glass'){mat.color.set(racing?'#1c2c35':'#455c66');mat.metalness=.22;mat.roughness=.075;mat.transmission=0;mat.transparent=!racing;mat.opacity=racing ? 1 : spec.id===STARTER_CAR_ID ? .62 : .73;mat.depthWrite=racing;mat.envMapIntensity=1.25;mat.aoMap=null;mat.normalMap=null;}
+      if(spec.id==='bmw-m3'&&source.name==='Glass'){
+        mat.color.set(racing?'#232b31':'#52636b');mat.metalness=.12;mat.roughness=.11;mat.opacity=racing?1:.66;
+      }
+      if(source.name==='BMW headlamp cover')mat.depthWrite=false;
       if(source.name.startsWith('Interior 3'))mat.color.set(color).multiplyScalar(.55);
       if(source.name==='Reverse'){mat.emissive.set('#deefff');mat.emissiveIntensity=0;}
-      if(source.name==='Brakelight'){mat.emissive.set('#ff1733');mat.emissiveIntensity=2.8;brake=mat;}
+      if(source.name==='Brakelight'){
+        mat.emissive.set('#ff1733');mat.emissiveIntensity=2.8;brake=mat;
+        if(spec.id==='bmw-m3'){mat.userData.tailIntensity=1.35;mat.userData.stopIntensity=4.8;mat.emissiveIntensity=1.35;}
+      }
       if(source.name==='Headlight'){mat.emissive.set('#cbebff');mat.emissiveIntensity=3.5;headlamps=mat;}
       if(source.name==='Rim2'){if(spec.id!==STARTER_CAR_ID)mat.color.set(spec.shape==='track'?'#b9a273':'#98a8b7');mat.roughness=.24;}
     }
@@ -67,7 +75,7 @@ function buildCar(spec:CarSpec,template:THREE.Group,color=spec.color,racing=fals
     const parent=wheelIndex<0?body:o.name.includes('BrakePad')?wheels[wheelIndex]:wheels[wheelIndex].children[0];
     const key=`${mat.uuid}:${parent.uuid}`,bucket=buckets.get(key)??{mat,geos:[],parent};bucket.geos.push(geo.index?geo.toNonIndexed():geo);if(geo.index)geo.dispose();buckets.set(key,bucket);
   });
-  for(const {mat,geos,parent} of buckets.values()){const geo=mergeGeometries(geos);if(geo){const mesh=new THREE.Mesh(geo,mat);mesh.name=mat===paint?'body-shell':mat.name==='Reverse'?'reverse-lamp':'vehicle-part';mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);}geos.forEach(g=>g.dispose());}
+  for(const {mat,geos,parent} of buckets.values()){const geo=mergeGeometries(geos);if(geo){const mesh=new THREE.Mesh(geo,mat);mesh.name=mat===paint?'body-shell':mat.name==='Reverse'?'reverse-lamp':'vehicle-part';mesh.castShadow=mat.name!=='BMW headlamp cover';mesh.receiveShadow=true;parent.add(mesh);}geos.forEach(g=>g.dispose());}
   paint??=new THREE.MeshPhysicalMaterial({color,metalness:.75,roughness:.26});brake??=new THREE.MeshStandardMaterial({emissive:'#ff1733'});headlamps??=new THREE.MeshStandardMaterial({emissive:'#ffffff'});
   const carbonMap=carbonTexture(),carbon=new THREE.MeshPhysicalMaterial({map:carbonMap,color:'#515b62',metalness:.3,roughness:.35,clearcoat:.7,clearcoatRoughness:.22});
   const detail=(size:number[],pos:number[],material:THREE.Material=carbon)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(...size as [number,number,number]),material);m.position.set(...pos as [number,number,number]);m.castShadow=true;body.add(m);return m;};
@@ -131,6 +139,8 @@ function buildCar(spec:CarSpec,template:THREE.Group,color=spec.color,racing=fals
 function animateCar(group:THREE.Group,body:THREE.Group,wheels:THREE.Group[],dimensions:THREE.Vector3,paint:THREE.MeshPhysicalMaterial,brake:THREE.MeshStandardMaterial,headlamps:THREE.MeshStandardMaterial,suspension:CarSpec['suspension'],flames:THREE.Mesh[],dispose:()=>void):CarModel {
   let wheelAngle=0,previousTime=0,heaveVelocity=0;
   const reverse=group.getObjectByName('reverse-lamp') as THREE.Mesh;
+  const tailIntensity=brake.userData.tailIntensity??2.4;
+  const stopIntensity=brake.userData.stopIntensity??6;
   return {group,body,wheels,dimensions,paint,brake,headlamps,flames,dispose,update(speed,steer,drift,boost,braking,time,acceleration=0,landing=0){
     const delta=previousTime?Math.max(0,Math.min(.1,time-previousTime)):1/60;
     previousTime=time;
@@ -156,7 +166,7 @@ function animateCar(group:THREE.Group,body:THREE.Group,wheels:THREE.Group[],dime
     }else{
       body.position.y=THREE.MathUtils.lerp(body.position.y,-landing*.045,settle);
     }
-    brake.emissiveIntensity=braking&&speed>=0?6:2.4;
+    brake.emissiveIntensity=braking&&speed>=0?stopIntensity:tailIntensity;
     if(reverse)(reverse.material as THREE.MeshStandardMaterial).emissiveIntensity=speed<-.1?5:0;
     flames.forEach((f,i)=>{f.visible=boost>0;f.scale.y=(.75+Math.sin(time*70+i)*.15)*(boost===2?1.65:1);(f.material as THREE.MeshBasicMaterial).color.set(i%2?'#ffffff':boost===2?'#b56bff':'#53c5ff');});
   }};

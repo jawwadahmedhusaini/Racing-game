@@ -1,4 +1,4 @@
-import {CARS,type CarSpec,type RaceMode,type Difficulty} from './content';
+import {CARS,HARBOR_SPRINT,canRaceModeOnTrack,raceLapCount,type CarSpec,type RaceMode,type Difficulty} from './content';
 import {Track,angleDelta,GUARDRAIL_HEIGHT} from './track';
 import {contactOffset,footprint,resolveContactSpeed,resolveStaticContactSpeed,velocity,setVelocity,groundSpeed} from './contact';
 import {rampSupport,rampContact,RAMP} from './ramp';
@@ -23,9 +23,12 @@ export class RaceSimulation {
   private nextLap=1;
   private readonly railDeparture=new Map<Driver,number>();
   constructor(options:RaceOptions) {
-    this.track=options.track;this.mode=options.mode;this.difficulty=options.difficulty;this.upgrade=options.upgrade;this.laps=options.laps??(options.mode==='time'?1:2);
+    if(!canRaceModeOnTrack(options.mode,options.track.id)) throw new Error('The sprint is only available at Neon Harbor.');
+    this.track=options.track;this.mode=options.mode;this.difficulty=options.difficulty;this.upgrade=options.upgrade;
+    this.laps=options.mode===HARBOR_SPRINT.mode?HARBOR_SPRINT.laps:options.laps??raceLapCount(options.mode);
     const names=['YOU','M. KOVA','J. SANTOS','R. WOLFF','A. RIVERA','K. MORI','L. COSTA'];
-    for(let i=0;i<(this.mode==='time'?1:7);i++)this.drivers.push({id:i,name:names[i],spec:i===0?options.car:CARS[(i-1)%CARS.length],distance:-Math.floor(i/2)*7,lateral:(i%2===0?-1:1)*3,speed:0,heading:0,yawVelocity:0,impactYaw:0,sideSpeed:0,brakeInput:0,impact:0,impactSerial:0,impactCooldown:0,scrape:0,landingSerial:0,nitro:65,boost:0,drift:0,driftTotal:0,airborne:0,verticalSpeed:0,rampLift:0,jumpRewardPending:false,jumpClean:false,finishTime:null,eliminated:false,eliminationPosition:null,collision:0,steer:0,lap:1,targetLane:(i%2===0?-1:1)*3,lastRamp:-1,boostCooldown:0,boostPrevious:false,jumpTotal:0,reverseHold:0,slipAngle:0,acceleration:0,landingImpact:0,throttle:0,gear:1});
+    const gridSize=this.mode==='time'?1:this.mode===HARBOR_SPRINT.mode?1+HARBOR_SPRINT.rivals:names.length;
+    for(let i=0;i<gridSize;i++)this.drivers.push({id:i,name:names[i],spec:i===0?options.car:CARS[(i-1)%CARS.length],distance:-Math.floor(i/2)*7,lateral:(i%2===0?-1:1)*3,speed:0,heading:0,yawVelocity:0,impactYaw:0,sideSpeed:0,brakeInput:0,impact:0,impactSerial:0,impactCooldown:0,scrape:0,landingSerial:0,nitro:65,boost:0,drift:0,driftTotal:0,airborne:0,verticalSpeed:0,rampLift:0,jumpRewardPending:false,jumpClean:false,finishTime:null,eliminated:false,eliminationPosition:null,collision:0,steer:0,lap:1,targetLane:(i%2===0?-1:1)*3,lastRamp:-1,boostCooldown:0,boostPrevious:false,jumpTotal:0,reverseHold:0,slipAngle:0,acceleration:0,landingImpact:0,throttle:0,gear:1});
     this.updateRank();
   }
   get player(){return this.drivers[0];}
@@ -48,7 +51,10 @@ export class RaceSimulation {
   }
   aiInput(d:Driver):Controls {
     const {lane,speedLimit,bend}=planOpponent(d,this.drivers,this.track);
-    const factor={rookie:.77,pro:.91,expert:1.02}[this.difficulty],personality=.96+(d.id%3)*.025;
+    // A single lap leaves less time to recover from a slow launch. A more
+    // measured sprint pace keeps the field in reach before the chicane.
+    const pace=this.mode===HARBOR_SPRINT.mode?{rookie:.59,pro:.64,expert:.78}:{rookie:.77,pro:.91,expert:1.02};
+    const factor=pace[this.difficulty],personality=.96+(d.id%3)*.025;
     const profile=rivalProfile(d.id);
     const targetSpeed=Math.min((d.spec.topSpeed/3.6)*factor*personality,Math.sqrt(36/(bend+.0015))*.83*profile.corner,speedLimit);
     d.targetLane=lane;

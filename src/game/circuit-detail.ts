@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {spatialMesh} from './batching';
 import {signTexture} from './materials';
+import {isHarborFreightSection} from './harbor';
 import type {Track} from './track';
 import type {RoadSpace} from './road-space';
 
@@ -21,7 +22,7 @@ export function addCircuitDetail(scene:THREE.Scene,track:Track,space:RoadSpace,h
   // Brake-distance references teach the route instead of relying on a wall hit.
   const used:number[]=[];
   for(let d=90;d<track.length-100;d+=18){
-    if(Math.abs(track.sample(d).curvature)<.012||used.some(v=>Math.abs(d-v)<180))continue;used.push(d);
+    if((track.id==='city'&&isHarborFreightSection(d))||Math.abs(track.sample(d).curvature)<.012||used.some(v=>Math.abs(d-v)<180))continue;used.push(d);
     for(const before of [100,50]){
       const s=track.sample(d-before),p=s.position.clone().addScaledVector(s.right,12);
       if(!space.place('braking-board',p.x,p.z,.65))continue;

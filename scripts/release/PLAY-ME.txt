@@ -1,4 +1,4 @@
-APEX RUSH 3.1.0 — browser racing game
+APEX RUSH 3.2.0 — browser racing game
 
 1. Unzip the complete download.
 2. Install Python 3 if it is not already on your computer.

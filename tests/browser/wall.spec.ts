@@ -6,7 +6,7 @@ for(const track of ['coast','city'])test(`${track}: touch wall impacts rotate th
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{adaptiveResolution:false,quality:'low',music:0,engine:0,effects:0}})));
  await page.goto('/drive.html');await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
- await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator(`[data-action="track"][data-value="${track}"]`).click();await page.locator('[data-action="mode"][data-value="time"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();
+ await page.getByRole('button',{name:'RACE',exact:true}).click();await page.locator(`[data-action="track"][data-value="${track}"]`).click();await page.locator('[data-action="mode"][data-value="time"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();
  await page.waitForFunction(()=>!(window as any).__apex.state().preparing,null,{timeout:90000});await page.evaluate(()=>{const game=(window as any).__apex;game.useManualClock();game.advance(4);});
  const cdp=await context.newCDPSession(page);
  const press=async(names:string[])=>{const points=[];for(const [id,name] of names.entries()){const b=(await page.getByRole('button',{name,exact:true}).boundingBox())!;points.push({id:id+1,x:b.x+b.width/2,y:b.y+b.height/2});}await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points});};

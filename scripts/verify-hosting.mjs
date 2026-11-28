@@ -32,7 +32,7 @@ try {
   expect(await licenseResponse.text()).toContain('Creative Commons');
   report.licenseLink = license;
   await page.getByRole('button', { name: 'Close credits' }).click();
-  await page.getByRole('button', { name: 'HIT THE ROAD' }).click();
+  await page.getByRole('button', { name: 'RACE', exact:true }).click();
   await page.locator('[data-action="track"][data-value="city"]').click();
   await page.setViewportSize({width:640,height:360});
   await page.getByRole('button', { name: 'START YOUR ENGINE' }).click();

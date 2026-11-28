@@ -22,16 +22,17 @@ try {
   for (const [width, height] of [[1280, 800], [1600, 900], [844, 390], [390, 844]]) {
     await page.setViewportSize({ width, height });
     const layout = await page.evaluate(() => {
-      const stage = document.querySelector('.studio-stage').getBoundingClientRect();
-      const details = document.querySelector('.studio-details').getBoundingClientRect();
-      return { width: innerWidth, height: innerHeight, overflow: document.body.scrollWidth > innerWidth,
-        separate: stage.right <= details.left + .5 || stage.bottom <= details.top + .5 };
+      const stage = document.querySelector('.pit-stage').getBoundingClientRect();
+      const race = document.querySelector('.pit-primary').getBoundingClientRect();
+      return {width:innerWidth,height:innerHeight,overflow:document.body.scrollWidth>innerWidth,
+        visible:race.bottom<=innerHeight && race.right<=innerWidth && stage.width===innerWidth};
     });
     report.layouts.push(layout);
     expect(layout.overflow).toBe(false);
-    expect(layout.separate).toBe(true);
+    expect(layout.visible).toBe(true);
   }
   await page.setViewportSize({ width: 1280, height: 800 });
+  await page.getByRole('button',{name:'Vehicles',exact:true}).click();
   await page.getByRole('button',{name:'View 575 GTC'}).click();
   await expect(page.getByRole('heading',{name:'CAVALLO 575 GTC'})).toBeVisible();
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('apex-rush-save-v1')).credits)).toBe(2500);
@@ -47,8 +48,7 @@ try {
   await page.locator('#quality').selectOption('low');
   await page.getByRole('button', { name: 'Close settings' }).click();
   await page.setViewportSize({ width: 960, height: 600 });
-  await page.getByRole('button', { name: 'HIT THE ROAD' }).click();
-  await page.getByRole('button', { name: 'START YOUR ENGINE' }).click();
+  await page.getByRole('button', { name: 'Race Neon Harbor sprint' }).click();
   await page.waitForSelector('#countdown',{timeout:90000});
   await page.keyboard.down('w');
   await expect.poll(async () => Number(await page.locator('#speed').innerText()), { timeout: 120000 }).toBeGreaterThan(20);

@@ -1,13 +1,14 @@
+import {openVehicles} from './garage-controls';
 import {test,expect} from '@playwright/test';
 import {writeFileSync} from 'node:fs';
 test('LF preview selection persists; imported city retries after a failed download and the new car drives',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[],requests:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().endsWith('.glb'))requests.push(r.url().split('/').at(-1)!);});
  await page.addInitScript(()=>{if(!localStorage.getItem('apex-rush-save-v1'))localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,credits:5000,settings:{quality:'low',adaptiveResolution:false,engine:0,music:0,effects:0}}));});
  await page.goto('/drive.html');await page.locator('.loading').waitFor({state:'detached',timeout:90000});expect(requests).toEqual(['concept-car.glb']);
- await page.getByRole('button',{name:'View LF GT',exact:true}).click();await page.waitForFunction(()=>(window as any).__apex.state().viewedCar==='LF GT');expect(await page.evaluate(()=>(window as any).__apex.state().credits)).toBe(5000);
+ await openVehicles(page);await page.getByRole('button',{name:'View LF GT',exact:true}).click();await page.waitForFunction(()=>(window as any).__apex.state().viewedCar==='LF GT');expect(await page.evaluate(()=>(window as any).__apex.state().credits)).toBe(5000);
  await page.reload();await page.locator('.loading').waitFor({state:'detached',timeout:90000});expect(await page.evaluate(()=>(window as any).__apex.state().selected)).toBe('lf-gt');
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.body.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'artifacts/lf-mobile.png'});await page.setViewportSize({width:1280,height:800});
- await page.route('**/harbor-architecture.glb',route=>route.abort());await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();
+ await page.route('**/harbor-architecture.glb',route=>route.abort());await page.getByRole('button',{name:'RACE',exact:true}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();
  await expect(page.getByRole('button',{name:'START YOUR ENGINE'})).toBeVisible({timeout:120000});expect(await page.evaluate(()=>(window as any).__apex.state().player)).toBeNull();
  await page.unroute('**/harbor-architecture.glb');let release!:()=>void,heldRequest=false;const held=new Promise<void>(r=>release=r);
  await page.route('**/harbor-architecture.glb',async route=>{heldRequest=true;await held;await route.continue();});await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await expect.poll(()=>heldRequest,{timeout:120000}).toBe(true);await page.locator('[data-action="cancel-load"]').click();await expect(page.getByRole('button',{name:'START YOUR ENGINE'})).toBeVisible();release();

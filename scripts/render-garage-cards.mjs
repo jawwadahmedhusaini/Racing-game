@@ -1,5 +1,5 @@
 // Photograph the actual assembled game cars, including each variant's bodywork.
-// Run from the project root with node scripts/render-garage-cards.mjs.
+// Run from the project root. Optional car IDs select which images to regenerate.
 import { createServer } from 'vite';
 import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -10,7 +10,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { CARS } from '/src/game/content';
 import { createCar, loadVehicleAsset } from '/src/game/car';
 
-export async function photograph() {
+export async function photograph(ids) {
   const renderer = new T.WebGLRenderer({alpha:true, antialias:true, preserveDrawingBuffer:true});
   renderer.setSize(300,128);
   renderer.setClearColor(0,0);
@@ -22,7 +22,12 @@ export async function photograph() {
   const key = new T.DirectionalLight(0xfff1da,2); key.position.set(4,7,2); scene.add(key);
   const camera = new T.PerspectiveCamera(20,300/128,.1,60);
   const pictures = {};
-  for (const spec of CARS) {
+  const specs = ids.length ? ids.map(id => {
+    const spec = CARS.find(candidate => candidate.id === id);
+    if (!spec) throw new Error('Unknown car ID: ' + id);
+    return spec;
+  }) : CARS;
+  for (const spec of specs) {
     await loadVehicleAsset(spec);
     const car = createCar(spec);
     scene.add(car.group);
@@ -48,7 +53,8 @@ const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH?
 try {
   const page = await browser.newPage();
   await page.goto(server.resolvedUrls.local[0]);
-  const photos = await page.evaluate(async path => (await import(path)).photograph(),path);
+  const ids = process.argv.slice(2);
+  const photos = await page.evaluate(async ({ path, ids }) => (await import(path)).photograph(ids), { path, ids });
   await mkdir('public/assets/garage',{recursive:true});
   for (const [id,encoded] of Object.entries(photos)) await writeFile(`public/assets/garage/${id}.webp`,Buffer.from(encoded,'base64'));
 } finally {

@@ -1,3 +1,4 @@
+import {openVehicles} from './garage-controls';
 import {test,expect} from '@playwright/test';
 import {writeFileSync,statSync} from 'node:fs';
 const state=(page:any)=>page.evaluate(()=>(window as any).__apex.state());
@@ -10,15 +11,15 @@ test('garage loads only its model; optional download failure retries and late se
   const errors:string[]=[],requests:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().endsWith('.glb'))requests.push(r.url().split('/').at(-1)!);});
   await page.route('**/solstice-gt.glb',route=>route.abort());await boot(page);
   expect(requests).toEqual(['concept-car.glb']);const initialBytes=statSync('public/assets/concept-car.glb').size;
-  await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await expect(page.getByText('This car could not load. Select it again to retry.')).toBeVisible();
+  await openVehicles(page);await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await expect(page.getByText('This car could not load. Select it again to retry.')).toBeVisible();
   expect((await state(page)).viewedCar).toBe('VANTA GT');expect((await state(page)).selected).toBe('vanta');
   await page.unroute('**/solstice-gt.glb');let release!:()=>void;const held=new Promise<void>(r=>release=r);let requested=false;
   await page.route('**/solstice-gt.glb',async route=>{requested=true;await held;await route.continue();});
-  await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await expect.poll(()=>requested).toBe(true);
-  await page.getByRole('button',{name:'View VANTA GT'}).click();release();
+  await openVehicles(page);await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await expect.poll(()=>requested).toBe(true);
+  await openVehicles(page);await page.getByRole('button',{name:'View VANTA GT'}).click();release();
   await expect.poll(async()=>(await state(page)).vehicleCache.some((e:any)=>e.key==='solstice-gt.glb'&&e.ready)).toBe(true);
   expect((await state(page)).viewedCar).toBe('VANTA GT');await expect(page.locator('.vehicle-status')).toBeHidden();
-  await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await expect.poll(async()=>(await state(page)).selected).toBe('solstice');
+  await openVehicles(page);await page.getByRole('button',{name:'View SOLSTICE GT'}).click();await expect.poll(async()=>(await state(page)).selected).toBe('solstice');
   expect((await state(page)).credits).toBe(2500);
   await page.reload();await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});expect((await state(page)).viewedCar).toBe('SOLSTICE GT');
   expect((await state(page)).vehicleCache.map((e:any)=>e.key)).toEqual(['solstice-gt.glb']);expect(errors).toEqual([]);
@@ -30,7 +31,7 @@ test('race streams LODs, cancels an in-flight grid, retries without duplicate do
   test.setTimeout(240000);const errors:string[]=[],requests:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().endsWith('.glb'))requests.push(r.url().split('/').at(-1)!);});
   await boot(page);let release!:()=>void,requested=false;const held=new Promise<void>(r=>release=r);
   await page.route('**/bmw-m3-lod.glb',async route=>{requested=true;await held;await route.continue();});
-  await page.getByRole('button',{name:'HIT THE ROAD'}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await expect.poll(()=>requested,{timeout:120000}).toBe(true);
+  await page.getByRole('button',{name:'RACE',exact:true}).click();await page.locator('[data-action="track"][data-value="city"]').click();await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await expect.poll(()=>requested,{timeout:120000}).toBe(true);
   await page.locator('[data-action="cancel-load"]').click();await expect(page.getByRole('button',{name:'START YOUR ENGINE'})).toBeVisible();expect((await state(page)).player).toBeNull();release();
   await page.getByRole('button',{name:'START YOUR ENGINE'}).click();await page.waitForFunction(()=>(window as any).__apex.state().screen==='racing',null,{timeout:120000});
   expect([...requests].sort()).toEqual(['bmw-m3-lod.glb','concept-car-lod.glb','concept-car.glb','solstice-gt-lod.glb','lf-gt-lod.glb','harbor-architecture.glb'].sort());expect((await state(page)).opponents).toBe(6);

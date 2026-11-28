@@ -7,7 +7,7 @@ import {addTrees} from './vegetation';
 import {spatialInstances,spatialMesh} from './batching';
 import {addLandmarks} from './landmarks';
 import {addImportedCity} from './imported-city';
-import {addHarbor} from './harbor';
+import {addHarbor,HARBOR_FIXTURE_SPACING,isHarborFreightSection,isHarborWaterfront} from './harbor';
 import {RoadSpace} from './road-space';
 import {HeightField} from './heightfield';
 import {addCircuitDetail} from './circuit-detail';
@@ -119,7 +119,7 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
   for(const offset of [1,4,7,10,12]){const distance=track.length*RAMP.fraction+offset,s=track.sample(distance),bar=new THREE.Mesh(new THREE.BoxGeometry(4.5,.02,.25),new THREE.MeshStandardMaterial({color:'#e1ac55',roughness:.75}));bar.position.copy(s.position).addScaledVector(s.right,5.5);bar.position.y+=rampHeight(track,distance,5.5)+.025;bar.rotation.set(-Math.asin(s.tangent.y)-Math.atan(RAMP.rise/RAMP.length),s.yaw,0,'YXZ');scene.add(bar);}
   // Clearly visible braking references before the tighter bends.
   const boardPosts:THREE.Matrix4[]=[];
-  for(let d=65;d<track.length;d+=95){const s=track.sample(d);if(Math.abs(s.curvature)<.004)continue;const side=s.curvature>0?1:-1;
+  for(let d=65;d<track.length;d+=95){const s=track.sample(d);if(Math.abs(s.curvature)<.004||night&&isHarborFreightSection(d))continue;const side=s.curvature>0?1:-1;
     const map=signTexture(s.curvature>0?'‹ ‹ ‹':'› › ›','#e8bd63','BRAKE · TURN IN');const board=new THREE.Mesh(new THREE.PlaneGeometry(4.4,1.45),new THREE.MeshStandardMaterial({map,emissiveMap:map,side:THREE.DoubleSide,roughness:.85,emissive:'#ffffff',emissiveIntensity:night?.2:0}));board.position.copy(s.position).addScaledVector(s.right,side*(half+1.2));board.position.y+=2.25;board.rotation.y=s.yaw+Math.PI;scene.add(board);boardPosts.push(at(s,side*(half+1.2),1.05,new THREE.Vector3(.10,2.1,.10)));
   }instanced(scene,new THREE.BoxGeometry(),darkMetal,boardPosts,true);
   const streetLights:THREE.SpotLight[]=[],headlights:THREE.SpotLight[]=[];
@@ -141,17 +141,21 @@ export async function createWorld(track:Track,checkpoint:(label:string)=>Promise
     sun.position.copy(position).addScaledVector(sunDirection,180);sun.target.position.copy(position);
     if(night){
       const progress=nearest(position.x,position.z).progress;
-      const inside=isHarborUnderpass(progress,track.length);
+      const {start,end,clearance}=HARBOR_UNDERPASS;
+      const nearTunnel=progress>=start-13&&progress<=end+13;
+      const poolSpacing=HARBOR_FIXTURE_SPACING*2;
+      const tunnelFixture=start+HARBOR_FIXTURE_SPACING/2;
+      const lastFixture=Math.floor((end-tunnelFixture)/poolSpacing);
+      const tunnelBase=THREE.MathUtils.clamp(Math.round((progress-tunnelFixture)/poolSpacing)-1,0,lastFixture-2);
       streetLights.forEach((light,i)=>{
-        const spacing=inside?27:38;
-        const center=inside?HARBOR_UNDERPASS.start:18;
-        const d=center+Math.floor((progress-center)/spacing)*spacing+(i-1)*spacing;
+        const d=nearTunnel?tunnelFixture+(tunnelBase+i)*poolSpacing:18+Math.floor((progress-18)/38)*38+(i-1)*38;
+        const wrapped=((d%track.length)+track.length)%track.length;
         const sample=track.sample(d);
-        const covered=isHarborUnderpass(d,track.length);
-        light.position.copy(sample.position).addScaledVector(sample.right,covered?0:half-.8);
-        light.position.y+=covered?HARBOR_UNDERPASS.clearance-.5:8.2;
-        light.color.set(covered?'#ffba78':['#91caff','#ffc290','#7bdae9'][((Math.floor(d/120)%3)+3)%3]);
-        light.intensity=covered?940:550;
+        light.position.copy(sample.position).addScaledVector(sample.right,nearTunnel?0:half-.8);
+        light.position.y+=nearTunnel?clearance-.68:8.2;
+        light.color.set(nearTunnel?'#ffc089':isHarborWaterfront(wrapped)?'#8ed8ed':['#91caff','#ffc290','#7bdae9'][Math.floor(wrapped/120)%3]);
+        light.intensity=nearTunnel?1320:550;
+        light.angle=nearTunnel?.72:.85;
         light.target.position.copy(sample.position);
       });
       headlights.forEach((light,i)=>{

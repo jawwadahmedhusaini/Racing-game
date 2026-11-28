@@ -5,6 +5,10 @@ import {RoadSpace} from './road-space';
 import {HARBOR_UNDERPASS,Track} from './track';
 import {random,signTexture,tiled} from './materials';
 
+export const HARBOR_FIXTURE_SPACING=9;
+export const isHarborFreightSection=(distance:number)=>distance>=590&&distance<=1120;
+export const isHarborWaterfront=(distance:number)=>distance>=2500&&distance<=2820;
+
 /** Original modular harbor set. Static meshes are merged by material and cell.
  * All roadside solids reserve a whole-circuit footprint before skyline placement.
  */
@@ -75,6 +79,7 @@ export function addHarbor(scene:THREE.Scene,track:Track,space:RoadSpace){
   const safety = new THREE.MeshStandardMaterial({color:'#eff3e9',roughness:.72});
   const barrierRed = new THREE.MeshStandardMaterial({color:'#a04434',roughness:.74});
   const position=(distance:number)=>track.sample(distance);
+  addHarborRaceMarkings(scene,track,space);
   // The launch has a visible service apron with setbacks for freight infrastructure.
   for(let d=-30;d<174;d+=17){
     const sample=position(d);
@@ -118,8 +123,8 @@ export function addHarbor(scene:THREE.Scene,track:Track,space:RoadSpace){
   const {start,end,clearance}=HARBOR_UNDERPASS;
   const half=track.width/2;
   add(underpassRoof(track),roofMaterial);
-  for(let d=start;d<end;d+=9){
-    const length=Math.min(9,end-d),sample=position(d+length/2);
+  for(let d=start;d<end;d+=HARBOR_FIXTURE_SPACING){
+    const length=Math.min(HARBOR_FIXTURE_SPACING,end-d),sample=position(d+length/2);
     const supportWidth=half+3.42;
     for(const side of [-1,1]){
       const foot=sample.position.clone().addScaledVector(sample.right,side*supportWidth);
@@ -129,10 +134,10 @@ export function addHarbor(scene:THREE.Scene,track:Track,space:RoadSpace){
         box(foot.clone().add(new THREE.Vector3(0,.25,0)),1.4,.5,1.4,barrierRed,sample.yaw);
         box(foot.clone().add(new THREE.Vector3(0,1.15,0)),1.26,.17,1.15,safety,sample.yaw);
       }
-      const lamp=sample.position.clone().addScaledVector(sample.right,side*3.9);
-      box(lamp.clone().add(new THREE.Vector3(0,clearance-.19,0)),.47,.3,3.9,steel,sample.yaw);
-      box(lamp.clone().add(new THREE.Vector3(0,clearance-.35,0)),.32,.03,3.7,warm,sample.yaw);
     }
+    const lamp=sample.position.clone().add(new THREE.Vector3(0,clearance-.52,0));
+    box(lamp,9.15,.24,.27,steel,sample.yaw);
+    box(lamp.clone().add(new THREE.Vector3(0,-.13,0)),8.85,.025,.15,warm,sample.yaw);
     box(sample.position.clone().add(new THREE.Vector3(0,clearance-.24,0)),track.width+5,.45,.69,steel,sample.yaw);
   }
   const gateTex=signTexture('FLOODGATE 01','#ffcca3','NEON HARBOR  /  WESTBOUND');
@@ -200,8 +205,106 @@ export function addHarbor(scene:THREE.Scene,track:Track,space:RoadSpace){
     beam(new THREE.Vector3(x,h,z),new THREE.Vector3(x,h+26,z),.2,steel);
   }
 
-  for(let d=4;d<track.length;d+=12){const s=track.sample(d);for(const side of [-1,1])box(s.position.clone().addScaledVector(s.right,side*(half+.35)).add(new THREE.Vector3(0,.9,0)),.055,.045,5,palette[Math.floor(d/220)%3],s.yaw);}
+  for(let d=4;d<track.length;d+=12){
+    const s=track.sample(d);
+    const light=isHarborWaterfront(d)?cyan:d>=start&&d<end?warm:palette[Math.floor(d/220)%3];
+    for(const side of [-1,1])box(s.position.clone().addScaledVector(s.right,side*(half+.35)).add(new THREE.Vector3(0,.9,0)),.055,.045,5,light,s.yaw);
+  }
   for(const [m,parts] of buckets){const merged=mergeGeometries(parts);parts.forEach(g=>g.dispose());if(merged){const group=spatialMesh(merged,m,!(m instanceof THREE.MeshBasicMaterial),110);group.name=m===roofMaterial?'harbor-underpass-roof':'harbor-district';scene.add(group);}}
+}
+
+/** Distance panels and paint follow the existing spline and stay clear of the racing surface. */
+function addHarborRaceMarkings(scene:THREE.Scene,track:Track,space:RoadSpace){
+  const turnIn=784;
+  const signs=[
+    ...[150,100,50].map((meters,tile)=>({distance:turnIn-meters,tile,side:-1})),
+    {distance:786,tile:3,side:-1},
+    {distance:852,tile:4,side:1},
+    {distance:1039,tile:3,side:-1},
+  ];
+  const atlas=document.createElement('canvas');
+  atlas.width=1280;
+  atlas.height=256;
+  const draw=atlas.getContext('2d')!;
+  for(let i=0;i<5;i++){
+    draw.save();
+    draw.translate(i*256,0);
+    draw.fillStyle='#171b20';
+    draw.fillRect(0,0,256,256);
+    draw.fillStyle='#ffc46d';
+    draw.fillRect(7,7,242,4);
+    draw.fillRect(7,245,242,4);
+    if(i<3){
+      draw.fillStyle='#fff6e0';
+      draw.font='bold 113px sans-serif';
+      draw.textAlign='center';
+      draw.fillText(String([150,100,50][i]),128,143,225);
+      draw.fillStyle='#ffc46d';
+      draw.font='bold 24px sans-serif';
+      draw.fillText('BRAKE',128,207);
+    }else{
+      if(i===4){draw.translate(256,0);draw.scale(-1,1);}
+      for(const x of [18,112]){
+        draw.beginPath();
+        draw.moveTo(x,54);draw.lineTo(x+45,54);draw.lineTo(x+107,128);draw.lineTo(x+45,202);draw.lineTo(x,202);
+        draw.lineTo(x+63,128);draw.closePath();draw.fill();
+      }
+    }
+    draw.restore();
+  }
+  const texture=new THREE.CanvasTexture(atlas);
+  texture.colorSpace=THREE.SRGBColorSpace;
+  const face=new THREE.MeshBasicMaterial({map:texture});
+  const backing=new THREE.MeshStandardMaterial({color:'#394953',metalness:.48,roughness:.63});
+  const positions:THREE.BufferGeometry[]=[];
+  const posts:THREE.BufferGeometry[]=[];
+  for(const {distance,tile,side} of signs){
+    const sample=track.sample(distance),directional=tile>=3;
+    const body=sample.position.clone().addScaledVector(sample.right,side*(track.width/2+(directional?4.9:4.0)));
+    const width=directional?3.15:1.76,height=directional?1.5:1.76;
+    const radius=Math.hypot(width/2,.43);
+    if(!space.reserve(directional?'harbor-direction-board':'harbor-brake-board',body.x,body.z,radius))continue;
+    const approach=track.sample(distance-28).position.sub(body),yaw=Math.atan2(approach.x,approach.z);
+    const top=body.clone().add(new THREE.Vector3(0,directional?2.15:2.48,0));
+    const surface=new THREE.PlaneGeometry(width,height),uv=surface.attributes.uv;
+    for(let j=0;j<uv.count;j++)uv.setX(j,(.01+uv.getX(j)*.98+tile)/5);
+    positions.push(surface.rotateY(yaw).translate(top.x,top.y,top.z));
+    const rear=top.clone().addScaledVector(new THREE.Vector3(Math.sin(yaw),0,Math.cos(yaw)),-.07);
+    posts.push(new THREE.BoxGeometry(width+.07,height+.07,.11).rotateY(yaw).translate(rear.x,rear.y,rear.z));
+    const supportLength=body.y+2+(directional?1.82:2.05);
+    posts.push(new THREE.BoxGeometry(.13,supportLength,.15).rotateY(yaw).translate(rear.x,-2+supportLength/2,rear.z));
+  }
+
+  const warmPaint=new THREE.MeshStandardMaterial({color:'#b6513a',emissive:'#6f3022',emissiveIntensity:.35,roughness:.82});
+  const lightPaint=new THREE.MeshStandardMaterial({color:'#dcd9cd',emissive:'#6d6c67',emissiveIntensity:.35,roughness:.82});
+  const stripes:number[][]=[[],[]];
+  for(const [from,to,side] of [[768,825,1],[844,893,-1],[1027,1073,1]]){
+    const edges=[side*(track.width/2-1.58),side*(track.width/2-.82)].sort((a,b)=>a-b);
+    for(let d=from,index=0;d<to;d+=2.55,index++){
+      const first=track.sample(d),last=track.sample(Math.min(to,d+2.55));
+      const [a,b,c,e]=[first,last].flatMap(s=>edges.map(x=>s.position.clone().addScaledVector(s.right,x)));
+      for(const v of [a,b,c,c,b,e])stripes[index%2].push(v.x,v.y+.035,v.z);
+    }
+  }
+  const groups:[THREE.Material,THREE.BufferGeometry[]][]=[[face,positions],[backing,posts]];
+  const batch=(material:THREE.Material,geometry:THREE.BufferGeometry)=>{
+    const group=spatialMesh(geometry,material,false,72);
+    group.name='harbor-race-markings';
+    scene.add(group);
+  };
+  for(const [material,parts] of groups){
+    if(parts.length){
+      const merged=mergeGeometries(parts);
+      if(merged)batch(material,merged);
+      parts.forEach(g=>g.dispose());
+    }
+  }
+  for(const [i,material] of [warmPaint,lightPaint].entries()){
+    const geometry=new THREE.BufferGeometry();
+    geometry.setAttribute('position',new THREE.Float32BufferAttribute(stripes[i],3));
+    geometry.computeVertexNormals();
+    batch(material,geometry);
+  }
 }
 
 /** A continuous roof section shares the same samples as the road; curved

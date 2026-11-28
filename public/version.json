@@ -1,10 +1,10 @@
 {
-  "version": "3.1.0",
-  "date": "2026-11-27",
+  "version": "3.2.0",
+  "date": "2026-11-28",
   "changes": [
-    "Rebuilt garage with a dedicated 3D studio, a separate vehicle control panel and a make-and-model roster",
-    "Every vehicle available to drive immediately in the preview",
-    "Preview selection, paints and upgrades persist with existing credits and ownership",
-    "Cavallo 575 GTC, a Ferrari 575 GTC–derived car adapted from Speed Dreams artwork"
+    "Full-screen Neon Harbor pit bay with a live car view, vehicle picker and tuning sheets",
+    "Refined BMW M3 GTR details and reflections, with a smaller race model",
+    "One-lap Neon Harbor Sprint against six rivals, with its own best time",
+    "New braking references, apex markings and practical lighting on the Harbor route"
   ]
 }

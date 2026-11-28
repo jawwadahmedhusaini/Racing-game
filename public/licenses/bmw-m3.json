@@ -43,20 +43,20 @@
       "sha256": "46e43d420722a813f39261ebec0b031f37b66244160cad8d04dbc27cd1e1227d"
     }
   ],
-  "modifications": "Coordinate conversion, PBR materials, remapped existing interior/wheel textures, rigged four wheels and fixed calipers, functional lamps, two LODs. Performance and sound are game tuning, not manufacturer specifications.",
+  "modifications": "Coordinate conversion, paint and dashboard atlas materials, exterior glass and headlamp covers, rigged outward-facing wheels and fixed calipers, rubber and alloy finishes, seated projector halos and reverse lamps, tail reflector mask, two detail levels. Performance and sound use game tuning.",
   "trademarkNotice": "Unofficial community model. BMW is a trademark of its owner; no endorsement or manufacturer sound recording is claimed.",
   "assets": [
     {
-      "triangles": 31947,
+      "triangles": 31483,
       "file": "assets/bmw-m3.glb",
-      "sha256": "37ec7f9f5007952a420d9b7a2a9d1f8f5a4f867a380ca313ae37165793a4389b",
-      "bytes": 1775908
+      "sha256": "a4d15ffda8a08fa7b573eaa2e37f9a587a50a87926f7b00d632e91de5cc7cec8",
+      "bytes": 2164116
     },
     {
-      "triangles": 20010,
+      "triangles": 18463,
       "file": "assets/bmw-m3-lod.glb",
-      "sha256": "81f79552831c4e1cb5dabb2239c9e8a636ed0391552244070534d1ff714c7f79",
-      "bytes": 1482536
+      "sha256": "ec889fe3907565d2a92938c54715c95edf977ce6a3cd38c84048544c77c482d0",
+      "bytes": 1218312
     }
   ]
 }

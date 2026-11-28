@@ -8,6 +8,7 @@ export interface CarSpec {
 export const OPEN_GARAGE = true;
 
 export const STARTER_CAR_ID = 'orion-r';
+export const PIT_FEATURED_CAR_ID = 'bmw-m3';
 
 export const CARS: CarSpec[] = [
   { id: 'vanta', name: 'VANTA GT', maker: 'AUREL', class: 'A', tagline: 'Precision, without compromise.', color: '#ff552b', topSpeed: 322, acceleration: 88, handling: 91, nitro: 82, price: 1800, shape: 'wedge' },
@@ -30,7 +31,24 @@ export const CARS: CarSpec[] = [
 
 export const PAINTS = ['#ff552b', '#b8dce0', '#e7f069', '#f2f1eb', '#7672e8', '#263645'];
 export type TrackId = 'coast' | 'city';
-export type RaceMode = 'quick' | 'career' | 'time' | 'elimination';
+export type RaceMode = 'quick' | 'career' | 'time' | 'elimination' | 'sprint';
+
+export const HARBOR_SPRINT = {
+  track: 'city',
+  mode: 'sprint',
+  name: 'Neon Harbor Sprint',
+  laps: 1,
+  rivals: 6,
+  description: 'One lap from the docks through Floodgate 01 and along the waterfront.',
+} as const;
+
+export function raceLapCount(mode: RaceMode) {
+  return mode === HARBOR_SPRINT.mode ? HARBOR_SPRINT.laps : mode === 'time' ? 1 : 2;
+}
+
+export function canRaceModeOnTrack(mode: RaceMode, track: TrackId) {
+  return mode !== HARBOR_SPRINT.mode || track === HARBOR_SPRINT.track;
+}
 export type Quality = 'low' | 'medium' | 'high' | 'ultra';
 export type Difficulty = 'rookie' | 'pro' | 'expert';
 

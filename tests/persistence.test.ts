@@ -30,6 +30,7 @@ it('gives new players Orion and migrates implicit Vanta ownership without changi
 });
 
 it('remembers a preview car without granting permanent ownership or spending credits',()=>{
+  expect(parseSave(null,true)).toMatchObject({selected:'bmw-m3',owned:['orion-r']});
   const save=freshSave();
   save.selected='bmw-m3';
   save.paints['bmw-m3']='#116644';

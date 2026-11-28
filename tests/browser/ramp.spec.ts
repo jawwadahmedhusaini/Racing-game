@@ -5,7 +5,7 @@ for(const track of ['coast','city'])test(`${track}: full ramp-edge approach laun
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>localStorage.setItem('apex-rush-save-v1',JSON.stringify({version:1,settings:{adaptiveResolution:false,quality:'low',music:0,engine:0,effects:0}})));
  await page.goto('/drive.html');await expect(page.locator('.loading')).toHaveCount(0,{timeout:60000});
- await page.getByRole('button',{name:'HIT THE ROAD'}).click();
+ await page.getByRole('button',{name:'RACE',exact:true}).click();
  await page.locator(`[data-action="track"][data-value="${track}"]`).click();
  await page.locator('[data-action="mode"][data-value="time"]').click();
  await page.getByRole('button',{name:'START YOUR ENGINE'}).click();

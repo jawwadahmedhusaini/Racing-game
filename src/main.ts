@@ -10,7 +10,7 @@ import './garage.css';
 import * as THREE from 'three';
 import {RenderSystem,createShowroom} from './game/renderer';
 import {createCar,loadVehicleAsset,trimVehicleCache,vehicleAssetKey,vehicleCacheStats,type CarModel} from './game/car';
-import {CARS,EVENTS,OPEN_GARAGE,type RaceMode,type TrackId,type Quality,type Difficulty} from './game/content';
+import {CARS,EVENTS,OPEN_GARAGE,HARBOR_SPRINT,canRaceModeOnTrack,type RaceMode,type TrackId,type Quality,type Difficulty} from './game/content';
 import {Track,isHarborUnderpass} from './game/track';
 import {createWorld,auditRoad,type World} from './game/world';
 import {RaceSimulation,NO_INPUT,type Controls} from './game/simulation';
@@ -33,6 +33,8 @@ const loading=app.querySelector<HTMLElement>('.loading')!;loading.innerHTML=`<sp
 let game:Game;
 class Game {
   private warmed = new Set<string>();
+  private revealedAt=-Infinity;
+  private readonly systemMotion=matchMedia('(prefers-reduced-motion: reduce)');
   vehicleRequest=0;vehicleLoading=false;vehicleStatus=document.createElement('output');
   preparation?:AbortController;pauseAfterLoad=false;loadMetrics:{totalMs:number;cancelled:boolean;stages:{label:string;elapsedSinceYieldMs:number}[]}={totalMs:0,cancelled:false,stages:[]};
   ready:Promise<void>;graphicsLost=false;performanceDisplay=document.createElement('output');storageNotice=document.createElement('div');render:RenderSystem;ui:UI;input=new InputSystem();save=loadSave(OPEN_GARAGE);audio=new AudioSystem(this.save.settings);
@@ -50,14 +52,14 @@ class Game {
     const entry=new URLSearchParams(location.search);
     const track=entry.get('track'), view=entry.get('view');
     if(track==='city'||track==='coast'||view==='race'||view==='continue'){
-      const choice=view==='continue'?(readRaceChoice()??featuredRace):{...featuredRace,track:track==='coast'?'coast' as const:'city' as const};
+      const choice=view==='continue'?(readRaceChoice()??featuredRace):track==='coast'?{track:'coast' as const,mode:'quick' as const}:featuredRace;
       this.ui.selectedTrack=choice.track;this.ui.mode=choice.mode;this.ui.select();
     }else if(view==='career')this.ui.career();
     else if(view==='settings')this.ui.settings(false);
     uiRoot.addEventListener('pointerdown',e=>{
-      const stage=e.target instanceof Element&&e.target.closest<HTMLElement>('.studio-stage');
+      const stage=e.target instanceof Element&&e.target.closest<HTMLElement>('.pit-stage');
       if(!stage||e.button!==0||!e.isPrimary||(e.target as Element).closest('button'))return;
-      this.dragging=true;this.dragX=e.clientX;stage.setPointerCapture(e.pointerId);
+      this.dragging=true;this.revealedAt=-Infinity;this.dragX=e.clientX;stage.setPointerCapture(e.pointerId);
     });
     uiRoot.addEventListener('pointermove',e=>{
       if(this.dragging&&e.isPrimary){this.rotation+=(e.clientX-this.dragX)*.008;this.dragX=e.clientX;}
@@ -82,27 +84,33 @@ class Game {
       await loadVehicleAsset(spec);
       if(request!==this.vehicleRequest||this.graphicsLost)return;
       const next=createCar(spec,this.save.paints[spec.id]);
-      this.garageCar.group.removeFromParent();this.garageCar.dispose();this.garageCar=next;this.showroom.group.add(next.group);this.rotation=0;
+      this.garageCar.group.removeFromParent();this.garageCar.dispose();this.garageCar=next;this.showroom.group.add(next.group);this.rotation=0;this.revealedAt=performance.now();
       if(canDriveCar(this.save,spec.id,OPEN_GARAGE)){this.save.selected=spec.id;this.persist();}this.ui.garage(index);
     }catch(error){if(request===this.vehicleRequest&&!this.graphicsLost)this.ui.toast('This car could not load. Select it again to retry.');}
     finally{if(request===this.vehicleRequest){this.vehicleLoading=false;this.vehicleStatus.hidden=true;}if(!this.preparation)trimVehicleCache();}
   }
   async action(action:string,value:string){
     if(this.graphicsLost)return;
-    if(this.vehicleLoading&&['paint','buy','upgrade','rev','race-select','start'].includes(action)){this.ui.toast('Your car is still loading. Please wait a moment.');return;}
+    if(this.vehicleLoading&&['paint','buy','upgrade','rev','race-select','featured-race','start','event'].includes(action)){this.ui.toast('Your car is still loading. Please wait a moment.');return;}
     if(this.preparation){if(action==='cancel-load'){this.preparation.abort();this.ui.loadProgress('Returning to race selection…',0);}return;}
     if(action!=='setting')void this.audio.start().catch(()=>{});if(!['paint','setting'].includes(action))this.audio.tone(680,.05,.07);
     switch(action){
-      case 'orbit':this.rotation+=Number(value)*Math.PI/6;break;
+      case 'orbit':this.revealedAt=-Infinity;this.rotation+=Number(value)*Math.PI/6;break;
+      case 'vehicles':this.ui.vehicles();break;
+      case 'tune':this.ui.tune();break;
+      case 'featured-race':
+        this.ui.selectedTrack=HARBOR_SPRINT.track;this.ui.mode=HARBOR_SPRINT.mode;
+        void this.startRace(HARBOR_SPRINT.track,HARBOR_SPRINT.mode);
+        break;
       case 'garage':this.leaveRace();this.ui.garage();break;
       case 'rev':await this.audio.start().catch(()=>{});this.audio.preview(CARS[this.ui.viewed].id);break;
       case 'car':this.audio.cancelPreview();void this.selectCar(Number(value));break;
-      case 'paint':{const id=CARS[this.ui.viewed].id;this.save.paints[id]=value;this.garageCar.paint.color.set(value);this.persist();this.ui.garage();break;}
+      case 'paint':{const id=CARS[this.ui.viewed].id;this.save.paints[id]=value;this.garageCar.paint.color.set(value);this.persist();this.ui.tune();break;}
       case 'buy':if(buyCar(this.save,value)){this.persist();this.ui.garage();this.ui.toast('Welcome to your garage. Your new car is ready.');}else this.ui.toast('Keep racing to earn more credits.');break;
-      case 'upgrade':{const id=CARS[this.ui.viewed].id;if(upgradeCar(this.save,id,OPEN_GARAGE)){this.persist();this.ui.garage();this.ui.toast('Performance upgrade installed. More power. More speed.');}else this.ui.toast('Not enough credits for this upgrade.');break;}
+      case 'upgrade':{const id=CARS[this.ui.viewed].id;if(upgradeCar(this.save,id,OPEN_GARAGE)){this.persist();this.ui.tune();this.ui.toast('Performance upgrade installed. More power. More speed.');}else this.ui.toast('Not enough credits for this upgrade.');break;}
       case 'race-select':this.leaveRace();this.ui.mode='quick';this.ui.select();break;
-      case 'track':this.ui.selectedTrack=value as TrackId;this.ui.select();break;
-      case 'mode':this.ui.mode=value as RaceMode;this.ui.select();break;
+      case 'track':this.ui.selectedTrack=value as TrackId;if(this.ui.mode==='sprint'&&value!==HARBOR_SPRINT.track)this.ui.mode='quick';this.ui.select();break;
+      case 'mode':if(value!=='sprint'||this.ui.selectedTrack===HARBOR_SPRINT.track)this.ui.mode=value as RaceMode;this.ui.select();break;
       case 'career':this.leaveRace();this.ui.career();break;
       case 'event':this.ui.careerIndex=Number(value);if(this.ui.careerIndex<=this.save.career){const event=EVENTS[this.ui.careerIndex];this.startRace(event.track,'career',this.ui.careerIndex);}break;
       case 'start':this.startRace(this.ui.selectedTrack,this.ui.mode);break;
@@ -118,7 +126,8 @@ class Game {
     }
   }
   async startRace(trackId:TrackId,mode:RaceMode,event=0){
-    if(this.preparation||this.graphicsLost)return;
+    if(this.preparation||this.graphicsLost||!canRaceModeOnTrack(mode,trackId))return;
+    const fromGarage=this.ui.screen==='garage';
     this.cancelVehicleLoad();
     const controller=new AbortController();this.preparation=controller;this.pauseAfterLoad=false;
     const started=performance.now();let lastYield=started,progress=0;
@@ -183,7 +192,8 @@ class Game {
       if(this.pauseAfterLoad||document.hidden)this.pause();
     }catch(error){
       this.loadMetrics.cancelled=controller.signal.aborted;
-      this.leaveRace(controller.signal.aborted);this.ui.select();
+      this.leaveRace(controller.signal.aborted);
+      if(fromGarage&&controller.signal.aborted)this.ui.garage();else this.ui.select();
       if(!controller.signal.aborted&&!this.graphicsLost){console.error(error);this.ui.toast('The race could not prepare. Try again or choose a lower graphics setting.');}
     }finally{
       this.loadMetrics.totalMs=performance.now()-started;this.preparation=undefined;
@@ -242,17 +252,27 @@ class Game {
       const stage=this.ui.screen==='garage'?this.ui.stage?.getBoundingClientRect():undefined;
       const {width,height}=this.render;
       const bounds=this.garageCar.dimensions;
+      const mobile=width<660;
+      const short=height<500;
+      const sheet=this.ui.screen==='garage'?document.querySelector('#modal.pit-sheet .modal')?.getBoundingClientRect():undefined;
       this.garageCar.group.rotation.y=this.rotation-.17;
-      camera.fov=36;
-      const tanHalfFov=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
-      const frameWidth=Math.min(stage?.width??width,width);
-      const frameHeight=stage?.height??height;
-      const fitWidth=Math.hypot(bounds.x,bounds.z)*height/(2*frameWidth*tanHalfFov*.85);
-      const fitHeight=(bounds.y+bounds.z*.27)*height/(2*frameHeight*tanHalfFov*.74);
-      const distance=Math.max(fitWidth,fitHeight)+bounds.z*.21;
-      camera.position.set(distance*.67,distance*.27+bounds.y*.36,distance*.74);
-      camera.lookAt(0,bounds.y*.38,0);
-      if(stage)camera.setViewOffset(width,height,width/2-stage.left-stage.width/2,height/2-stage.top-stage.height/2,width,height);
+      const stageWidth=stage?.width??width,stageHeight=stage?.height??height;
+      const left=stage?.left??0,top=stage?.top??0;
+      const frameWidth=sheet&&!mobile?Math.max(260,sheet.left-left):stageWidth;
+      const frameHeight=sheet&&mobile?Math.max(155,sheet.top-top):stageHeight;
+      const displayWidth=frameWidth*(mobile ? .96 : short ? .71 : .79);
+      const heightFraction=sheet ? .46 : mobile ? .43 : .50;
+      const fitWidth=Math.hypot(bounds.x,bounds.z)*height/(2*displayWidth);
+      const fitHeight=(bounds.y+bounds.z*.28)*height/(2*frameHeight*(mobile ? .76 : .63));
+      const fit=Math.max(fitWidth,fitHeight);
+      const tanHalfFov=Math.max(Math.tan(THREE.MathUtils.degToRad(18)),fit/8.1);
+      camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(tanHalfFov));
+      const reveal=this.save.settings.reducedMotion||this.systemMotion.matches?0:Math.pow(Math.max(0,1-(now-this.revealedAt)/680),3);
+      const distance=(Math.max(6.9,fit/tanHalfFov)+bounds.z*.15)*(1+reveal*.1);
+      const azimuth=.68+reveal*.13;
+      camera.position.set(distance*Math.sin(azimuth),distance*.20+bounds.y*.48,distance*Math.cos(azimuth));
+      camera.lookAt(0,bounds.y*.39,0);
+      if(stage)camera.setViewOffset(width,height,width/2-left-frameWidth*.5,height/2-top-frameHeight*heightFraction,width,height);
       else camera.clearViewOffset();
       this.showroom.shadow.scale.set(bounds.x*2.05,bounds.z*1.45,1);
       this.render.camera.updateProjectionMatrix();this.audio.update(null,false);

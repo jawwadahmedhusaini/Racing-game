@@ -1,3 +1,15 @@
+# APEX RUSH 3.2 preview verification
+
+- 293 unit tests passed, including sprint validation, timing, records, recovery, and BMW asset geometry.
+- Six targeted Chromium workflows passed across two runs. The garage-to-sprint workflow started directly with the BMW, checked one lap and six rivals, completed a deterministic browser race, saved a sprint best time, restarted, and reopened the event through Continue. The other workflows covered the title, all eight vehicles, Cavallo driving, download retry, and race-loading cancellation and retry.
+- Desktop, phone portrait and phone landscape captures verified the full-screen bay, vehicle picker, and visible Race button. Keyboard Escape returned focus to Vehicles. Painting a car updated the selected swatch and kept keyboard focus.
+- The course audit covered 5,320 road samples and 341 placements with zero violations and 10 m of underpass clearance. The sprint-specific deterministic BMW run finished in 68.05 seconds.
+- The production smoke test passed at the GitHub Pages preview path served locally. It exercised four viewport sizes, Ultra graphics, Cavallo selection, acceleration, nitro, pause, resume, and reverse.
+- The published ZIP passed CRC and 102 packaged web files matched the root production build byte for byte. The extracted package opened the garage and vehicle picker through its Python launcher with external HTTP requests blocked.
+- Chromium used software WebGL. Physical-device frame pacing, thermal testing, and uncoached player sessions remain pending.
+
+## Historical release evidence
+
 # APEX RUSH 3.1 preview verification
 
 - 286 unit tests passed. Coverage includes preview car selection with zero credits, persistent ownership, Cavallo wheel rigs and cockpit materials, and the existing race and save regressions.
